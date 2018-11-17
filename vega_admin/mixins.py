@@ -10,17 +10,21 @@ from django.utils.translation import ugettext as _
 from vega_admin.forms import ListViewSearchForm
 
 
-class VegaFormKwargsMixin(object):
+class VegaFormKwargsMixin:  # pylint: disable=too-few-public-methods
     """
     Adds form kwargs
     """
 
     def get_form_kwargs(self):
+        """
+        Adds kwargs to the form
+        """
         kwargs = super().get_form_kwargs()
         kwargs['request'] = self.request
         return kwargs
 
 
+# pylint: disable=too-few-public-methods
 class VegaFormMixin(VegaFormKwargsMixin):
     """
     Adds some nice stuff to formviews used in create/update/delete views
@@ -29,7 +33,7 @@ class VegaFormMixin(VegaFormKwargsMixin):
     pass
 
 
-class ListViewSearchMixin(object):
+class ListViewSearchMixin:
     """
     Adds search to listview
     """
@@ -38,13 +42,15 @@ class ListViewSearchMixin(object):
     filter_class = None
 
     def get_queryset(self):
-
+        """
+        Get the queryset
+        """
         queryset = super().get_queryset()
 
         if self.filter_class:
             # pylint: disable=not-callable
-            f = self.filter_class(self.request.GET, queryset=queryset)
-            queryset = f.qs
+            the_filter = self.filter_class(self.request.GET, queryset=queryset)
+            queryset = the_filter.qs
 
         if self.request.GET.get('q'):
             form = self.form_class(self.request.GET)
@@ -60,6 +66,9 @@ class ListViewSearchMixin(object):
         return queryset.distinct()
 
     def get_context_data(self, **kwargs):
+        """
+        Get context data
+        """
         context = super().get_context_data(**kwargs)
         if self.search_fields:
             form = self.form_class(request=self.request)
@@ -70,12 +79,15 @@ class ListViewSearchMixin(object):
         return context
 
 
-class VerboseNameMixin(object):
+class VerboseNameMixin:
     """
     Sets the Model verbose name in the context data
     """
 
     def get_context_data(self, **kwargs):
+        """
+        Get context data
+        """
         context = super().get_context_data(**kwargs)
         context['vega_verbose_name'] = self.model._meta.verbose_name
         context['vega_verbose_name_plural'] =\
@@ -83,22 +95,29 @@ class VerboseNameMixin(object):
         return context
 
 
-class PageTitleMixin(object):
+class PageTitleMixin:
     """
     Sets the page title in the context data
     """
 
     def get_context_data(self, **kwargs):
+        """
+        Get context data
+        """
         context = super().get_context_data(**kwargs)
         context['vega_page_title'] = getattr(self, 'page_title', None)
         return context
 
 
-class DeleteViewMixin(object):
+class DeleteViewMixin:
     """
     Mixin for delete views that adds in missing elements
     """
+
     def delete(self, request, *args, **kwargs):
+        """
+        Custom delete method
+        """
         # Handle cases where you get ProtectedError
         try:
             return super().delete(request, *args, **kwargs)

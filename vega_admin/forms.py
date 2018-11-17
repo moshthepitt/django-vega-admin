@@ -11,6 +11,10 @@ from crispy_forms.layout import Layout, Submit
 
 
 class ListViewSearchForm(forms.Form):
+    """
+    search form for use in the vega-admin list view
+    """
+
     q = forms.CharField(
         label=_(settings.VEGA_LISTVIEW_SEARCH_QUERY_TXT), required=False)
 
