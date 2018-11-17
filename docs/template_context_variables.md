@@ -1,0 +1,4 @@
+vega_listview_search_form
+vega_verbose_name
+vega_verbose_name_plural
+vega_page_title
