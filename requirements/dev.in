@@ -1,0 +1,13 @@
+# load from setup.py
+-e .
+
+# others
+pylint
+pylint-django
+tox
+flake8
+pep8
+coverage
+yapf
+isort
+psycopg2-binary
