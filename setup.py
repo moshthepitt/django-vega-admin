@@ -15,6 +15,8 @@ setup(
     install_requires=[
         'Django >= 2.0',
         'django-crispy-forms',
+        'django-braces',
+        'django-tables2',  
     ],
     classifiers=[
         'Programming Language :: Python',
