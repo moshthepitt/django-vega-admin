@@ -17,7 +17,7 @@ INSTALLED_APPS = [
     # third party
     'crispy_forms',
     # custom
-    # 'small_small_hr.apps.SmallSmallHrConfig',
+    'vega_admin.apps.VegaAdminConfig',
 ]
 
 DATABASES = {
