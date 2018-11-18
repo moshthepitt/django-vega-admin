@@ -4,8 +4,12 @@ vega-admin module to test mixins
 from django.contrib.auth.models import AnonymousUser, User
 from django.test import RequestFactory, TestCase
 from django.views.generic import TemplateView
+from django.views.generic.list import ListView
 
-from vega_admin.mixins import PageTitleMixin, VerboseNameMixin
+from model_mommy import mommy
+
+from vega_admin.mixins import (ListViewSearchMixin, PageTitleMixin,
+                               VerboseNameMixin)
 
 
 class TestMixins(TestCase):
@@ -46,6 +50,9 @@ class TestMixins(TestCase):
         """
 
         class TestView(PageTitleMixin, TemplateView):
+            """
+            Test view
+            """
             page_title = 'Big bad title'
             template_name = 'example.html'
 
@@ -59,6 +66,9 @@ class TestMixins(TestCase):
         """
 
         class TestView(VerboseNameMixin, TemplateView):
+            """
+            Test view
+            """
             model = User
             template_name = 'example.html'
 
@@ -66,3 +76,38 @@ class TestMixins(TestCase):
         self.assertEqual('user', response.context_data['vega_verbose_name'])
         self.assertEqual(
             'users', response.context_data['vega_verbose_name_plural'])
+
+    def test_listview_search_mixin(self):
+        """
+        Test ListViewSearchMixin
+        """
+        # make some users
+        mommy.make('auth.User', _quantity=2)
+        mosh_user = mommy.make('auth.User', first_name='mosh')
+
+        class TestView(ListViewSearchMixin, ListView):
+            """
+            Test view
+            """
+            model = User
+            search_fields = ['first_name']
+            template_name = 'example.html'
+
+        _, response = self.get_request_response(TestView.as_view())
+
+        # the form is in the context data as well as all users
+        self.assertTrue('vega_listview_search_form' in response.context_data)
+        self.assertEqual(
+            list(set([x.id for x in response.context_data['object_list']])),
+            list(set([x.id for x in User.objects.all()]))
+        )
+
+        # now lets search for mosh
+        request = self.factory.get('/?q=mosh')
+        request.session = {}
+        request.user = AnonymousUser
+        response2 = TestView.as_view()(request)
+        # we should get back just mosh
+        self.assertEqual(1, response2.context_data['object_list'].count())
+        self.assertEqual(
+            mosh_user, response2.context_data['object_list'].first())
