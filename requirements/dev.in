@@ -11,3 +11,4 @@ coverage
 yapf
 isort
 psycopg2-binary
+ipdb
