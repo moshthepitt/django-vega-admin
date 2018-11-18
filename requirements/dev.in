@@ -12,3 +12,4 @@ yapf
 isort
 psycopg2-binary
 ipdb
+model_mommy
