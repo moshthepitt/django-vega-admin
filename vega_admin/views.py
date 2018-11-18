@@ -20,7 +20,7 @@ class VegaListView(VerboseNameMixin, ListViewSearchMixin, PageTitleMixin,
     """
     vega-admin Generic List View
     """
-    template_name = "vega-admin/list.html"
+    template_name = "vega_admin/basic/list.html"
 
 
 class VegaCreateView(FormMessagesMixin, PageTitleMixin, VerboseNameMixin,
@@ -28,7 +28,7 @@ class VegaCreateView(FormMessagesMixin, PageTitleMixin, VerboseNameMixin,
     """
     vega-admin Generic Create View
     """
-    template_name = "vega-admin/create.html"
+    template_name = "vega_admin/basic/create.html"
     form_valid_message = _(settings.VEGA_FORM_VALID_CREATE_TXT)
     form_invalid_message = _(settings.VEGA_FORM_INVALID_TXT)
 
@@ -38,7 +38,7 @@ class VegaUpdateView(FormMessagesMixin, PageTitleMixin, VerboseNameMixin,
     """
     vega-admin Generic Update View
     """
-    template_name = "vega-admin/edit.html"
+    template_name = "vega_admin/basic/update.html"
     form_valid_message = _(settings.VEGA_FORM_VALID_UPDATE_TXT)
     form_invalid_message = _(settings.VEGA_FORM_INVALID_TXT)
 
@@ -48,6 +48,6 @@ class VegaDeleteView(FormMessagesMixin, PageTitleMixin, VerboseNameMixin,
     """
     vega-admin Generic Delete View
     """
-    template_name = "vega-admin/delete.html"
+    template_name = "vega_admin/basic/delete.html"
     form_valid_message = _(settings.VEGA_FORM_VALID_DELETE_TXT)
     form_invalid_message = _(settings.VEGA_FORM_INVALID_TXT)
