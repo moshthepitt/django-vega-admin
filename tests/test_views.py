@@ -3,14 +3,15 @@ vega-admin module to test views
 """
 from django.conf import settings
 from django.test import TestCase, override_settings
-
 from model_mommy import mommy
 
-from vega_admin.views import VegaCreateView, VegaDeleteView, VegaUpdateView
+from vega_admin.views import (VegaCreateView, VegaDeleteView, VegaListView,
+                              VegaUpdateView)
 
 from .artist_app.forms import ArtistForm
 from .artist_app.models import Artist
-from .artist_app.views import ArtistCreate, ArtistDelete, ArtistUpdate
+from .artist_app.views import (ArtistCreate, ArtistDelete, ArtistListView,
+                               ArtistUpdate)
 
 
 @override_settings(
@@ -20,6 +21,23 @@ class TestViews(TestCase):
     """
     Test class for views
     """
+
+    def test_vega_list_view(self):
+        """
+        Test VegaListView
+        """
+        artist = mommy.make('artist_app.Artist', name="Bob")
+        mommy.make('artist_app.Artist', _quantity=7)
+        res = self.client.get('/list/artists/')
+        self.assertEqual(res.status_code, 200)
+        self.assertIsInstance(res.context['view'], ArtistListView)
+        self.assertIsInstance(res.context['view'], VegaListView)
+        self.assertEqual(res.context['object_list'].count(), 8)
+        self.assertTemplateUsed(res, 'vega_admin/basic/list.html')
+
+        res = self.client.get('/list/artists/?q=Bob')
+        self.assertEqual(res.context['object_list'].count(), 1)
+        self.assertEqual(res.context['object_list'].first(), artist)
 
     def test_vega_create_view(self):
         """

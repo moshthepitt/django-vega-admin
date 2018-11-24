@@ -1,12 +1,15 @@
 """
 Module for vega-admin test views
 """
-from vega_admin.views import VegaCreateView, VegaUpdateView, VegaDeleteView
-from .models import Artist
+from vega_admin.views import (VegaCreateView, VegaDeleteView, VegaListView,
+                              VegaUpdateView)
+
 from .forms import ArtistForm
+from .models import Artist
+from .tables import ArtistTable
 
 
-class ArtistCreate(VegaCreateView):
+class ArtistCreate(VegaCreateView):  # pylint: disable=too-many-ancestors
     """
     Artist CreateView class
     """
@@ -20,7 +23,7 @@ class ArtistCreate(VegaCreateView):
         return "/edit/artists/create/"
 
 
-class ArtistUpdate(VegaUpdateView):
+class ArtistUpdate(VegaUpdateView):  # pylint: disable=too-many-ancestors
     """
     Artist UpdateView class
     """
@@ -34,7 +37,7 @@ class ArtistUpdate(VegaUpdateView):
         return f"/edit/artists/edit/{self.object.id}"
 
 
-class ArtistDelete(VegaDeleteView):
+class ArtistDelete(VegaDeleteView):  # pylint: disable=too-many-ancestors
     """
     Artist DeleteView class
     """
@@ -45,3 +48,12 @@ class ArtistDelete(VegaDeleteView):
         Method to get success url
         """
         return "/edit/artists/create/"
+
+
+class ArtistListView(VegaListView):  # pylint: disable=too-many-ancestors
+    """
+    Artist list view
+    """
+    model = Artist
+    table_class = ArtistTable
+    search_fields = ['name']
