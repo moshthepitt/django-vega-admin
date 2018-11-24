@@ -113,6 +113,13 @@ class DeleteViewMixin:
     """
     Mixin for delete views that adds in missing elements
     """
+    delete_url = "/"
+
+    def get_delete_url(self):
+        """
+        Get the delete url for the object in question
+        """
+        return self.delete_url
 
     def delete(self, request, *args, **kwargs):
         """
@@ -124,4 +131,5 @@ class DeleteViewMixin:
         except ProtectedError:
             info = _(settings.VEGA_DELETE_PROTECTED_ERROR_TXT)
             messages.error(request, info, fail_silently=True)
+
             return redirect(self.get_delete_url())

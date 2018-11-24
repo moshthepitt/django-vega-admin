@@ -1,14 +1,14 @@
 """
 Module for vega-admin test views
 """
-from vega_admin.views import VegaCreateView, VegaUpdateView
+from vega_admin.views import VegaCreateView, VegaUpdateView, VegaDeleteView
 from .models import Artist
 from .forms import ArtistForm
 
 
 class ArtistCreate(VegaCreateView):
     """
-    Author CreateView class
+    Artist CreateView class
     """
     form_class = ArtistForm
     model = Artist
@@ -22,7 +22,7 @@ class ArtistCreate(VegaCreateView):
 
 class ArtistUpdate(VegaUpdateView):
     """
-    Author UpdateView class
+    Artist UpdateView class
     """
     form_class = ArtistForm
     model = Artist
@@ -32,3 +32,16 @@ class ArtistUpdate(VegaUpdateView):
         Method to get success url
         """
         return f"/edit/artists/edit/{self.object.id}"
+
+
+class ArtistDelete(VegaDeleteView):
+    """
+    Artist DeleteView class
+    """
+    model = Artist
+
+    def get_success_url(self):
+        """
+        Method to get success url
+        """
+        return "/edit/artists/create/"
