@@ -14,10 +14,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'django.contrib.messages',
     # third party
     'crispy_forms',
     # custom
-    # 'small_small_hr.apps.SmallSmallHrConfig',
+    'vega_admin',
+    # tests
+    'tests.artist_app'
 ]
 
 DATABASES = {
@@ -46,6 +49,9 @@ TEMPLATES = [
     },
 ]
 
+MIDDLEWARE = ['django.contrib.messages.middleware.MessageMiddleware']
+MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
+
 TIME_ZONE = 'Africa/Nairobi'
 USE_I18N = True
 USE_L10N = True
@@ -53,7 +59,6 @@ USE_TZ = True
 
 SECRET_KEY = "i love oov"
 
-PRIVATE_STORAGE_ROOT = '/tmp/'
 MEDIA_ROOT = '/tmp/'
 
 SITE_ID = 1
