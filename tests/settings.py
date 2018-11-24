@@ -18,7 +18,7 @@ INSTALLED_APPS = [
     # third party
     'crispy_forms',
     # custom
-    'vega_admin.apps.VegaAdminConfig',
+    'vega_admin',
     # tests
     'tests.artist_app'
 ]
