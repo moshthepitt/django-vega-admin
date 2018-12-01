@@ -133,3 +133,29 @@ class DeleteViewMixin:
             messages.error(request, info, fail_silently=True)
 
             return redirect(self.get_delete_url())
+
+
+class SimpleURLPatternMixin:
+    """
+    very simply implements the derive_url_pattern method
+    """
+
+    @classmethod
+    def derive_url_pattern(cls, crud_path, action):
+        """
+        Derive the url pattern
+        """
+        return f"{crud_path}/{action}/"
+
+
+class ObjectURLPatternMixin:
+    """
+    Implements the derive_url_pattern method for single object views
+    """
+
+    @classmethod
+    def derive_url_pattern(cls, crud_path, action):
+        """
+        Derive the url pattern
+        """
+        return f"{crud_path}/{action}/<int:pk>/"
