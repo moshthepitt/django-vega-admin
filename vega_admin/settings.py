@@ -16,3 +16,6 @@ VEGA_DELETE_PROTECTED_ERROR_TXT = \
     "You cannot delete this item, it is referenced by other items."
 VEGA_LISTVIEW_SEARCH_TXT = "Search"
 VEGA_LISTVIEW_SEARCH_QUERY_TXT = "Search Query"
+
+# exceptions
+VEGA_INVALID_ACTION = "Invalid Action"
