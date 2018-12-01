@@ -56,7 +56,7 @@ class VegaDeleteView(FormMessagesMixin, PageTitleMixin, VerboseNameMixin,
     form_invalid_message = _(settings.VEGA_FORM_INVALID_TXT)
 
 
-class VegaCRUDView(object):
+class VegaCRUDView:
     """
     Creates generic CRUD views for a model automagically
 
@@ -76,7 +76,7 @@ class VegaCRUDView(object):
         self.app_label = self.model._meta.app_label
         self.crud_path = self.model._meta.label_lower
 
-    def get_view_classes(self):
+    def get_view_classes(self):  # pylint: disable=no-self-use
         """
         Returns the available views
         """
@@ -93,14 +93,15 @@ class VegaCRUDView(object):
         """
         view_classes = self.get_view_classes()
         try:
-            ViewClass = view_classes[action]
+            view_class = view_classes[action]
         except KeyError:
             # this action is not supported
             raise Exception(settings.VEGA_INVALID_ACTION)
         else:
-            ViewClass.model = self.model
-            return ViewClass
+            view_class.model = self.model
+            return view_class
 
+    # pylint: disable=no-self-use
     def get_url_name_for_action(self, action: str):
         """
         Returns the url name for the action
@@ -124,8 +125,9 @@ class VegaCRUDView(object):
         """
         urls = []
         for action in self.actions:
-            ViewClass = self.get_view_class_for_action(action=action)
-            pattern = self.get_url_pattern_for_action(ViewClass, action)
+            view_class = self.get_view_class_for_action(action=action)
+            pattern = self.get_url_pattern_for_action(view_class, action)
             url_name = self.get_url_name_for_action(action=action)
-            urls.append(path(pattern, ViewClass.as_view(), name=url_name))
+            urls.append(path(pattern, view_class.as_view(), name=url_name))
+
         return urls
