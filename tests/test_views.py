@@ -219,6 +219,13 @@ class TestCRUD(TestCase):
         self.assertTrue(
             settings.VEGA_FORM_INVALID_TXT in res.cookies['messages'].value)
 
+        # test content
+        self.maxDiff = None
+        res = self.client.get(url)
+        csrf_token = str(res.context['csrf_token'])
+        html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title> Create professional artist</title></head><body><form method="post" > <input type="hidden" name="csrfmiddlewaretoken" value="{csrf_token}"><div id="div_id_name" class="control-group"> <label for="id_name" class="control-label requiredField"> Name<span class="asteriskField">*</span> </label><div class="controls"> <input type="text" name="name" maxlength="100" class="textinput textInput" required id="id_name"></div></div></form></body></html>"""  # noqa
+        self.assertHTMLEqual(html, res.content.decode("utf-8"))
+
     def test_update(self):
         """
         Test CRUD update
@@ -234,6 +241,13 @@ class TestCRUD(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertTrue(
             settings.VEGA_FORM_INVALID_TXT in res.cookies['messages'].value)
+
+        # test content
+        self.maxDiff = None
+        res = self.client.get(url)
+        csrf_token = str(res.context['csrf_token'])
+        html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title> Update professional artist</title></head><body><form method="post" > <input type="hidden" name="csrfmiddlewaretoken" value="{csrf_token}"><div id="div_id_name" class="control-group"> <label for="id_name" class="control-label requiredField"> Name<span class="asteriskField">*</span> </label><div class="controls"> <input type="text" name="name" value="Pitt" maxlength="100" class="textinput textInput" required id="id_name"></div></div></form></body></html>"""  # noqa
+        self.assertHTMLEqual(html, res.content.decode("utf-8"))
 
     def test_delete(self):
         """
