@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.db.models import ProtectedError, Q
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
+from django.urls import reverse_lazy
 
 from vega_admin.forms import ListViewSearchForm
 
@@ -114,11 +115,15 @@ class DeleteViewMixin:
     Mixin for delete views that adds in missing elements
     """
     delete_url = "/"
+    delete_url_name = None
 
     def get_delete_url(self):
         """
         Get the delete url for the object in question
         """
+        if self.delete_url_name is not None:
+            return reverse_lazy(
+                self.delete_url_name, kwargs={"pk": self.object.pk})
         return self.delete_url
 
     def delete(self, request, *args, **kwargs):
