@@ -211,7 +211,9 @@ class TestCRUD(TestCase):
         """
         Artist.objects.all().delete()
         url = reverse('artist_app.artist-create')
-        self.client.post(url, {"name": "Mosh"})
+        res = self.client.post(url, {"name": "Mosh"})
+        self.assertEqual(res.status_code, 302)
+        self.assertRedirects(res, reverse('artist_app.artist-list'))
         self.assertQuerysetEqual(Artist.objects.all(), ['<Artist: Mosh>'])
 
         # test what happens for a form error
@@ -233,7 +235,9 @@ class TestCRUD(TestCase):
         """
         artist = mommy.make('artist_app.Artist')
         url = reverse('artist_app.artist-update', kwargs={"pk": artist.id})
-        self.client.post(url, {"id": artist.id, "name": "Pitt"})
+        res = self.client.post(url, {"id": artist.id, "name": "Pitt"})
+        self.assertEqual(res.status_code, 302)
+        self.assertRedirects(res, reverse('artist_app.artist-list'))
         artist.refresh_from_db()
         self.assertEqual('Pitt', artist.name)
 
@@ -256,7 +260,9 @@ class TestCRUD(TestCase):
         """
         artist = mommy.make('artist_app.Artist')
         url = reverse('artist_app.artist-delete', kwargs={"pk": artist.id})
-        self.client.post(url)
+        res = self.client.post(url)
+        self.assertEqual(res.status_code, 302)
+        self.assertRedirects(res, reverse('artist_app.artist-list'))
         with self.assertRaises(Artist.DoesNotExist):
             artist.refresh_from_db()
 
@@ -265,6 +271,10 @@ class TestCRUD(TestCase):
         mommy.make('artist_app.Song', name="Nuts", artist=artist2)
         url2 = reverse('artist_app.artist-delete', kwargs={"pk": artist2.id})
         res = self.client.post(url2)
+        self.assertEqual(res.status_code, 302)
+        self.assertRedirects(
+            res, reverse(
+                'artist_app.artist-delete', kwargs={"pk": artist2.id}))
         self.assertTrue(settings.VEGA_DELETE_PROTECTED_ERROR_TXT in res.
                         cookies['messages'].value)
         self.assertTrue(Artist.objects.filter(id=artist2.id).exists())
