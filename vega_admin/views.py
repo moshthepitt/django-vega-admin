@@ -9,6 +9,7 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 from django_tables2 import SingleTableView
 from django_tables2.export.views import ExportMixin
+from django.urls import reverse_lazy
 
 from vega_admin.utils import get_modelform
 from vega_admin.mixins import (DeleteViewMixin, ListViewSearchMixin,
@@ -116,13 +117,17 @@ class VegaCRUDView:
         else:
             if action == 'create':
                 options['form_class'] = self.get_createform_class()
-                options['success_url'] = self.get_url_name_for_action('list')
+                options['success_url'] = reverse_lazy(
+                    self.get_url_name_for_action('list'))
             if action == 'update':
                 options['form_class'] = self.get_updateform_class()
-                options['success_url'] = self.get_url_name_for_action('list')
+                options['success_url'] = reverse_lazy(
+                    self.get_url_name_for_action('list'))
             if action == 'delete':
-                options['success_url'] = self.get_url_name_for_action('list')
-                options['delete_url'] = self.get_url_name_for_action('delete')
+                options['success_url'] = reverse_lazy(
+                    self.get_url_name_for_action('list'))
+                options['delete_url_name'] = self.get_url_name_for_action(
+                    'delete')
             return type(
                 f'{self.model_name.title()}{action.title()}View',
                 (view_class, ),  # the classes that we should inherit
