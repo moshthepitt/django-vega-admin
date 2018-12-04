@@ -10,6 +10,7 @@ from django.views.generic.list import ListView
 from django_tables2 import SingleTableView
 from django_tables2.export.views import ExportMixin
 
+from vega_admin.utils import get_modelform
 from vega_admin.mixins import (DeleteViewMixin, ListViewSearchMixin,
                                ObjectURLPatternMixin, PageTitleMixin,
                                SimpleURLPatternMixin, VegaFormMixin,
@@ -87,19 +88,46 @@ class VegaCRUDView:
             'delete': VegaDeleteView,
         }
 
+    def get_createform_class(self):
+        """
+        Get form class for create view
+        """
+        return get_modelform(model=self.model)
+
+    def get_updateform_class(self):
+        """
+        Get form class for create view
+        """
+        return get_modelform(model=self.model)
+
     def get_view_class_for_action(self, action: str):
         """
         Get the view for an action
         """
         view_classes = self.get_view_classes()
+        options = {
+            "model": self.model
+        }
         try:
             view_class = view_classes[action]
         except KeyError:
             # this action is not supported
             raise Exception(settings.VEGA_INVALID_ACTION)
         else:
-            view_class.model = self.model
-            return view_class
+            if action == 'create':
+                options['form_class'] = self.get_createform_class()
+                options['success_url'] = self.get_url_name_for_action('list')
+            if action == 'update':
+                options['form_class'] = self.get_updateform_class()
+                options['success_url'] = self.get_url_name_for_action('list')
+            if action == 'delete':
+                options['success_url'] = self.get_url_name_for_action('list')
+                options['delete_url'] = self.get_url_name_for_action('delete')
+            return type(
+                f'{self.model_name.title()}{action.title()}View',
+                (view_class, ),  # the classes that we should inherit
+                options
+            )
 
     # pylint: disable=no-self-use
     def get_url_name_for_action(self, action: str):
