@@ -181,6 +181,7 @@ class TestViews(TestCase):
         self.assertTrue(Artist.objects.filter(id=artist2.id).exists())
 
 
+# pylint: disable=line-too-long
 @override_settings(ROOT_URLCONF='tests.artist_app.urls')
 class TestCRUD(TestCase):
     """
@@ -267,3 +268,10 @@ class TestCRUD(TestCase):
         self.assertTrue(settings.VEGA_DELETE_PROTECTED_ERROR_TXT in res.
                         cookies['messages'].value)
         self.assertTrue(Artist.objects.filter(id=artist2.id).exists())
+
+        # test content
+        self.maxDiff = None
+        res = self.client.get(url2)
+        csrf_token = str(res.context['csrf_token'])
+        html = f"""<!doctype html> <html lang="en"> <head> <meta charset="utf-8"> <title> Delete professional artist </title> </head> <body> <form action="" method="post"> <input type="hidden" name="csrfmiddlewaretoken" value="{csrf_token}"> <p>Are you sure you want to delete "Coco"?</p> <input type="submit" value="Confirm" /> </form> </body> </html>"""  # noqa
+        self.assertHTMLEqual(html, res.content.decode("utf-8"))
