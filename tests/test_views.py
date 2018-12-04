@@ -4,6 +4,7 @@ vega-admin module to test views
 from django.conf import settings
 from django.test import TestCase, override_settings
 from django.urls import reverse
+
 from model_mommy import mommy
 
 from vega_admin.views import (VegaCreateView, VegaCRUDView, VegaDeleteView,

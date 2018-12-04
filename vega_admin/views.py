@@ -1,21 +1,21 @@
 """
 Views module
 """
-from braces.views import FormMessagesMixin
 from django.conf import settings
-from django.urls import path
+from django.urls import path, reverse_lazy
 from django.utils.translation import ugettext as _
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
+
+from braces.views import FormMessagesMixin
 from django_tables2 import SingleTableView
 from django_tables2.export.views import ExportMixin
-from django.urls import reverse_lazy
 
-from vega_admin.utils import get_modelform
 from vega_admin.mixins import (DeleteViewMixin, ListViewSearchMixin,
                                ObjectURLPatternMixin, PageTitleMixin,
                                SimpleURLPatternMixin, VegaFormMixin,
                                VerboseNameMixin)
+from vega_admin.utils import get_modelform
 
 
 # pylint: disable=too-many-ancestors
