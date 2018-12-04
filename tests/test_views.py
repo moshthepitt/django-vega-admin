@@ -105,6 +105,7 @@ class TestViews(TestCase):
         """
         Test VegaCreateView
         """
+        Artist.objects.all().delete()
         res = self.client.get('/edit/artists/create/')
         self.assertEqual(res.status_code, 200)
         self.assertIsInstance(res.context['form'], ArtistForm)
@@ -202,3 +203,53 @@ class TestCRUD(TestCase):
         self.assertEqual(
             f"/artist_app.artist/update/{artist.pk}/",
             reverse('artist_app.artist-update', kwargs={'pk': artist.pk}))
+
+    def test_create(self):
+        """
+        Test CRUD create
+        """
+        Artist.objects.all().delete()
+        url = reverse('artist_app.artist-create')
+        self.client.post(url, {"name": "Mosh"})
+        self.assertQuerysetEqual(Artist.objects.all(), ['<Artist: Mosh>'])
+
+        # test what happens for a form error
+        res = self.client.post(url, {})
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(
+            settings.VEGA_FORM_INVALID_TXT in res.cookies['messages'].value)
+
+    def test_update(self):
+        """
+        Test CRUD update
+        """
+        artist = mommy.make('artist_app.Artist')
+        url = reverse('artist_app.artist-update', kwargs={"pk": artist.id})
+        self.client.post(url, {"id": artist.id, "name": "Pitt"})
+        artist.refresh_from_db()
+        self.assertEqual('Pitt', artist.name)
+
+        # test what happens for a form error
+        res = self.client.post(url, {})
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(
+            settings.VEGA_FORM_INVALID_TXT in res.cookies['messages'].value)
+
+    def test_delete(self):
+        """
+        Test CRUD delete
+        """
+        artist = mommy.make('artist_app.Artist')
+        url = reverse('artist_app.artist-delete', kwargs={"pk": artist.id})
+        self.client.post(url)
+        with self.assertRaises(Artist.DoesNotExist):
+            artist.refresh_from_db()
+
+        # test what happens when we have a protected related item
+        artist2 = mommy.make('artist_app.Artist', name="Coco")
+        mommy.make('artist_app.Song', name="Nuts", artist=artist2)
+        url2 = reverse('artist_app.artist-delete', kwargs={"pk": artist2.id})
+        res = self.client.post(url2)
+        self.assertTrue(settings.VEGA_DELETE_PROTECTED_ERROR_TXT in res.
+                        cookies['messages'].value)
+        self.assertTrue(Artist.objects.filter(id=artist2.id).exists())
