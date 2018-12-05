@@ -14,14 +14,14 @@ from django_tables2.export.views import ExportMixin
 from vega_admin.mixins import (DeleteViewMixin, ListViewSearchMixin,
                                ObjectURLPatternMixin, PageTitleMixin,
                                SimpleURLPatternMixin, VegaFormMixin,
-                               VerboseNameMixin)
+                               VerboseNameMixin, CRUDURLsMixin)
 from vega_admin.utils import get_modelform
 
 
 # pylint: disable=too-many-ancestors
 class VegaListView(VerboseNameMixin, ListViewSearchMixin, PageTitleMixin,
-                   ExportMixin, SingleTableView, SimpleURLPatternMixin,
-                   ListView):
+                   CRUDURLsMixin, ExportMixin, SingleTableView,
+                   SimpleURLPatternMixin, ListView):
     """
     vega-admin Generic List View
     """
@@ -29,7 +29,8 @@ class VegaListView(VerboseNameMixin, ListViewSearchMixin, PageTitleMixin,
 
 
 class VegaCreateView(FormMessagesMixin, PageTitleMixin, VerboseNameMixin,
-                     VegaFormMixin, SimpleURLPatternMixin, CreateView):
+                     VegaFormMixin, CRUDURLsMixin, SimpleURLPatternMixin,
+                     CreateView):
     """
     vega-admin Generic Create View
     """
@@ -39,7 +40,8 @@ class VegaCreateView(FormMessagesMixin, PageTitleMixin, VerboseNameMixin,
 
 
 class VegaUpdateView(FormMessagesMixin, PageTitleMixin, VerboseNameMixin,
-                     VegaFormMixin, ObjectURLPatternMixin, UpdateView):
+                     VegaFormMixin, CRUDURLsMixin, ObjectURLPatternMixin,
+                     UpdateView):
     """
     vega-admin Generic Update View
     """
@@ -49,7 +51,8 @@ class VegaUpdateView(FormMessagesMixin, PageTitleMixin, VerboseNameMixin,
 
 
 class VegaDeleteView(FormMessagesMixin, PageTitleMixin, VerboseNameMixin,
-                     DeleteViewMixin, ObjectURLPatternMixin, DeleteView):
+                     DeleteViewMixin, CRUDURLsMixin, ObjectURLPatternMixin,
+                     DeleteView):
     """
     vega-admin Generic Delete View
     """
@@ -115,19 +118,35 @@ class VegaCRUDView:
             # this action is not supported
             raise Exception(settings.VEGA_INVALID_ACTION)
         else:
+            # add some common usefule CRUD urls
+            options['list_url'] = reverse_lazy(
+                self.get_url_name_for_action('list'))
+            options['create_url'] = reverse_lazy(
+                self.get_url_name_for_action('create'))
+            options['cancel_url'] = reverse_lazy(
+                self.get_url_name_for_action('list'))
+
+            # add the success url
+            if action in ['create', 'update', 'delete']:
+                options['success_url'] = reverse_lazy(
+                    self.get_url_name_for_action('list'))
+
+            # add the create form class
             if action == 'create':
                 options['form_class'] = self.get_createform_class()
-                options['success_url'] = reverse_lazy(
-                    self.get_url_name_for_action('list'))
+
+            # add the update form class and update url
             if action == 'update':
                 options['form_class'] = self.get_updateform_class()
-                options['success_url'] = reverse_lazy(
-                    self.get_url_name_for_action('list'))
+                options['update_url_name'] = self.get_url_name_for_action(
+                    'update')
+
+            # add the delete url
             if action == 'delete':
-                options['success_url'] = reverse_lazy(
-                    self.get_url_name_for_action('list'))
                 options['delete_url_name'] = self.get_url_name_for_action(
                     'delete')
+
+            # create and return the View class
             return type(
                 f'{self.model_name.title()}{action.title()}View',
                 (view_class, ),  # the classes that we should inherit

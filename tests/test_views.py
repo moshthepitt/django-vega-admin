@@ -226,6 +226,12 @@ class TestCRUD(TestCase):
         # test content
         self.maxDiff = None
         res = self.client.get(url)
+        self.assertEqual("/artist_app.artist/list/",
+                         res.context_data['vega_list_url'])
+        self.assertEqual("/artist_app.artist/create/",
+                         res.context_data['vega_create_url'])
+        self.assertEqual("/artist_app.artist/list/",
+                         res.context_data['vega_cancel_url'])
         csrf_token = str(res.context['csrf_token'])
         html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title> Create professional artist</title></head><body><form method="post" > <input type="hidden" name="csrfmiddlewaretoken" value="{csrf_token}"><div id="div_id_name" class="control-group"> <label for="id_name" class="control-label requiredField"> Name<span class="asteriskField">*</span> </label><div class="controls"> <input type="text" name="name" maxlength="100" class="textinput textInput" required id="id_name"></div></div></form></body></html>"""  # noqa
         self.assertHTMLEqual(html, res.content.decode("utf-8"))
@@ -251,6 +257,14 @@ class TestCRUD(TestCase):
         # test content
         self.maxDiff = None
         res = self.client.get(url)
+        self.assertEqual("/artist_app.artist/list/",
+                         res.context_data['vega_list_url'])
+        self.assertEqual("/artist_app.artist/create/",
+                         res.context_data['vega_create_url'])
+        self.assertEqual("/artist_app.artist/list/",
+                         res.context_data['vega_cancel_url'])
+        self.assertEqual(f"/artist_app.artist/update/{artist.pk}/",
+                         res.context_data['vega_update_url'])
         csrf_token = str(res.context['csrf_token'])
         html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title> Update professional artist</title></head><body><form method="post" > <input type="hidden" name="csrfmiddlewaretoken" value="{csrf_token}"><div id="div_id_name" class="control-group"> <label for="id_name" class="control-label requiredField"> Name<span class="asteriskField">*</span> </label><div class="controls"> <input type="text" name="name" value="Pitt" maxlength="100" class="textinput textInput" required id="id_name"></div></div></form></body></html>"""  # noqa
         self.assertHTMLEqual(html, res.content.decode("utf-8"))
@@ -283,6 +297,14 @@ class TestCRUD(TestCase):
         # test content
         self.maxDiff = None
         res = self.client.get(url2)
+        self.assertEqual("/artist_app.artist/list/",
+                         res.context_data['vega_list_url'])
+        self.assertEqual("/artist_app.artist/create/",
+                         res.context_data['vega_create_url'])
+        self.assertEqual("/artist_app.artist/list/",
+                         res.context_data['vega_cancel_url'])
+        self.assertEqual(f"/artist_app.artist/delete/{artist2.pk}/",
+                         res.context_data['vega_delete_url'])
         csrf_token = str(res.context['csrf_token'])
         html = f"""<!doctype html> <html lang="en"> <head> <meta charset="utf-8"> <title> Delete professional artist </title> </head> <body> <form action="" method="post"> <input type="hidden" name="csrfmiddlewaretoken" value="{csrf_token}"> <p>Are you sure you want to delete "Coco"?</p> <input type="submit" value="Confirm" /> </form> </body> </html>"""  # noqa
         self.assertHTMLEqual(html, res.content.decode("utf-8"))
