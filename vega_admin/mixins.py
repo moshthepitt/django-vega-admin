@@ -210,6 +210,15 @@ class CRUDURLsMixin:
             context['vega_update_url'] = self.get_update_url()
         return context
 
+    def get_form_kwargs(self):
+        """
+        Adds kwargs to the form
+        """
+        kwargs = super().get_form_kwargs()
+        url_kwargs = {'cancel_url': self.get_list_url()}
+        kwargs['vega_extra_kwargs'] = url_kwargs
+        return kwargs
+
 
 class DeleteViewMixin:
     """
