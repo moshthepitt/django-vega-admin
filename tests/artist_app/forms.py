@@ -21,6 +21,7 @@ class ArtistForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request', None)
+        self.vega_extra_kwargs = kwargs.pop('vega_extra_kwargs', dict())
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_tag = True

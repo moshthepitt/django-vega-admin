@@ -21,7 +21,7 @@ def get_modelform(model: object):
     # this is going to be our custom init method
     def _constructor(self, *args, **kwargs):
         self.request = kwargs.pop('request', None)
-        self.vega_extra_kwargs = kwargs.pop('vega_extra_kwargs', {})
+        self.vega_extra_kwargs = kwargs.pop('vega_extra_kwargs', dict())
         cancel_url = self.vega_extra_kwargs['cancel_url']
         super(modelform_class, self).__init__(*args, **kwargs)
         # add crispy forms FormHelper
