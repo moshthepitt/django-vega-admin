@@ -70,6 +70,7 @@ class VegaCRUDView:
     straight away.
     """
     actions = ['create', 'update', 'list', 'delete']
+    list_fields = None
 
     def __init__(self, model=None):
         """

@@ -75,7 +75,7 @@ def get_modelform(model: object):
     return modelform_class
 
 
-def get_table(model: object):
+def get_table(model: object, exclude_fields: list = None):
     """
     Get the a Table for the provided model
 
@@ -83,13 +83,13 @@ def get_table(model: object):
     :return: table
     """
     # the Meta class
+    meta_options = {'model': model, 'empty_text': _("Nothing to show")}
+    if exclude_fields:
+        meta_options['exclude'] = exclude_fields
     meta_class = type(
         'Meta',  # name of class
         (),  # inherit from object
-        {
-            'model': model,
-            'empty_text': _("Nothing to show")
-        })
+        meta_options)
 
     # the attributes of our new table class
     options = {
