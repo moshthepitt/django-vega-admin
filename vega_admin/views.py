@@ -15,7 +15,7 @@ from vega_admin.mixins import (DeleteViewMixin, ListViewSearchMixin,
                                ObjectURLPatternMixin, PageTitleMixin,
                                SimpleURLPatternMixin, VegaFormMixin,
                                VerboseNameMixin, CRUDURLsMixin)
-from vega_admin.utils import get_modelform
+from vega_admin.utils import get_modelform, get_table
 
 
 # pylint: disable=too-many-ancestors
@@ -145,6 +145,10 @@ class VegaCRUDView:
             if action == 'delete':
                 options['delete_url_name'] = self.get_url_name_for_action(
                     'delete')
+
+            # add the table class
+            if action == 'list':
+                options['table_class'] = get_table(model=self.model)
 
             # create and return the View class
             return type(
