@@ -7,6 +7,7 @@ from django.utils.translation import ugettext as _
 from crispy_forms.bootstrap import FormActions
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import HTML, Div, Layout, Submit
+import django_tables2 as tables
 
 from vega_admin.mixins import VegaFormMixin
 
@@ -16,6 +17,7 @@ def get_modelform(model: object):
     Get the a ModelForm for the provided model
 
     :param model:  the model class
+    :return: model form
     """
 
     # this is going to be our custom init method
@@ -71,3 +73,33 @@ def get_modelform(model: object):
         options)
 
     return modelform_class
+
+
+def get_table(model: object):
+    """
+    Get the a Table for the provided model
+
+    :param model:  the model class
+    :return: table
+    """
+    # the Meta class
+    meta_class = type(
+        'Meta',  # name of class
+        (),  # inherit from object
+        {
+            'model': model,
+            'empty_text': _("Nothing to show")
+        })
+
+    # the attributes of our new table class
+    options = {
+        "Meta": meta_class,
+    }
+
+    # create the table dynamically using type
+    table_class = type(
+        f'{model.__name__.title()}Table',  # the name of the new table
+        (tables.Table, ),  # the classes that we should inherit
+        options)
+
+    return table_class
