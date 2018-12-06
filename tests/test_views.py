@@ -308,3 +308,25 @@ class TestCRUD(TestCase):
         csrf_token = str(res.context['csrf_token'])
         html = f"""<!doctype html> <html lang="en"> <head> <meta charset="utf-8"> <title> Delete professional artist </title> </head> <body> <form action="" method="post"> <input type="hidden" name="csrfmiddlewaretoken" value="{csrf_token}"> <p>Are you sure you want to delete "Coco"?</p> <input type="submit" value="Confirm" /> </form> </body> </html>"""  # noqa
         self.assertHTMLEqual(html, res.content.decode("utf-8"))
+
+    def test_list(self):
+        """
+        Test CRUD list
+        """
+        Artist.objects.all().delete()
+        self.maxDiff = None
+
+        # make 3 objects
+        mommy.make('artist_app.Artist', name="Mosh", id="60")
+        mommy.make('artist_app.Artist', name="Tranx", id="70")
+        mommy.make('artist_app.Artist', name="Eddie", id="80")
+
+        url = reverse('artist_app.artist-list')
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual("/artist_app.artist/list/",
+                         res.context_data['vega_list_url'])
+        self.assertEqual("/artist_app.artist/create/",
+                         res.context_data['vega_create_url'])
+        html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title> professional artists</title></head><body><div class="table-container"><table class="table"><thead ><tr><th class="orderable"> <a href="?sort=id">ID</a></th><th class="orderable"> <a href="?sort=name">Name</a></th></tr></thead><tbody ><tr class="even"><td >80</td><td >Eddie</td></tr><tr class="odd"><td >60</td><td >Mosh</td></tr><tr class="even"><td >70</td><td >Tranx</td></tr></tbody></table></div></body></html>"""  # noqa
+        self.assertHTMLEqual(html, res.content.decode("utf-8"))
