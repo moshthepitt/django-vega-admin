@@ -2,11 +2,18 @@
 Module for vega-admin test views
 """
 from vega_admin.views import (VegaCreateView, VegaDeleteView, VegaListView,
-                              VegaUpdateView)
+                              VegaUpdateView, VegaCRUDView)
 
 from .forms import ArtistForm
 from .models import Artist
 from .tables import ArtistTable
+
+
+class ArtistCRUD(VegaCRUDView):
+    """
+    CRUD view for artists
+    """
+    model = Artist
 
 
 class ArtistCreate(VegaCreateView):  # pylint: disable=too-many-ancestors

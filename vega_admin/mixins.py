@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.db.models import ProtectedError, Q
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
+from django.urls import reverse_lazy
 
 from vega_admin.forms import ListViewSearchForm
 
@@ -109,17 +110,120 @@ class PageTitleMixin:
         return context
 
 
-class DeleteViewMixin:
+class CRUDURLsMixin:
     """
-    Mixin for delete views that adds in missing elements
+    Mixin that adds some CRUD helper urls
     """
+    cancel_url = "/"
+    cancel_url_name = None
     delete_url = "/"
+    delete_url_name = None
+    list_url = "/"
+    list_url_name = None
+    create_url = "/"
+    create_url_name = None
+    update_url = "/"
+    update_url_name = None
+
+    def get_crud_url(  # pylint: disable=no-self-use
+            self,
+            url: str,
+            url_name: str,
+            url_kwargs: dict = None):
+        """
+        Helper function that returns a url
+
+        Attempt to use reverse_lazy to get the url, otherwise return what we
+        hope are safe defaults
+
+        :param url: the url
+        :param url_name: the url name
+        :param url_kwargs: the url kwargs
+
+        :return: url
+        """
+        if url_name:
+            if url_kwargs:
+                return reverse_lazy(url_name, kwargs=url_kwargs)
+            return reverse_lazy(url_name)
+        return url
+
+    def get_create_url(self):
+        """
+        Get the create url for the object in question
+
+        :return: url
+        """
+        return self.get_crud_url(
+            url=self.create_url, url_name=self.create_url_name)
+
+    def get_list_url(self):
+        """
+        Get the cancel url for the object in question
+
+        :return: url
+        """
+        return self.get_crud_url(
+            url=self.list_url, url_name=self.list_url_name)
+
+    def get_update_url(self):
+        """
+        Get the update url for the object in question
+
+        :return: url
+        """
+        return self.get_crud_url(
+            url=self.update_url,
+            url_name=self.update_url_name,
+            url_kwargs={"pk": self.object.pk})
 
     def get_delete_url(self):
         """
         Get the delete url for the object in question
+
+        :return: url
         """
-        return self.delete_url
+        return self.get_crud_url(
+            url=self.delete_url,
+            url_name=self.delete_url_name,
+            url_kwargs={"pk": self.object.pk})
+
+    def get_cancel_url(self):
+        """
+        Get the cancel url for the object in question
+
+        :return: url
+        """
+        return self.get_crud_url(
+            url=self.cancel_url, url_name=self.cancel_url_name)
+
+    def get_context_data(self, **kwargs):
+        """
+        Get context data
+        """
+        context = super().get_context_data(**kwargs)
+        context['vega_create_url'] = self.get_create_url()
+        context['vega_list_url'] = self.get_list_url()
+        context['vega_cancel_url'] = self.get_cancel_url()
+        if hasattr(self, 'object') and self.object is not None:
+            context['vega_delete_url'] = self.get_delete_url()
+            context['vega_update_url'] = self.get_update_url()
+        return context
+
+    def get_form_kwargs(self):
+        """
+        Adds kwargs to the form
+        """
+        kwargs = super().get_form_kwargs()
+        url_kwargs = {'cancel_url': self.get_list_url()}
+        kwargs['vega_extra_kwargs'] = url_kwargs
+        return kwargs
+
+
+class DeleteViewMixin:
+    """
+    Mixin for delete views that adds in missing elements
+    """
 
     def delete(self, request, *args, **kwargs):
         """
@@ -133,3 +237,29 @@ class DeleteViewMixin:
             messages.error(request, info, fail_silently=True)
 
             return redirect(self.get_delete_url())
+
+
+class SimpleURLPatternMixin:
+    """
+    very simply implements the derive_url_pattern method
+    """
+
+    @classmethod
+    def derive_url_pattern(cls, crud_path: str, action: str):
+        """
+        Derive the url pattern
+        """
+        return f"{crud_path}/{action}/"
+
+
+class ObjectURLPatternMixin:
+    """
+    Implements the derive_url_pattern method for single object views
+    """
+
+    @classmethod
+    def derive_url_pattern(cls, crud_path: str, action: str):
+        """
+        Derive the url pattern
+        """
+        return f"{crud_path}/{action}/<int:pk>/"
