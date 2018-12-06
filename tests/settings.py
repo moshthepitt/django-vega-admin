@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     # third party
     'crispy_forms',
+    'django_tables2',
     # custom
     'vega_admin',
     # tests
