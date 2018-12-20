@@ -11,13 +11,30 @@ from vega_admin.views import (VegaCreateView, VegaCRUDView, VegaDeleteView,
                               VegaListView, VegaUpdateView)
 
 from .artist_app.forms import ArtistForm
-from .artist_app.models import Artist
+from .artist_app.models import Artist, Song
 from .artist_app.views import (ArtistCreate, ArtistDelete, ArtistListView,
                                ArtistUpdate)
 
 
+class TestViewsBase(TestCase):
+    """
+    Base test class for views
+    """
+
+    def setUp(self):
+        """setUp"""
+        super().setUp()
+        self.maxDiff = None
+
+    def tearDown(self):
+        """tearDown"""
+        super().setUp()
+        Song.objects.all().delete()
+        Artist.objects.all().delete()
+
+
 @override_settings(ROOT_URLCONF="tests.artist_app.urls")
-class TestViews(TestCase):
+class TestViews(TestViewsBase):
     """
     Test class for views
     """
@@ -112,7 +129,6 @@ class TestViews(TestCase):
         """
         Test VegaCreateView
         """
-        Artist.objects.all().delete()
         res = self.client.get("/edit/artists/create/")
         self.assertEqual(res.status_code, 200)
         self.assertIsInstance(res.context["form"], ArtistForm)
@@ -195,7 +211,7 @@ class TestViews(TestCase):
 
 # pylint: disable=line-too-long
 @override_settings(ROOT_URLCONF="tests.artist_app.urls")
-class TestCRUD(TestCase):
+class TestCRUD(TestViewsBase):
     """
     Test class for CRUD views
     """
@@ -224,7 +240,6 @@ class TestCRUD(TestCase):
         """
         Test CRUD create
         """
-        Artist.objects.all().delete()
         url = reverse("artist_app.artist-create")
         res = self.client.post(url, {"name": "Mosh"})
         self.assertEqual(res.status_code, 302)
@@ -238,7 +253,6 @@ class TestCRUD(TestCase):
             settings.VEGA_FORM_INVALID_TXT in res.cookies["messages"].value)
 
         # test content
-        self.maxDiff = None
         res = self.client.get(url)
         self.assertEqual(
             "/artist_app.artist/list/", res.context_data["vega_list_url"])
@@ -271,7 +285,6 @@ class TestCRUD(TestCase):
             settings.VEGA_FORM_INVALID_TXT in res.cookies["messages"].value)
 
         # test content
-        self.maxDiff = None
         res = self.client.get(url)
         self.assertEqual(
             "/artist_app.artist/list/", res.context_data["vega_list_url"])
@@ -317,7 +330,6 @@ class TestCRUD(TestCase):
         self.assertTrue(Artist.objects.filter(id=artist2.id).exists())
 
         # test content
-        self.maxDiff = None
         res = self.client.get(url2)
         self.assertEqual(
             "/artist_app.artist/list/", res.context_data["vega_list_url"])
@@ -339,9 +351,6 @@ class TestCRUD(TestCase):
         """
         Test CRUD list
         """
-        Artist.objects.all().delete()
-        self.maxDiff = None
-
         # make 3 objects
         mommy.make("artist_app.Artist", name="Mosh", id="60")
         mommy.make("artist_app.Artist", name="Tranx", id="70")
@@ -363,9 +372,6 @@ class TestCRUD(TestCase):
         """
         Test CRUD list with configuration options
         """
-        Artist.objects.all().delete()
-        self.maxDiff = None
-
         # make 3 objects
         artist = mommy.make("artist_app.Artist", name="Mosh", id="60")
         mommy.make("artist_app.Song", name="Song 1", artist=artist, id="31")
