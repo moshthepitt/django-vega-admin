@@ -210,7 +210,10 @@ class TestViews(TestViewsBase):
 
 
 # pylint: disable=line-too-long
-@override_settings(ROOT_URLCONF="tests.artist_app.urls")
+@override_settings(
+    VEGA_ACTION_COLUMN_NAME="Actions",
+    ROOT_URLCONF="tests.artist_app.urls"
+)
 class TestCRUD(TestViewsBase):
     """
     Test class for CRUD views
@@ -367,7 +370,6 @@ class TestCRUD(TestViewsBase):
         html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title> professional artists</title></head><body><div class="table-container"><table class="table"><thead ><tr><th class="orderable"> <a href="?sort=id">ID</a></th><th class="orderable"> <a href="?sort=name">Name</a></th></tr></thead><tbody ><tr class="even"><td >80</td><td >Eddie</td></tr><tr class="odd"><td >60</td><td >Mosh</td></tr><tr class="even"><td >70</td><td >Tranx</td></tr></tbody></table></div></body></html>"""  # noqa
         self.assertHTMLEqual(html, res.content.decode("utf-8"))
 
-    @override_settings(VEGA_ACTION_COLUMN_NAME="Actions")
     def test_list_options(self):
         """
         Test CRUD list with configuration options
@@ -381,5 +383,5 @@ class TestCRUD(TestViewsBase):
         url = reverse("artist_app.song-list")
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
-        html = f""""""  # noqa
+        html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title> Songs</title></head><body><div class="table-container"><table class="song-table"><thead ><tr><th class="orderable"> <a href="?sort=name">Name</a></th><th class="orderable"> <a href="?sort=artist">Artist</a></th><th > Actions</th></tr></thead><tbody ><tr class="even"><td >Song 1</td><td >Mosh</td><td ><a href='/artist_app.song/create/' class='vega-action'>create</a> | <a href='/artist_app.song/update/31/' class='vega-action'>update</a> | <a href='/artist_app.song/delete/31/' class='vega-action'>delete</a></td></tr><tr class="odd"><td >Song 2</td><td >Mosh</td><td ><a href='/artist_app.song/create/' class='vega-action'>create</a> | <a href='/artist_app.song/update/32/' class='vega-action'>update</a> | <a href='/artist_app.song/delete/32/' class='vega-action'>delete</a></td></tr><tr class="even"><td >Song 3</td><td >Mosh</td><td ><a href='/artist_app.song/create/' class='vega-action'>create</a> | <a href='/artist_app.song/update/33/' class='vega-action'>update</a> | <a href='/artist_app.song/delete/33/' class='vega-action'>delete</a></td></tr></tbody></table></div></body></html>"""  # noqa
         self.assertHTMLEqual(html, res.content.decode("utf-8"))
