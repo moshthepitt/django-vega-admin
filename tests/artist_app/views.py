@@ -79,4 +79,4 @@ class SongCRUD(VegaCRUDView):
     model = Song
     list_fields = ["name", "artist"]
     table_attrs = {"class": "song-table"}
-    table_actions = ["create", "update", "list", "delete"]
+    table_actions = ["create", "update", "delete"]
