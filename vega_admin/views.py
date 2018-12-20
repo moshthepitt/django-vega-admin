@@ -97,6 +97,9 @@ class VegaCRUDView:
 
     actions = ["create", "update", "list", "delete"]
     list_fields = None
+    form_fields = None
+    create_fields = None
+    update_fields = None
     table_attrs = None
     table_actions = None
 
@@ -121,17 +124,41 @@ class VegaCRUDView:
             "delete": VegaDeleteView,
         }
 
+    def get_createform_fields(self):
+        """
+        Get fields for create form
+        """
+        if self.create_fields:
+            return self.create_fields
+        if self.form_fields:
+            return self.form_fields
+
+        return None
+
     def get_createform_class(self):
         """
         Get form class for create view
         """
-        return get_modelform(model=self.model)
+        return get_modelform(
+            model=self.model, fields=self.get_createform_fields())
+
+    def get_updateform_fields(self):
+        """
+        Get fields for update form
+        """
+        if self.update_fields:
+            return self.update_fields
+        if self.form_fields:
+            return self.form_fields
+
+        return None
 
     def get_updateform_class(self):
         """
         Get form class for create view
         """
-        return get_modelform(model=self.model)
+        return get_modelform(
+            model=self.model, fields=self.get_updateform_fields())
 
     def get_table_actions(self):
         """

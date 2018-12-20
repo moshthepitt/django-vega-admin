@@ -385,3 +385,30 @@ class TestCRUD(TestViewsBase):
         self.assertEqual(res.status_code, 200)
         html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title> Songs</title></head><body><div class="table-container"><table class="song-table"><thead ><tr><th class="orderable"> <a href="?sort=name">Name</a></th><th class="orderable"> <a href="?sort=artist">Artist</a></th><th > Actions</th></tr></thead><tbody ><tr class="even"><td >Song 1</td><td >Mosh</td><td ><a href='/artist_app.song/create/' class='vega-action'>create</a> | <a href='/artist_app.song/update/31/' class='vega-action'>update</a> | <a href='/artist_app.song/delete/31/' class='vega-action'>delete</a></td></tr><tr class="odd"><td >Song 2</td><td >Mosh</td><td ><a href='/artist_app.song/create/' class='vega-action'>create</a> | <a href='/artist_app.song/update/32/' class='vega-action'>update</a> | <a href='/artist_app.song/delete/32/' class='vega-action'>delete</a></td></tr><tr class="even"><td >Song 3</td><td >Mosh</td><td ><a href='/artist_app.song/create/' class='vega-action'>create</a> | <a href='/artist_app.song/update/33/' class='vega-action'>update</a> | <a href='/artist_app.song/delete/33/' class='vega-action'>delete</a></td></tr></tbody></table></div></body></html>"""  # noqa
         self.assertHTMLEqual(html, res.content.decode("utf-8"))
+
+    def test_create_options(self):
+        """
+        Test CRUD create with options
+        """
+        url = reverse("artist_app.song-create")
+        # test content
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        csrf_token = str(res.context["csrf_token"])
+        html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title> Create Song</title></head><body><form id="song-form" method="post" > <input type="hidden" name="csrfmiddlewaretoken" value="{csrf_token}"><div id="div_id_name" class="control-group"> <label for="id_name" class="control-label requiredField"> Name<span class="asteriskField">*</span> </label><div class="controls"> <input type="text" name="name" maxlength="100" class="textinput textInput" required id="id_name"></div></div><div id="div_id_artist" class="control-group"> <label for="id_artist" class="control-label requiredField"> Artist<span class="asteriskField">*</span> </label><div class="controls"> <select name="artist" class="select" required id="id_artist"><option value="" selected>---------</option></select></div></div><div class="form-actions"><div class="row" ><div class="col-md-12" ><div class="col-md-6" > <a href="/artist_app.song/list/" class="btn vega-cancel"> Cancel </a></div><div class="col-md-6" > <input type="submit" name="submit" value="Submit" class="btn btn-primary vega-submit" id="submit-id-submit" /></div></div></div></div></form></body></html>"""  # noqa
+        self.assertHTMLEqual(html, res.content.decode("utf-8"))
+
+    def test_update_options(self):
+        """
+        Test CRUD update with options
+        """
+        artist = mommy.make("artist_app.Artist", name="Mosh")
+        song = mommy.make(
+            "artist_app.Song", name="Song 1", artist=artist)
+        url = reverse("artist_app.song-update", kwargs={"pk": song.id})
+        # test content
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        csrf_token = str(res.context["csrf_token"])
+        html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title> Update Song</title></head><body><form id="song-form" method="post" > <input type="hidden" name="csrfmiddlewaretoken" value="{csrf_token}"><div id="div_id_name" class="control-group"> <label for="id_name" class="control-label requiredField"> Name<span class="asteriskField">*</span> </label><div class="controls"> <input type="text" name="name" value="Song 1" maxlength="100" class="textinput textInput" required id="id_name"></div></div><div class="form-actions"><div class="row" ><div class="col-md-12" ><div class="col-md-6" > <a href="/artist_app.song/list/" class="btn vega-cancel"> Cancel </a></div><div class="col-md-6" > <input type="submit" name="submit" value="Submit" class="btn btn-primary vega-submit" id="submit-id-submit" /></div></div></div></div></form></body></html>"""  # noqa
+        self.assertHTMLEqual(html, res.content.decode("utf-8"))

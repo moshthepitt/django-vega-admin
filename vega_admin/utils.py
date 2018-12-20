@@ -16,11 +16,12 @@ from crispy_forms.layout import HTML, Div, Layout, Submit
 from vega_admin.mixins import VegaFormMixin
 
 
-def get_modelform(model: object):
+def get_modelform(model: object, fields: list = None):
     """
     Get the a ModelForm for the provided model
 
-    :param model:  the model class
+    :param model: the model class
+    :param fields: list of the fields that you want included in the form
     :return: model form
     """
 
@@ -69,13 +70,16 @@ def get_modelform(model: object):
             )
         )
 
+    if fields is None:
+        fields = [_.name for _ in model._meta.concrete_fields]
+
     # the Meta class
     meta_class = type(
         "Meta",  # name of class
         (),  # inherit from object
         {
             "model": model,
-            "fields": [_.name for _ in model._meta.concrete_fields]},
+            "fields": fields},
     )
 
     # the attributes of our new modelform
@@ -95,10 +99,11 @@ def get_table(
         model: object, fields: list = None, actions: list = None,
         attrs: dict = None):
     """
-    Get the a Table for the provided model
+    Get the Table Class for the provided model
 
     :param model: the model class
     :param fields: list of the fields that you want included in the table
+    :param actions: list of tuples representing actions and action url names
     :param options: dict representing kwargs/options to pass to the table
     :return: table
     """
