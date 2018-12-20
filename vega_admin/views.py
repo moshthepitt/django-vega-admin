@@ -205,8 +205,9 @@ class VegaCRUDView:
                 options["table_class"] = self.get_table_class()
 
             # create and return the View class
+            view_label = settings.VEGA_VIEW_LABEL
             return type(
-                f"{self.model_name.title()}{action.title()}View",
+                f"{self.model_name.title()}{action.title()}{view_label}",
                 (view_class,),  # the classes that we should inherit
                 options,
             )
