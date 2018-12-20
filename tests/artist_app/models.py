@@ -29,6 +29,7 @@ class Song(models.Model):
         """Meta definition for Song."""
         verbose_name = 'Song'
         verbose_name_plural = 'Songs'
+        ordering = ['name']
 
     def __str__(self):
         """Unicode representation of Song."""
