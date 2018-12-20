@@ -73,7 +73,7 @@ class ArtistListView(VegaListView):  # pylint: disable=too-many-ancestors
 
 class SongCRUD(VegaCRUDView):
     """
-    CRUD view for artists
+    CRUD view for songs
     """
 
     model = Song
@@ -82,3 +82,15 @@ class SongCRUD(VegaCRUDView):
     table_actions = ["create", "update", "delete", ]
     create_fields = ["name", "artist", ]
     update_fields = ["name", ]
+
+
+class CustomArtistCRUD(VegaCRUDView):
+    """
+    CRUD view for artists with custom forms and table
+    """
+
+    model = Artist
+    crud_path = "custom-artist"
+    create_form_class = ArtistForm
+    update_form_class = ArtistForm
+    table_class = ArtistTable

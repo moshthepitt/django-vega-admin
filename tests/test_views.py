@@ -11,6 +11,7 @@ from vega_admin.views import (VegaCreateView, VegaCRUDView, VegaDeleteView,
                               VegaListView, VegaUpdateView)
 
 from .artist_app.forms import ArtistForm
+from .artist_app.tables import ArtistTable
 from .artist_app.models import Artist, Song
 from .artist_app.views import (ArtistCreate, ArtistDelete, ArtistListView,
                                ArtistUpdate)
@@ -412,3 +413,21 @@ class TestCRUD(TestViewsBase):
         csrf_token = str(res.context["csrf_token"])
         html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title> Update Song</title></head><body><form id="song-form" method="post" > <input type="hidden" name="csrfmiddlewaretoken" value="{csrf_token}"><div id="div_id_name" class="control-group"> <label for="id_name" class="control-label requiredField"> Name<span class="asteriskField">*</span> </label><div class="controls"> <input type="text" name="name" value="Song 1" maxlength="100" class="textinput textInput" required id="id_name"></div></div><div class="form-actions"><div class="row" ><div class="col-md-12" ><div class="col-md-6" > <a href="/artist_app.song/list/" class="btn vega-cancel"> Cancel </a></div><div class="col-md-6" > <input type="submit" name="submit" value="Submit" class="btn btn-primary vega-submit" id="submit-id-submit" /></div></div></div></div></form></body></html>"""  # noqa
         self.assertHTMLEqual(html, res.content.decode("utf-8"))
+
+    def test_custom_form_and_table_class(self):
+        """
+        Test custom form and table class
+        """
+        artist = mommy.make("artist_app.Artist", name="Mosh")
+        create_url = reverse("custom-artist-create")
+        update_url = reverse("custom-artist-update", kwargs={"pk": artist.id})
+        list_url = reverse("custom-artist-list")
+
+        create_res = self.client.get(create_url)
+        self.assertEqual(ArtistForm, create_res.context["view"].form_class)
+
+        update_res = self.client.get(update_url)
+        self.assertEqual(ArtistForm, update_res.context["view"].form_class)
+
+        list_res = self.client.get(list_url)
+        self.assertEqual(ArtistTable, list_res.context["view"].table_class)

@@ -102,6 +102,11 @@ class VegaCRUDView:
     update_fields = None
     table_attrs = None
     table_actions = None
+    form_class = None
+    create_form_class = None
+    update_form_class = None
+    table_class = None
+    crud_path = None
 
     def __init__(self, model=None):
         """
@@ -111,7 +116,9 @@ class VegaCRUDView:
             self.model = model
         self.model_name = self.model._meta.model_name
         self.app_label = self.model._meta.app_label
-        self.crud_path = self.model._meta.label_lower
+
+        if self.crud_path is None:
+            self.crud_path = self.model._meta.label_lower
 
     def get_view_classes(self):  # pylint: disable=no-self-use
         """
@@ -139,6 +146,11 @@ class VegaCRUDView:
         """
         Get form class for create view
         """
+        if self.create_form_class:
+            return self.create_form_class
+        if self.form_class:
+            return self.form_class
+
         return get_modelform(
             model=self.model, fields=self.get_createform_fields())
 
@@ -157,6 +169,11 @@ class VegaCRUDView:
         """
         Get form class for create view
         """
+        if self.update_form_class:
+            return self.update_form_class
+        if self.form_class:
+            return self.form_class
+
         return get_modelform(
             model=self.model, fields=self.get_updateform_fields())
 
@@ -170,6 +187,9 @@ class VegaCRUDView:
         """
         Get the table class
         """
+        if self.table_class:
+            return self.table_class
+
         tables_kwargs = {"model": self.model}
         if isinstance(self.list_fields, list):
             tables_kwargs["fields"] = self.list_fields
