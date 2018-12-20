@@ -20,15 +20,14 @@ from vega_admin.utils import get_modelform, get_table
 
 # pylint: disable=too-many-ancestors
 class VegaListView(
-    VerboseNameMixin,
-    ListViewSearchMixin,
-    PageTitleMixin,
-    CRUDURLsMixin,
-    ExportMixin,
-    SingleTableView,
-    SimpleURLPatternMixin,
-    ListView,
-):
+        VerboseNameMixin,
+        ListViewSearchMixin,
+        PageTitleMixin,
+        CRUDURLsMixin,
+        ExportMixin,
+        SingleTableView,
+        SimpleURLPatternMixin,
+        ListView,):
     """
     vega-admin Generic List View
     """
@@ -37,14 +36,13 @@ class VegaListView(
 
 
 class VegaCreateView(
-    FormMessagesMixin,
-    PageTitleMixin,
-    VerboseNameMixin,
-    VegaFormMixin,
-    CRUDURLsMixin,
-    SimpleURLPatternMixin,
-    CreateView,
-):
+        FormMessagesMixin,
+        PageTitleMixin,
+        VerboseNameMixin,
+        VegaFormMixin,
+        CRUDURLsMixin,
+        SimpleURLPatternMixin,
+        CreateView,):
     """
     vega-admin Generic Create View
     """
@@ -55,14 +53,13 @@ class VegaCreateView(
 
 
 class VegaUpdateView(
-    FormMessagesMixin,
-    PageTitleMixin,
-    VerboseNameMixin,
-    VegaFormMixin,
-    CRUDURLsMixin,
-    ObjectURLPatternMixin,
-    UpdateView,
-):
+        FormMessagesMixin,
+        PageTitleMixin,
+        VerboseNameMixin,
+        VegaFormMixin,
+        CRUDURLsMixin,
+        ObjectURLPatternMixin,
+        UpdateView,):
     """
     vega-admin Generic Update View
     """
@@ -73,14 +70,13 @@ class VegaUpdateView(
 
 
 class VegaDeleteView(
-    FormMessagesMixin,
-    PageTitleMixin,
-    VerboseNameMixin,
-    DeleteViewMixin,
-    CRUDURLsMixin,
-    ObjectURLPatternMixin,
-    DeleteView,
-):
+        FormMessagesMixin,
+        PageTitleMixin,
+        VerboseNameMixin,
+        DeleteViewMixin,
+        CRUDURLsMixin,
+        ObjectURLPatternMixin,
+        DeleteView,):
     """
     vega-admin Generic Delete View
     """
