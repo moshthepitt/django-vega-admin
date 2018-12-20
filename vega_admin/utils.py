@@ -3,7 +3,10 @@ vega-admin forms module
 """
 from django import forms
 from django.conf import settings
+from django.utils.html import format_html
 from django.utils.translation import ugettext as _
+from django.urls import reverse
+from django.urls.exceptions import NoReverseMatch
 
 import django_tables2 as tables
 from crispy_forms.bootstrap import FormActions
@@ -88,7 +91,9 @@ def get_modelform(model: object):
     return modelform_class
 
 
-def get_table(model: object, fields: list = None, attrs: dict = None):
+def get_table(
+        model: object, fields: list = None, actions: list = None,
+        attrs: dict = None):
     """
     Get the a Table for the provided model
 
@@ -119,6 +124,31 @@ def get_table(model: object, fields: list = None, attrs: dict = None):
 
     # the attributes of our new table class
     options = {"Meta": meta_class}
+
+    if isinstance(actions, list):
+        # pylint: disable=unused-argument
+        def render_actions_fn(self, *args, **kwargs):
+            """Render the actions column"""
+            record = kwargs['record']
+            actions_links = []
+            for item in self.actions_list:
+                try:
+                    url = reverse(item[1])
+                except NoReverseMatch:
+                    url = reverse(item[1], args=[record.pk])
+                name = item[0]
+                actions_links.append(
+                    f"<a href='{url}' class='vega-action'>{name}</a>")
+            actions_links_html = settings.VEGA_ACTION_LINK_SEPARATOR.join(
+                actions_links)
+            return format_html(actions_links_html)
+
+        options["actions_list"] = actions
+        options["action"] = tables.Column(
+            verbose_name=_(settings.VEGA_ACTION_COLUMN_NAME),
+            accessor=settings.VEGA_ACTION_COLUMN_ACCESSOR_FIELD,
+            orderable=False)
+        options["render_action"] = render_actions_fn
 
     # create the table dynamically using type
     table_class = type(
