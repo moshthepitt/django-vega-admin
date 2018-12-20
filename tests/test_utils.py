@@ -5,13 +5,24 @@ from django.test import TestCase, override_settings
 
 from tests.artist_app.models import Artist
 
-from vega_admin.utils import get_table
+from vega_admin.utils import get_table, get_modelform
 
 
 class TestUtils(TestCase):
     """
     class for testing vega-admin utils
     """
+
+    def test_get_modelform(self):
+        """Test get_modelform"""
+        # basic form
+        form = get_modelform(model=Artist)
+        self.assertEqual(Artist, form.model)
+        self.assertEqual(["id", "name"], form.Meta.fields)
+        # form with all options
+        form2 = get_modelform(model=Artist, fields=['name'])
+        self.assertEqual(Artist, form2.model)
+        self.assertEqual(["name"], form2.Meta.fields)
 
     @override_settings(VEGA_NOTHING_TO_SHOW="Nothing here")
     def test_get_table(self):
