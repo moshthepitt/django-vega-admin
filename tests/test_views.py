@@ -16,9 +16,7 @@ from .artist_app.views import (ArtistCreate, ArtistDelete, ArtistListView,
                                ArtistUpdate)
 
 
-@override_settings(
-    ROOT_URLCONF='tests.artist_app.urls'
-)
+@override_settings(ROOT_URLCONF="tests.artist_app.urls")
 class TestViews(TestCase):
     """
     Test class for views
@@ -28,7 +26,7 @@ class TestViews(TestCase):
         """
         Test VegaCRUDView
         """
-        default_actions = ['create', 'update', 'list', 'delete']
+        default_actions = ["create", "update", "list", "delete"]
 
         class ArtistCrud(VegaCRUDView):
             model = Artist
@@ -37,153 +35,166 @@ class TestViews(TestCase):
 
         self.assertEqual(Artist, view.model)
         self.assertEqual(default_actions, view.actions)
-        self.assertEqual('artist_app.artist', view.crud_path)
-        self.assertEqual('artist_app', view.app_label)
-        self.assertEqual('artist', view.model_name)
+        self.assertEqual("artist_app.artist", view.crud_path)
+        self.assertEqual("artist_app", view.app_label)
+        self.assertEqual("artist", view.model_name)
 
         self.assertEqual(
-            Artist,
-            view.get_view_class_for_action('create')().model)
+            Artist, view.get_view_class_for_action("create")().model)
         self.assertEqual(
-            Artist,
-            view.get_view_class_for_action('update')().model)
+            Artist, view.get_view_class_for_action("update")().model)
         self.assertEqual(
-            Artist,
-            view.get_view_class_for_action('delete')().model)
+            Artist, view.get_view_class_for_action("delete")().model)
         self.assertEqual(
-            Artist,
-            view.get_view_class_for_action('list')().model)
+            Artist, view.get_view_class_for_action("list")().model)
 
         self.assertIsInstance(
-            view.get_view_class_for_action('create')(), VegaCreateView)
+            view.get_view_class_for_action("create")(), VegaCreateView
+        )
         self.assertIsInstance(
-            view.get_view_class_for_action('update')(), VegaUpdateView)
+            view.get_view_class_for_action("update")(), VegaUpdateView
+        )
         self.assertIsInstance(
-            view.get_view_class_for_action('delete')(), VegaDeleteView)
+            view.get_view_class_for_action("delete")(), VegaDeleteView
+        )
         self.assertIsInstance(
-            view.get_view_class_for_action('list')(), VegaListView)
+            view.get_view_class_for_action("list")(), VegaListView)
 
-        self.assertEqual(f"{view.crud_path}/create/",
-                         view.get_url_pattern_for_action(
-                             view.get_view_class_for_action('create'),
-                             'create'))
-        self.assertEqual(f"{view.crud_path}/list/",
-                         view.get_url_pattern_for_action(
-                             view.get_view_class_for_action('list'),
-                             'list'))
-        self.assertEqual(f"{view.crud_path}/update/<int:pk>/",
-                         view.get_url_pattern_for_action(
-                             view.get_view_class_for_action('update'),
-                             'update'))
-        self.assertEqual(f"{view.crud_path}/delete/<int:pk>/",
-                         view.get_url_pattern_for_action(
-                             view.get_view_class_for_action('delete'),
-                             'delete'))
+        self.assertEqual(
+            f"{view.crud_path}/create/",
+            view.get_url_pattern_for_action(
+                view.get_view_class_for_action("create"), "create"
+            ),
+        )
+        self.assertEqual(
+            f"{view.crud_path}/list/",
+            view.get_url_pattern_for_action(
+                view.get_view_class_for_action("list"), "list"
+            ),
+        )
+        self.assertEqual(
+            f"{view.crud_path}/update/<int:pk>/",
+            view.get_url_pattern_for_action(
+                view.get_view_class_for_action("update"), "update"
+            ),
+        )
+        self.assertEqual(
+            f"{view.crud_path}/delete/<int:pk>/",
+            view.get_url_pattern_for_action(
+                view.get_view_class_for_action("delete"), "delete"
+            ),
+        )
 
         for action in default_actions:
             self.assertEqual(
                 f"{view.crud_path}-{action}",
-                view.get_url_name_for_action(action))
+                view.get_url_name_for_action(action)
+            )
 
     def test_vega_list_view(self):
         """
         Test VegaListView
         """
-        artist = mommy.make('artist_app.Artist', name="Bob")
-        mommy.make('artist_app.Artist', _quantity=7)
-        res = self.client.get('/list/artists/')
+        artist = mommy.make("artist_app.Artist", name="Bob")
+        mommy.make("artist_app.Artist", _quantity=7)
+        res = self.client.get("/list/artists/")
         self.assertEqual(res.status_code, 200)
-        self.assertIsInstance(res.context['view'], ArtistListView)
-        self.assertIsInstance(res.context['view'], VegaListView)
-        self.assertEqual(res.context['object_list'].count(), 8)
-        self.assertTemplateUsed(res, 'vega_admin/basic/list.html')
+        self.assertIsInstance(res.context["view"], ArtistListView)
+        self.assertIsInstance(res.context["view"], VegaListView)
+        self.assertEqual(res.context["object_list"].count(), 8)
+        self.assertTemplateUsed(res, "vega_admin/basic/list.html")
 
-        res = self.client.get('/list/artists/?q=Bob')
-        self.assertEqual(res.context['object_list'].count(), 1)
-        self.assertEqual(res.context['object_list'].first(), artist)
+        res = self.client.get("/list/artists/?q=Bob")
+        self.assertEqual(res.context["object_list"].count(), 1)
+        self.assertEqual(res.context["object_list"].first(), artist)
 
     def test_vega_create_view(self):
         """
         Test VegaCreateView
         """
         Artist.objects.all().delete()
-        res = self.client.get('/edit/artists/create/')
+        res = self.client.get("/edit/artists/create/")
         self.assertEqual(res.status_code, 200)
-        self.assertIsInstance(res.context['form'], ArtistForm)
-        self.assertIsInstance(res.context['view'], ArtistCreate)
-        self.assertIsInstance(res.context['view'], VegaCreateView)
-        self.assertTemplateUsed(res, 'vega_admin/basic/create.html')
-        res = self.client.post('/edit/artists/create/', {'name': 'Mosh'})
+        self.assertIsInstance(res.context["form"], ArtistForm)
+        self.assertIsInstance(res.context["view"], ArtistCreate)
+        self.assertIsInstance(res.context["view"], VegaCreateView)
+        self.assertTemplateUsed(res, "vega_admin/basic/create.html")
+        res = self.client.post("/edit/artists/create/", {"name": "Mosh"})
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, '/edit/artists/create/')
-        self.assertQuerysetEqual(Artist.objects.all(), ['<Artist: Mosh>'])
+        self.assertRedirects(res, "/edit/artists/create/")
+        self.assertQuerysetEqual(Artist.objects.all(), ["<Artist: Mosh>"])
         self.assertTrue(
-            settings.VEGA_FORM_VALID_CREATE_TXT in res.cookies[
-                'messages'].value)
+            settings.VEGA_FORM_VALID_CREATE_TXT in
+            res.cookies["messages"].value
+        )
         self.assertFalse(
-            settings.VEGA_FORM_INVALID_TXT in res.cookies['messages'].value)
+            settings.VEGA_FORM_INVALID_TXT in res.cookies["messages"].value
+        )
 
-        res = self.client.post('/edit/artists/create/', {})
+        res = self.client.post("/edit/artists/create/", {})
         self.assertEqual(res.status_code, 200)
         self.assertTrue(
-            settings.VEGA_FORM_INVALID_TXT in res.cookies['messages'].value)
+            settings.VEGA_FORM_INVALID_TXT in res.cookies["messages"].value)
 
     def test_vega_update_view(self):
         """
         Test VegaUpdateView
         """
-        artist = mommy.make('artist_app.Artist', name="Bob")
-        res = self.client.get(f'/edit/artists/edit/{artist.id}')
+        artist = mommy.make("artist_app.Artist", name="Bob")
+        res = self.client.get(f"/edit/artists/edit/{artist.id}")
         self.assertEqual(res.status_code, 200)
-        self.assertIsInstance(res.context['form'], ArtistForm)
-        self.assertIsInstance(res.context['view'], ArtistUpdate)
-        self.assertIsInstance(res.context['view'], VegaUpdateView)
-        self.assertTemplateUsed(res, 'vega_admin/basic/update.html')
+        self.assertIsInstance(res.context["form"], ArtistForm)
+        self.assertIsInstance(res.context["view"], ArtistUpdate)
+        self.assertIsInstance(res.context["view"], VegaUpdateView)
+        self.assertTemplateUsed(res, "vega_admin/basic/update.html")
         res = self.client.post(
-            f'/edit/artists/edit/{artist.id}', {'name': 'Mosh'})
+            f"/edit/artists/edit/{artist.id}", {"name": "Mosh"})
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, f'/edit/artists/edit/{artist.id}')
+        self.assertRedirects(res, f"/edit/artists/edit/{artist.id}")
         artist.refresh_from_db()
-        self.assertEqual('Mosh', artist.name)
+        self.assertEqual("Mosh", artist.name)
         self.assertTrue(
-            settings.VEGA_FORM_VALID_UPDATE_TXT in res.cookies[
-                'messages'].value)
+            settings.VEGA_FORM_VALID_UPDATE_TXT in
+            res.cookies["messages"].value
+        )
         self.assertFalse(
-            settings.VEGA_FORM_INVALID_TXT in res.cookies['messages'].value)
+            settings.VEGA_FORM_INVALID_TXT in res.cookies["messages"].value
+        )
 
-        res = self.client.post(f'/edit/artists/edit/{artist.id}', {})
+        res = self.client.post(f"/edit/artists/edit/{artist.id}", {})
         self.assertEqual(res.status_code, 200)
         self.assertTrue(
-            settings.VEGA_FORM_INVALID_TXT in res.cookies['messages'].value)
+            settings.VEGA_FORM_INVALID_TXT in res.cookies["messages"].value)
 
     def test_vega_delete_view(self):
         """
         Test ArtistDelete
         """
-        artist = mommy.make('artist_app.Artist', name="Bob")
-        res = self.client.get(f'/edit/artists/delete/{artist.id}')
+        artist = mommy.make("artist_app.Artist", name="Bob")
+        res = self.client.get(f"/edit/artists/delete/{artist.id}")
         self.assertEqual(res.status_code, 200)
-        self.assertIsInstance(res.context['view'], ArtistDelete)
-        self.assertIsInstance(res.context['view'], VegaDeleteView)
-        self.assertTemplateUsed(res, 'vega_admin/basic/delete.html')
-        res = self.client.post(f'/edit/artists/delete/{artist.id}')
+        self.assertIsInstance(res.context["view"], ArtistDelete)
+        self.assertIsInstance(res.context["view"], VegaDeleteView)
+        self.assertTemplateUsed(res, "vega_admin/basic/delete.html")
+        res = self.client.post(f"/edit/artists/delete/{artist.id}")
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, f'/edit/artists/create/')
+        self.assertRedirects(res, f"/edit/artists/create/")
         with self.assertRaises(Artist.DoesNotExist):
             artist.refresh_from_db()
 
         # test what happens when we have a protected related item
-        artist2 = mommy.make('artist_app.Artist', name="Coco")
-        mommy.make('artist_app.Song', name="Nuts", artist=artist2)
-        res = self.client.post(f'/edit/artists/delete/{artist2.id}')
+        artist2 = mommy.make("artist_app.Artist", name="Coco")
+        mommy.make("artist_app.Song", name="Nuts", artist=artist2)
+        res = self.client.post(f"/edit/artists/delete/{artist2.id}")
         self.assertTrue(
             settings.VEGA_DELETE_PROTECTED_ERROR_TXT in
-            res.cookies['messages'].value)
+            res.cookies["messages"].value
+        )
         self.assertTrue(Artist.objects.filter(id=artist2.id).exists())
 
 
 # pylint: disable=line-too-long
-@override_settings(ROOT_URLCONF='tests.artist_app.urls')
+@override_settings(ROOT_URLCONF="tests.artist_app.urls")
 class TestCRUD(TestCase):
     """
     Test class for CRUD views
@@ -193,119 +204,134 @@ class TestCRUD(TestCase):
         """
         Test that all url patterns work for default actions
         """
-        artist = mommy.make('artist_app.Artist', name="Bob")
+        artist = mommy.make("artist_app.Artist", name="Bob")
 
-        self.assertEqual("/artist_app.artist/create/",
-                         reverse('artist_app.artist-create'))
-        self.assertEqual("/artist_app.artist/list/",
-                         reverse('artist_app.artist-list'))
+        self.assertEqual(
+            "/artist_app.artist/create/", reverse("artist_app.artist-create")
+        )
+        self.assertEqual(
+            "/artist_app.artist/list/", reverse("artist_app.artist-list"))
         self.assertEqual(
             f"/artist_app.artist/delete/{artist.pk}/",
-            reverse('artist_app.artist-delete', kwargs={'pk': artist.pk}))
+            reverse("artist_app.artist-delete", kwargs={"pk": artist.pk}),
+        )
         self.assertEqual(
             f"/artist_app.artist/update/{artist.pk}/",
-            reverse('artist_app.artist-update', kwargs={'pk': artist.pk}))
+            reverse("artist_app.artist-update", kwargs={"pk": artist.pk}),
+        )
 
     def test_create(self):
         """
         Test CRUD create
         """
         Artist.objects.all().delete()
-        url = reverse('artist_app.artist-create')
+        url = reverse("artist_app.artist-create")
         res = self.client.post(url, {"name": "Mosh"})
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, reverse('artist_app.artist-list'))
-        self.assertQuerysetEqual(Artist.objects.all(), ['<Artist: Mosh>'])
+        self.assertRedirects(res, reverse("artist_app.artist-list"))
+        self.assertQuerysetEqual(Artist.objects.all(), ["<Artist: Mosh>"])
 
         # test what happens for a form error
         res = self.client.post(url, {})
         self.assertEqual(res.status_code, 200)
         self.assertTrue(
-            settings.VEGA_FORM_INVALID_TXT in res.cookies['messages'].value)
+            settings.VEGA_FORM_INVALID_TXT in res.cookies["messages"].value)
 
         # test content
         self.maxDiff = None
         res = self.client.get(url)
-        self.assertEqual("/artist_app.artist/list/",
-                         res.context_data['vega_list_url'])
-        self.assertEqual("/artist_app.artist/create/",
-                         res.context_data['vega_create_url'])
-        self.assertEqual("/artist_app.artist/list/",
-                         res.context_data['vega_cancel_url'])
-        csrf_token = str(res.context['csrf_token'])
-        html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title> Create professional artist</title></head><body><form id="artist-form" method="post" > <input type="hidden" name="csrfmiddlewaretoken" value="{csrf_token}"><div id="div_id_name" class="control-group"> <label for="id_name" class="control-label requiredField"> Name<span class="asteriskField">*</span> </label><div class="controls"> <input type="text" name="name" maxlength="100" class="textinput textInput" required id="id_name"></div></div><div class="form-actions"><div class="row" ><div class="col-md-12" ><div class="col-md-6" > <a href="/artist_app.artist/list/" class="btn"> Cancel </a></div><div class="col-md-6" > <input type="submit" name="submit" value="Submit" class="btn btn-primary " id="submit-id-submit" /></div></div></div></div></form></body></html>"""  # noqa
+        self.assertEqual(
+            "/artist_app.artist/list/", res.context_data["vega_list_url"])
+        self.assertEqual(
+            "/artist_app.artist/create/", res.context_data["vega_create_url"]
+        )
+        self.assertEqual(
+            "/artist_app.artist/list/", res.context_data["vega_cancel_url"]
+        )
+        csrf_token = str(res.context["csrf_token"])
+        html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title> Create professional artist</title></head><body><form id="artist-form" method="post" > <input type="hidden" name="csrfmiddlewaretoken" value="{csrf_token}"><div id="div_id_name" class="control-group"> <label for="id_name" class="control-label requiredField"> Name<span class="asteriskField">*</span> </label><div class="controls"> <input type="text" name="name" maxlength="100" class="textinput textInput" required id="id_name"></div></div><div class="form-actions"><div class="row" ><div class="col-md-12" ><div class="col-md-6" > <a href="/artist_app.artist/list/" class="btn vega-cancel"> Cancel </a></div><div class="col-md-6" > <input type="submit" name="submit" value="Submit" class="btn btn-primary vega-submit" id="submit-id-submit" /></div></div></div></div></form></body></html>"""  # noqa
         self.assertHTMLEqual(html, res.content.decode("utf-8"))
 
     def test_update(self):
         """
         Test CRUD update
         """
-        artist = mommy.make('artist_app.Artist')
-        url = reverse('artist_app.artist-update', kwargs={"pk": artist.id})
+        artist = mommy.make("artist_app.Artist")
+        url = reverse("artist_app.artist-update", kwargs={"pk": artist.id})
         res = self.client.post(url, {"id": artist.id, "name": "Pitt"})
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, reverse('artist_app.artist-list'))
+        self.assertRedirects(res, reverse("artist_app.artist-list"))
         artist.refresh_from_db()
-        self.assertEqual('Pitt', artist.name)
+        self.assertEqual("Pitt", artist.name)
 
         # test what happens for a form error
         res = self.client.post(url, {})
         self.assertEqual(res.status_code, 200)
         self.assertTrue(
-            settings.VEGA_FORM_INVALID_TXT in res.cookies['messages'].value)
+            settings.VEGA_FORM_INVALID_TXT in res.cookies["messages"].value)
 
         # test content
         self.maxDiff = None
         res = self.client.get(url)
-        self.assertEqual("/artist_app.artist/list/",
-                         res.context_data['vega_list_url'])
-        self.assertEqual("/artist_app.artist/create/",
-                         res.context_data['vega_create_url'])
-        self.assertEqual("/artist_app.artist/list/",
-                         res.context_data['vega_cancel_url'])
-        self.assertEqual(f"/artist_app.artist/update/{artist.pk}/",
-                         res.context_data['vega_update_url'])
-        csrf_token = str(res.context['csrf_token'])
-        html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title> Update professional artist</title></head><body><form id="artist-form" method="post" > <input type="hidden" name="csrfmiddlewaretoken" value="{csrf_token}"><div id="div_id_name" class="control-group"> <label for="id_name" class="control-label requiredField"> Name<span class="asteriskField">*</span> </label><div class="controls"> <input type="text" name="name" value="Pitt" maxlength="100" class="textinput textInput" required id="id_name"></div></div><div class="form-actions"><div class="row" ><div class="col-md-12" ><div class="col-md-6" > <a href="/artist_app.artist/list/" class="btn"> Cancel </a></div><div class="col-md-6" > <input type="submit" name="submit" value="Submit" class="btn btn-primary " id="submit-id-submit" /></div></div></div></div></form></body></html>"""  # noqa
+        self.assertEqual(
+            "/artist_app.artist/list/", res.context_data["vega_list_url"])
+        self.assertEqual(
+            "/artist_app.artist/create/", res.context_data["vega_create_url"]
+        )
+        self.assertEqual(
+            "/artist_app.artist/list/", res.context_data["vega_cancel_url"]
+        )
+        self.assertEqual(
+            f"/artist_app.artist/update/{artist.pk}/",
+            res.context_data["vega_update_url"],
+        )
+        csrf_token = str(res.context["csrf_token"])
+        html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title> Update professional artist</title></head><body><form id="artist-form" method="post" > <input type="hidden" name="csrfmiddlewaretoken" value="{csrf_token}"><div id="div_id_name" class="control-group"> <label for="id_name" class="control-label requiredField"> Name<span class="asteriskField">*</span> </label><div class="controls"> <input type="text" name="name" value="Pitt" maxlength="100" class="textinput textInput" required id="id_name"></div></div><div class="form-actions"><div class="row" ><div class="col-md-12" ><div class="col-md-6" > <a href="/artist_app.artist/list/" class="btn vega-cancel"> Cancel </a></div><div class="col-md-6" > <input type="submit" name="submit" value="Submit" class="btn btn-primary vega-submit" id="submit-id-submit" /></div></div></div></div></form></body></html>"""  # noqa
         self.assertHTMLEqual(html, res.content.decode("utf-8"))
 
     def test_delete(self):
         """
         Test CRUD delete
         """
-        artist = mommy.make('artist_app.Artist')
-        url = reverse('artist_app.artist-delete', kwargs={"pk": artist.id})
+        artist = mommy.make("artist_app.Artist")
+        url = reverse("artist_app.artist-delete", kwargs={"pk": artist.id})
         res = self.client.post(url)
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, reverse('artist_app.artist-list'))
+        self.assertRedirects(res, reverse("artist_app.artist-list"))
         with self.assertRaises(Artist.DoesNotExist):
             artist.refresh_from_db()
 
         # test what happens when we have a protected related item
-        artist2 = mommy.make('artist_app.Artist', name="Coco")
-        mommy.make('artist_app.Song', name="Nuts", artist=artist2)
-        url2 = reverse('artist_app.artist-delete', kwargs={"pk": artist2.id})
+        artist2 = mommy.make("artist_app.Artist", name="Coco")
+        mommy.make("artist_app.Song", name="Nuts", artist=artist2)
+        url2 = reverse("artist_app.artist-delete", kwargs={"pk": artist2.id})
         res = self.client.post(url2)
         self.assertEqual(res.status_code, 302)
         self.assertRedirects(
-            res, reverse(
-                'artist_app.artist-delete', kwargs={"pk": artist2.id}))
-        self.assertTrue(settings.VEGA_DELETE_PROTECTED_ERROR_TXT in res.
-                        cookies['messages'].value)
+            res, reverse("artist_app.artist-delete", kwargs={"pk": artist2.id})
+        )
+        self.assertTrue(
+            settings.VEGA_DELETE_PROTECTED_ERROR_TXT in
+            res.cookies["messages"].value
+        )
         self.assertTrue(Artist.objects.filter(id=artist2.id).exists())
 
         # test content
         self.maxDiff = None
         res = self.client.get(url2)
-        self.assertEqual("/artist_app.artist/list/",
-                         res.context_data['vega_list_url'])
-        self.assertEqual("/artist_app.artist/create/",
-                         res.context_data['vega_create_url'])
-        self.assertEqual("/artist_app.artist/list/",
-                         res.context_data['vega_cancel_url'])
-        self.assertEqual(f"/artist_app.artist/delete/{artist2.pk}/",
-                         res.context_data['vega_delete_url'])
-        csrf_token = str(res.context['csrf_token'])
+        self.assertEqual(
+            "/artist_app.artist/list/", res.context_data["vega_list_url"])
+        self.assertEqual(
+            "/artist_app.artist/create/", res.context_data["vega_create_url"]
+        )
+        self.assertEqual(
+            "/artist_app.artist/list/", res.context_data["vega_cancel_url"]
+        )
+        self.assertEqual(
+            f"/artist_app.artist/delete/{artist2.pk}/",
+            res.context_data["vega_delete_url"],
+        )
+        csrf_token = str(res.context["csrf_token"])
         html = f"""<!doctype html> <html lang="en"> <head> <meta charset="utf-8"> <title> Delete professional artist </title> </head> <body> <form action="" method="post"> <input type="hidden" name="csrfmiddlewaretoken" value="{csrf_token}"> <p>Are you sure you want to delete "Coco"?</p> <input type="submit" value="Confirm" /> </form> </body> </html>"""  # noqa
         self.assertHTMLEqual(html, res.content.decode("utf-8"))
 
@@ -317,16 +343,37 @@ class TestCRUD(TestCase):
         self.maxDiff = None
 
         # make 3 objects
-        mommy.make('artist_app.Artist', name="Mosh", id="60")
-        mommy.make('artist_app.Artist', name="Tranx", id="70")
-        mommy.make('artist_app.Artist', name="Eddie", id="80")
+        mommy.make("artist_app.Artist", name="Mosh", id="60")
+        mommy.make("artist_app.Artist", name="Tranx", id="70")
+        mommy.make("artist_app.Artist", name="Eddie", id="80")
 
-        url = reverse('artist_app.artist-list')
+        url = reverse("artist_app.artist-list")
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
-        self.assertEqual("/artist_app.artist/list/",
-                         res.context_data['vega_list_url'])
-        self.assertEqual("/artist_app.artist/create/",
-                         res.context_data['vega_create_url'])
+        self.assertEqual(
+            "/artist_app.artist/list/", res.context_data["vega_list_url"])
+        self.assertEqual(
+            "/artist_app.artist/create/", res.context_data["vega_create_url"]
+        )
         html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title> professional artists</title></head><body><div class="table-container"><table class="table"><thead ><tr><th class="orderable"> <a href="?sort=id">ID</a></th><th class="orderable"> <a href="?sort=name">Name</a></th></tr></thead><tbody ><tr class="even"><td >80</td><td >Eddie</td></tr><tr class="odd"><td >60</td><td >Mosh</td></tr><tr class="even"><td >70</td><td >Tranx</td></tr></tbody></table></div></body></html>"""  # noqa
+        self.assertHTMLEqual(html, res.content.decode("utf-8"))
+
+    @override_settings(VEGA_ACTION_COLUMN_NAME="Actions")
+    def test_list_options(self):
+        """
+        Test CRUD list with configuration options
+        """
+        Artist.objects.all().delete()
+        self.maxDiff = None
+
+        # make 3 objects
+        artist = mommy.make("artist_app.Artist", name="Mosh", id="60")
+        mommy.make("artist_app.Song", name="Song 1", artist=artist, id="31")
+        mommy.make("artist_app.Song", name="Song 2", artist=artist, id="32")
+        mommy.make("artist_app.Song", name="Song 3", artist=artist, id="33")
+
+        url = reverse("artist_app.song-list")
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        html = f""""""  # noqa
         self.assertHTMLEqual(html, res.content.decode("utf-8"))
