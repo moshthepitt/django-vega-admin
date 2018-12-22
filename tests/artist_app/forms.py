@@ -7,6 +7,8 @@ from crispy_forms.bootstrap import Field, FormActions
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit
 
+from vega_admin.forms import ListViewSearchForm
+
 from .models import Artist
 
 
@@ -38,3 +40,9 @@ class ArtistForm(forms.ModelForm):
                        css_class='btn-success btn-block'),
             )
         )
+
+
+class CustomSearchForm(ListViewSearchForm):
+    """Custom search form"""
+
+    pass

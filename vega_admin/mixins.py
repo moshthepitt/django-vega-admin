@@ -5,8 +5,8 @@ from django.conf import settings
 from django.contrib import messages
 from django.db.models import ProtectedError, Q
 from django.shortcuts import redirect
-from django.utils.translation import ugettext as _
 from django.urls import reverse_lazy
+from django.utils.translation import ugettext as _
 
 from vega_admin.forms import ListViewSearchForm
 

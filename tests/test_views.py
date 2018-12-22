@@ -10,9 +10,9 @@ from model_mommy import mommy
 from vega_admin.views import (VegaCreateView, VegaCRUDView, VegaDeleteView,
                               VegaListView, VegaUpdateView)
 
-from .artist_app.forms import ArtistForm
-from .artist_app.tables import ArtistTable
+from .artist_app.forms import ArtistForm, CustomSearchForm
 from .artist_app.models import Artist, Song
+from .artist_app.tables import ArtistTable
 from .artist_app.views import (ArtistCreate, ArtistDelete, ArtistListView,
                                ArtistUpdate)
 
@@ -431,3 +431,5 @@ class TestCRUD(TestViewsBase):
 
         list_res = self.client.get(list_url)
         self.assertEqual(ArtistTable, list_res.context["view"].table_class)
+        self.assertEqual(["name"], list_res.context["view"].search_fields)
+        self.assertEqual(CustomSearchForm, list_res.context["view"].form_class)
