@@ -86,7 +86,7 @@ class VegaDeleteView(
     form_invalid_message = _(settings.VEGA_FORM_INVALID_TXT)
 
 
-class VegaCRUDView:
+class VegaCRUDView:  # pylint: disable=too-many-public-methods
     """
     Creates generic CRUD views for a model automagically
 
@@ -127,7 +127,9 @@ class VegaCRUDView:
 
     def get_actions(self):
         """Get actions"""
-        return self.actions
+        custom_actions = self.get_view_classes().keys()
+        custom_actions = [_ for _ in custom_actions if _ not in self.actions]
+        return self.actions + custom_actions
 
     def get_view_classes(self):  # pylint: disable=no-self-use
         """
@@ -220,21 +222,48 @@ class VegaCRUDView:
 
         return get_table(**tables_kwargs)
 
-    def get_create_view_class(self):
+    def get_create_view_class(self):  # pylint: disable=no-self-use
         """Get view class for create action"""
         return VegaCreateView
 
-    def get_update_view_class(self):
+    def get_update_view_class(self):  # pylint: disable=no-self-use
         """Get view class for update action"""
         return VegaUpdateView
 
-    def get_list_view_class(self):
+    def get_list_view_class(self):  # pylint: disable=no-self-use
         """Get view class for list action"""
         return VegaListView
 
-    def get_delete_view_class(self):
+    def get_delete_view_class(self):  # pylint: disable=no-self-use
         """Get view class for delete action"""
         return VegaDeleteView
+
+    # pylint: disable=no-self-use
+    def enforce_login_protection(self, view_class: object):
+        """ensures view class has login protection"""
+        if issubclass(view_class, LoginRequiredMixin):
+            return view_class
+
+        # add LoginRequiredMixin
+        return type(
+            f"{view_class.__name__}{settings.VEGA_PROTECTED_LABEL}",
+            (LoginRequiredMixin, view_class,),
+            {},
+        )
+
+    def get_default_action_view_classes(self, action: str):
+        """Get view class for default actions"""
+        if action == settings.VEGA_LIST_ACTION:
+            return self.get_list_view_class()
+        if action == settings.VEGA_CREATE_ACTION:
+            return self.get_create_view_class()
+        if action == settings.VEGA_UPDATE_ACTION:
+            return self.get_update_view_class()
+        if action == settings.VEGA_DELETE_ACTION:
+            return self.get_delete_view_class()
+
+        # this action is set as a default action but has no defined view class
+        raise Exception(settings.VEGA_INVALID_ACTION)
 
     def get_view_class_for_action(self, action: str):
         """
@@ -243,25 +272,18 @@ class VegaCRUDView:
         view_classes = self.get_view_classes()
         try:
             # return the view class if found
-            return view_classes[action]
+            view_class = view_classes[action]
         except KeyError:
             if action not in settings.VEGA_DEFAULT_ACTIONS:
                 # this action is not supported
                 raise Exception(settings.VEGA_INVALID_ACTION)
 
             # lets get the view class for the default actions
-            if action == settings.VEGA_LIST_ACTION:
-                view_class = self.get_list_view_class()
-            elif action == settings.VEGA_CREATE_ACTION:
-                view_class = self.get_create_view_class()
-            elif action == settings.VEGA_UPDATE_ACTION:
-                view_class = self.get_update_view_class()
-            elif action == settings.VEGA_DELETE_ACTION:
-                view_class = self.get_delete_view_class()
-            else:
-                # this action is set as a default action but has no defined
-                # view class
-                raise Exception(settings.VEGA_INVALID_ACTION)
+            view_class = self.get_default_action_view_classes(action)
+        else:
+            if action in self.get_protected_actions():
+                return self.enforce_login_protection(view_class)
+            return view_class
 
         # lets go on and create the view class(es)
         options = {"model": self.model}
