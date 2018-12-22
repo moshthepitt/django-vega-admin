@@ -1,13 +1,12 @@
 """
 Views module
 """
+from braces.views import FormMessagesMixin, LoginRequiredMixin
 from django.conf import settings
 from django.urls import path, reverse_lazy
 from django.utils.translation import ugettext as _
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
-
-from braces.views import FormMessagesMixin
 from django_tables2 import SingleTableView
 from django_tables2.export.views import ExportMixin
 
@@ -97,6 +96,7 @@ class VegaCRUDView:
     """
 
     actions = ["create", "update", "list", "delete"]
+    protected_actions = actions  # actions that require login
     list_fields = None
     search_fields = None
     search_form_class = ListViewSearchForm
@@ -134,6 +134,12 @@ class VegaCRUDView:
             "update": VegaUpdateView,
             "delete": VegaDeleteView,
         }
+
+    def get_protected_actions(self):
+        """get list of actions that have login protection"""
+        if isinstance(self.protected_actions, list):
+            return self.protected_actions
+        return []
 
     def get_search_fields(self):
         """Get search fields for list view"""
@@ -262,11 +268,16 @@ class VegaCRUDView:
                 options["form_class"] = self.get_search_form_class()
                 options["paginate_by"] = self.paginate_by
 
+            inherited_classes = (view_class,)
+            # login protection
+            if action in self.get_protected_actions():
+                inherited_classes = (LoginRequiredMixin, view_class,)
+
             # create and return the View class
             view_label = settings.VEGA_VIEW_LABEL
             return type(
                 f"{self.model_name.title()}{action.title()}{view_label}",
-                (view_class,),  # the classes that we should inherit
+                inherited_classes,  # the classes that we should inherit
                 options,
             )
 
