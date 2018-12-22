@@ -117,7 +117,8 @@ def get_table(
         exclude_fields = [_ for _ in all_fields if _ not in fields]
         # get sequence
         sequence_list = fields
-        sequence_list.append("...")
+        if "..." not in sequence_list:
+            sequence_list.append("...")
         # set meta options
         meta_options["exclude"] = exclude_fields
         meta_options["sequence"] = tuple(sequence_list)
