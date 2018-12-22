@@ -124,6 +124,10 @@ class VegaCRUDView:
         if self.crud_path is None:
             self.crud_path = self.model._meta.label_lower
 
+    def get_actions(self):
+        """Get actions"""
+        return self.actions
+
     def get_view_classes(self):  # pylint: disable=no-self-use
         """
         Returns the available views
@@ -299,7 +303,7 @@ class VegaCRUDView:
         Get list of tuples of (action, url_name)
         """
         if actions is None:
-            actions = self.actions
+            actions = self.get_actions()
         return [self.get_action_urlname(_) for _ in actions]
 
     def get_url_pattern_for_action(self, view_class, action: str):
@@ -318,7 +322,7 @@ class VegaCRUDView:
         Returns the URL patters for the selected actions in this CRUD view
         """
         if actions is None:
-            actions = self.actions
+            actions = self.get_actions()
         urls = []
         for action in actions:
             view_class = self.get_view_class_for_action(action=action)
