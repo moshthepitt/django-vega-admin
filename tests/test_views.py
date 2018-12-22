@@ -2,6 +2,7 @@
 vega-admin module to test views
 """
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
@@ -26,12 +27,18 @@ class TestViewsBase(TestCase):
         """setUp"""
         super().setUp()
         self.maxDiff = None
+        self.user = User.objects.create_user(
+            username='mosh',
+            email='mosh@example.com',
+            password='hunter2',
+        )
 
     def tearDown(self):
         """tearDown"""
         super().setUp()
         Song.objects.all().delete()
         Artist.objects.all().delete()
+        User.objects.all().delete()
 
 
 @override_settings(ROOT_URLCONF="tests.artist_app.urls")
@@ -442,3 +449,41 @@ class TestCRUD(TestViewsBase):
         list_url = reverse("custom-artist-list")
         list_res = self.client.get(list_url)
         self.assertEqual(list_res.context["object_list"].count(), 10)
+
+    @override_settings(LOGIN_URL='/list/artists/')
+    def test_login_protection(self):
+        """
+        Test login protection
+        """
+        artist = mommy.make("artist_app.Artist", name="Mosh")
+        song = mommy.make("artist_app.Song", name="Song 1", artist=artist)
+        create_url = reverse("private-songs-create")
+        update_url = reverse("private-songs-update", kwargs={"pk": song.id})
+        delete_url = reverse("private-songs-delete", kwargs={"pk": song.id})
+        list_url = reverse("private-songs-list")
+
+        # first check that login is required
+        create_res = self.client.get(create_url)
+        self.assertEqual(302, create_res.status_code)
+        self.assertRedirects(create_res, f"/list/artists/?next={create_url}")
+        update_res = self.client.get(update_url)
+        self.assertEqual(302, update_res.status_code)
+        self.assertRedirects(update_res, f"/list/artists/?next={update_url}")
+        delete_res = self.client.get(delete_url)
+        self.assertEqual(302, delete_res.status_code)
+        self.assertRedirects(delete_res, f"/list/artists/?next={delete_url}")
+        list_res = self.client.get(list_url)
+        # the list action is not set to be protected
+        self.assertEqual(200, list_res.status_code)
+
+        # now login
+        self.client.force_login(self.user)
+
+        create_res = self.client.get(create_url)
+        self.assertEqual(200, create_res.status_code)
+        update_res = self.client.get(update_url)
+        self.assertEqual(200, update_res.status_code)
+        delete_res = self.client.get(delete_url)
+        self.assertEqual(200, delete_res.status_code)
+        list_res = self.client.get(list_url)
+        self.assertEqual(200, list_res.status_code)
