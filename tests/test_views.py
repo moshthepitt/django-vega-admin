@@ -5,7 +5,6 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase, override_settings
 from django.urls import reverse
-
 from model_mommy import mommy
 
 from vega_admin.views import (VegaCreateView, VegaCRUDView, VegaDeleteView,
@@ -15,7 +14,8 @@ from .artist_app.forms import ArtistForm, CustomSearchForm
 from .artist_app.models import Artist, Song
 from .artist_app.tables import ArtistTable
 from .artist_app.views import (ArtistCreate, ArtistDelete, ArtistListView,
-                               ArtistUpdate)
+                               ArtistUpdate, CustomDefaultActions,
+                               CustomSongCRUD)
 
 
 class TestViewsBase(TestCase):
@@ -59,7 +59,8 @@ class TestViews(TestViewsBase):
         view = ArtistCrud()
 
         self.assertEqual(Artist, view.model)
-        self.assertEqual(default_actions, view.get_actions())
+        self.assertEqual(
+            list(set(default_actions)), list(set(view.get_actions())))
         self.assertEqual("artist_app.artist", view.crud_path)
         self.assertEqual("artist_app", view.app_label)
         self.assertEqual("artist", view.model_name)
@@ -246,6 +247,13 @@ class TestCRUD(TestViewsBase):
             f"/artist_app.artist/update/{artist.pk}/",
             reverse("artist_app.artist-update", kwargs={"pk": artist.pk}),
         )
+        # custom actions
+        self.assertEqual(
+            "/private-songs/artists/", reverse("private-songs-artists")
+        )
+        self.assertEqual(
+            "/private-songs/template/", reverse("private-songs-template")
+        )
 
     def test_create(self):
         """
@@ -378,6 +386,51 @@ class TestCRUD(TestViewsBase):
         html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title> professional artists</title></head><body><div class="table-container"><table class="table"><thead ><tr><th class="orderable"> <a href="?sort=id">ID</a></th><th class="orderable"> <a href="?sort=name">Name</a></th></tr></thead><tbody ><tr class="even"><td >80</td><td >Eddie</td></tr><tr class="odd"><td >60</td><td >Mosh</td></tr><tr class="even"><td >70</td><td >Tranx</td></tr></tbody></table></div></body></html>"""  # noqa
         self.assertHTMLEqual(html, res.content.decode("utf-8"))
 
+    def test_custom_views(self):
+        """Test custom views"""
+        self.client.force_login(self.user)
+
+        artists_view_url = reverse("private-songs-artists")
+        res = self.client.get(artists_view_url)
+        self.assertEqual(res.status_code, 200)
+        self.assertIsInstance(res.context["view"],
+                              CustomSongCRUD.CustomListView)
+
+        template_view_url = reverse("private-songs-template")
+        res = self.client.get(template_view_url)
+        self.assertEqual(res.status_code, 200)
+        self.assertIsInstance(res.context["view"], CustomSongCRUD.FooView)
+
+    def test_custom_default_views(self):
+        """Test custom default views"""
+
+        artist = mommy.make("artist_app.Artist")
+        url = reverse("custom-default-actions-list")
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertIsInstance(res.context["view"],
+                              CustomDefaultActions.CustomListView)
+
+        url = reverse("custom-default-actions-create")
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertIsInstance(res.context["view"],
+                              CustomDefaultActions.CustomCreateView)
+
+        url = reverse(
+            "custom-default-actions-update", kwargs={"pk": artist.pk})
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertIsInstance(res.context["view"],
+                              CustomDefaultActions.CustomUpdateView)
+
+        url = reverse(
+            "custom-default-actions-delete", kwargs={"pk": artist.pk})
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertIsInstance(res.context["view"],
+                              CustomDefaultActions.CustomDeleteView)
+
     def test_list_options(self):
         """
         Test CRUD list with configuration options
@@ -487,3 +540,23 @@ class TestCRUD(TestViewsBase):
         self.assertEqual(200, delete_res.status_code)
         list_res = self.client.get(list_url)
         self.assertEqual(200, list_res.status_code)
+
+    @override_settings(LOGIN_URL='/list/artists/')
+    def test_custom_view_login_protection(self):
+        """Test custom views"""
+        artists_view_url = reverse("private-songs-artists")
+        template_view_url = reverse("private-songs-template")
+        res1 = self.client.get(artists_view_url)
+        self.assertEqual(res1.status_code, 200)
+
+        res2 = self.client.get(template_view_url)
+        self.assertEqual(res2.status_code, 302)
+        self.assertRedirects(res2, f"/list/artists/?next={template_view_url}")
+
+        # now login
+        self.client.force_login(self.user)
+        res1 = self.client.get(artists_view_url)
+        self.assertEqual(res1.status_code, 200)
+
+        res2 = self.client.get(template_view_url)
+        self.assertEqual(res2.status_code, 200)

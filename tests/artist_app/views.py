@@ -1,6 +1,9 @@
 """
 Module for vega-admin test views
 """
+from django.views.generic import TemplateView
+
+from vega_admin.mixins import SimpleURLPatternMixin
 from vega_admin.views import (VegaCreateView, VegaCRUDView, VegaDeleteView,
                               VegaListView, VegaUpdateView)
 
@@ -81,8 +84,21 @@ class CustomSongCRUD(SongCRUD):
     """
     CRUD view for songs with login protection
     """
-    protected_actions = ["create", "update", "delete"]
+
+    class CustomListView(ArtistListView):  # pylint: disable=too-many-ancestors
+        """custom list view"""
+        pass
+
+    class FooView(SimpleURLPatternMixin, TemplateView):
+        """random template view"""
+        template_name = "artist_app/empty.html"
+
+    protected_actions = ["create", "update", "delete", "template"]
     crud_path = "private-songs"
+    view_classes = {
+        "artists": CustomListView,
+        "template": FooView,
+    }
 
 
 class ArtistCRUD(VegaCRUDView):
@@ -92,6 +108,35 @@ class ArtistCRUD(VegaCRUDView):
 
     model = Artist
     protected_actions = None
+
+
+class CustomDefaultActions(ArtistCRUD):
+    """CRUD view with custom default actions"""
+
+    # pylint: disable=too-many-ancestors
+    class CustomCreateView(ArtistCreate):
+        """custom Create view"""
+        pass
+
+    class CustomUpdateView(ArtistUpdate):
+        """custom Update view"""
+        pass
+
+    class CustomListView(ArtistListView):
+        """custom list view"""
+        pass
+
+    class CustomDeleteView(ArtistDelete):
+        """custom Delete view"""
+        pass
+
+    view_classes = {
+        "list": CustomListView,
+        "update": CustomUpdateView,
+        "create": CustomCreateView,
+        "delete": CustomDeleteView,
+    }
+    crud_path = "custom-default-actions"
 
 
 class CustomArtistCRUD(VegaCRUDView):
