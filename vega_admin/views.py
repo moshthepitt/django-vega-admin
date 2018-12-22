@@ -109,6 +109,7 @@ class VegaCRUDView:
     create_form_class = None
     update_form_class = None
     table_class = None
+    paginate_by = 25
     crud_path = None
 
     def __init__(self, model=None):
@@ -259,6 +260,7 @@ class VegaCRUDView:
                 options["table_class"] = self.get_table_class()
                 options["search_fields"] = self.get_search_fields()
                 options["form_class"] = self.get_search_form_class()
+                options["paginate_by"] = self.paginate_by
 
             # create and return the View class
             view_label = settings.VEGA_VIEW_LABEL

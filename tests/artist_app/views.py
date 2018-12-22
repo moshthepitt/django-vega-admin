@@ -96,3 +96,4 @@ class CustomArtistCRUD(VegaCRUDView):
     table_class = ArtistTable
     search_fields = ["name"]
     search_form_class = CustomSearchForm
+    paginate_by = 10
