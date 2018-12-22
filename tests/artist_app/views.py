@@ -9,14 +9,6 @@ from .models import Artist, Song
 from .tables import ArtistTable
 
 
-class ArtistCRUD(VegaCRUDView):
-    """
-    CRUD view for artists
-    """
-
-    model = Artist
-
-
 class ArtistCreate(VegaCreateView):  # pylint: disable=too-many-ancestors
     """
     Artist CreateView class
@@ -77,11 +69,29 @@ class SongCRUD(VegaCRUDView):
     """
 
     model = Song
+    protected_actions = None
     list_fields = ["name", "artist", ]
     table_attrs = {"class": "song-table"}
     table_actions = ["create", "update", "delete", ]
     create_fields = ["name", "artist", ]
     update_fields = ["name", ]
+
+
+class CustomSongCRUD(SongCRUD):
+    """
+    CRUD view for songs with login protection
+    """
+    protected_actions = ["create", "update", "delete"]
+    crud_path = "private-songs"
+
+
+class ArtistCRUD(VegaCRUDView):
+    """
+    CRUD view for artists
+    """
+
+    model = Artist
+    protected_actions = None
 
 
 class CustomArtistCRUD(VegaCRUDView):
@@ -90,6 +100,7 @@ class CustomArtistCRUD(VegaCRUDView):
     """
 
     model = Artist
+    protected_actions = None
     crud_path = "custom-artist"
     create_form_class = ArtistForm
     update_form_class = ArtistForm
