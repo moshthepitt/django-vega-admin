@@ -4,7 +4,7 @@ Module for vega-admin test views
 from vega_admin.views import (VegaCreateView, VegaCRUDView, VegaDeleteView,
                               VegaListView, VegaUpdateView)
 
-from .forms import ArtistForm
+from .forms import ArtistForm, CustomSearchForm
 from .models import Artist, Song
 from .tables import ArtistTable
 
@@ -94,3 +94,5 @@ class CustomArtistCRUD(VegaCRUDView):
     create_form_class = ArtistForm
     update_form_class = ArtistForm
     table_class = ArtistTable
+    search_fields = ["name"]
+    search_form_class = CustomSearchForm

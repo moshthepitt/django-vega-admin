@@ -11,6 +11,7 @@ from braces.views import FormMessagesMixin
 from django_tables2 import SingleTableView
 from django_tables2.export.views import ExportMixin
 
+from vega_admin.forms import ListViewSearchForm
 from vega_admin.mixins import (CRUDURLsMixin, DeleteViewMixin,
                                ListViewSearchMixin, ObjectURLPatternMixin,
                                PageTitleMixin, SimpleURLPatternMixin,
@@ -97,6 +98,8 @@ class VegaCRUDView:
 
     actions = ["create", "update", "list", "delete"]
     list_fields = None
+    search_fields = None
+    search_form_class = ListViewSearchForm
     form_fields = None
     create_fields = None
     update_fields = None
@@ -130,6 +133,14 @@ class VegaCRUDView:
             "update": VegaUpdateView,
             "delete": VegaDeleteView,
         }
+
+    def get_search_fields(self):
+        """Get search fields for list view"""
+        return self.search_fields
+
+    def get_search_form_class(self):
+        """Get search form for list view"""
+        return self.search_form_class
 
     def get_createform_fields(self):
         """
@@ -246,6 +257,8 @@ class VegaCRUDView:
             # add the table class
             if action == "list":
                 options["table_class"] = self.get_table_class()
+                options["search_fields"] = self.get_search_fields()
+                options["form_class"] = self.get_search_form_class()
 
             # create and return the View class
             view_label = settings.VEGA_VIEW_LABEL
