@@ -59,7 +59,8 @@ class TestViews(TestViewsBase):
         view = ArtistCrud()
 
         self.assertEqual(Artist, view.model)
-        self.assertEqual(default_actions, view.get_actions())
+        self.assertEqual(
+            list(set(default_actions)), list(set(view.get_actions())))
         self.assertEqual("artist_app.artist", view.crud_path)
         self.assertEqual("artist_app", view.app_label)
         self.assertEqual("artist", view.model_name)
