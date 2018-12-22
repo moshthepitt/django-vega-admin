@@ -95,8 +95,9 @@ class VegaCRUDView:
     straight away.
     """
 
-    actions = ["create", "update", "list", "delete"]
+    actions = settings.VEGA_DEFAULT_ACTIONS
     protected_actions = actions  # actions that require login
+    view_classes = {}
     list_fields = None
     search_fields = None
     search_form_class = ListViewSearchForm
@@ -132,12 +133,7 @@ class VegaCRUDView:
         """
         Returns the available views
         """
-        return {
-            "list": VegaListView,
-            "create": VegaCreateView,
-            "update": VegaUpdateView,
-            "delete": VegaDeleteView,
-        }
+        return self.view_classes
 
     def get_protected_actions(self):
         """get list of actions that have login protection"""
@@ -224,66 +220,100 @@ class VegaCRUDView:
 
         return get_table(**tables_kwargs)
 
+    def get_create_view_class(self):
+        """Get view class for create action"""
+        return VegaCreateView
+
+    def get_update_view_class(self):
+        """Get view class for update action"""
+        return VegaUpdateView
+
+    def get_list_view_class(self):
+        """Get view class for list action"""
+        return VegaListView
+
+    def get_delete_view_class(self):
+        """Get view class for delete action"""
+        return VegaDeleteView
+
     def get_view_class_for_action(self, action: str):
         """
         Get the view for an action
         """
         view_classes = self.get_view_classes()
-        options = {"model": self.model}
         try:
-            view_class = view_classes[action]
+            # return the view class if found
+            return view_classes[action]
         except KeyError:
-            # this action is not supported
-            raise Exception(settings.VEGA_INVALID_ACTION)
-        else:
-            # add some common usefule CRUD urls
-            options["list_url"] = reverse_lazy(
-                self.get_url_name_for_action("list"))
-            options["create_url"] = reverse_lazy(
-                self.get_url_name_for_action("create"))
-            options["cancel_url"] = reverse_lazy(
-                self.get_url_name_for_action("list"))
+            if action not in settings.VEGA_DEFAULT_ACTIONS:
+                # this action is not supported
+                raise Exception(settings.VEGA_INVALID_ACTION)
 
-            # add the success url
-            if action in ["create", "update", "delete"]:
-                options["success_url"] = reverse_lazy(
-                    self.get_url_name_for_action("list")
-                )
+            # lets get the view class for the default actions
+            if action == settings.VEGA_LIST_ACTION:
+                view_class = self.get_list_view_class()
+            elif action == settings.VEGA_CREATE_ACTION:
+                view_class = self.get_create_view_class()
+            elif action == settings.VEGA_UPDATE_ACTION:
+                view_class = self.get_update_view_class()
+            elif action == settings.VEGA_DELETE_ACTION:
+                view_class = self.get_delete_view_class()
+            else:
+                # this action is set as a default action but has no defined
+                # view class
+                raise Exception(settings.VEGA_INVALID_ACTION)
 
-            # add the create form class
-            if action == "create":
-                options["form_class"] = self.get_createform_class()
+        # lets go on and create the view class(es)
+        options = {"model": self.model}
+        # add some common useful CRUD urls
+        options["list_url"] = reverse_lazy(
+            self.get_url_name_for_action(settings.VEGA_LIST_ACTION))
+        options["create_url"] = reverse_lazy(
+            self.get_url_name_for_action(settings.VEGA_CREATE_ACTION))
+        options["cancel_url"] = options["list_url"]
 
-            # add the update form class and update url
-            if action == "update":
-                options["form_class"] = self.get_updateform_class()
-                options["update_url_name"] = self.get_url_name_for_action(
-                    "update")
+        # add the success url
+        if action in [
+                settings.VEGA_CREATE_ACTION, settings.VEGA_UPDATE_ACTION,
+                settings.VEGA_DELETE_ACTION
+        ]:
+            options["success_url"] = reverse_lazy(
+                self.get_url_name_for_action(settings.VEGA_LIST_ACTION))
 
-            # add the delete url
-            if action == "delete":
-                options["delete_url_name"] = self.get_url_name_for_action(
-                    "delete")
+        # add the create form class
+        if action == settings.VEGA_CREATE_ACTION:
+            options["form_class"] = self.get_createform_class()
 
-            # add the table class
-            if action == "list":
-                options["table_class"] = self.get_table_class()
-                options["search_fields"] = self.get_search_fields()
-                options["form_class"] = self.get_search_form_class()
-                options["paginate_by"] = self.paginate_by
+        # add the update form class and update url
+        if action == settings.VEGA_UPDATE_ACTION:
+            options["form_class"] = self.get_updateform_class()
+            options["update_url_name"] = self.get_url_name_for_action(
+                settings.VEGA_UPDATE_ACTION)
 
-            inherited_classes = (view_class,)
-            # login protection
-            if action in self.get_protected_actions():
-                inherited_classes = (LoginRequiredMixin, view_class,)
+        # add the delete url
+        if action == settings.VEGA_DELETE_ACTION:
+            options["delete_url_name"] = self.get_url_name_for_action(
+                settings.VEGA_DELETE_ACTION)
 
-            # create and return the View class
-            view_label = settings.VEGA_VIEW_LABEL
-            return type(
-                f"{self.model_name.title()}{action.title()}{view_label}",
-                inherited_classes,  # the classes that we should inherit
-                options,
-            )
+        # add the table class
+        if action == settings.VEGA_LIST_ACTION:
+            options["table_class"] = self.get_table_class()
+            options["search_fields"] = self.get_search_fields()
+            options["form_class"] = self.get_search_form_class()
+            options["paginate_by"] = self.paginate_by
+
+        inherited_classes = (view_class,)
+        # login protection
+        if action in self.get_protected_actions():
+            inherited_classes = (LoginRequiredMixin, view_class,)
+
+        # create and return the View class
+        view_label = settings.VEGA_VIEW_LABEL
+        return type(
+            f"{self.model_name.title()}{action.title()}{view_label}",
+            inherited_classes,  # the classes that we should inherit
+            options,
+        )
 
     # pylint: disable=no-self-use
     def get_url_name_for_action(self, action: str):
