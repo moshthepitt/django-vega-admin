@@ -1,13 +1,12 @@
 """
 Views module
 """
+from braces.views import FormMessagesMixin, LoginRequiredMixin
 from django.conf import settings
 from django.urls import path, reverse_lazy
 from django.utils.translation import ugettext as _
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
-
-from braces.views import FormMessagesMixin
 from django_tables2 import SingleTableView
 from django_tables2.export.views import ExportMixin
 
@@ -97,6 +96,7 @@ class VegaCRUDView:
     """
 
     actions = ["create", "update", "list", "delete"]
+    protected_actions = actions  # actions that require login
     list_fields = None
     search_fields = None
     search_form_class = ListViewSearchForm
@@ -124,6 +124,10 @@ class VegaCRUDView:
         if self.crud_path is None:
             self.crud_path = self.model._meta.label_lower
 
+    def get_actions(self):
+        """Get actions"""
+        return self.actions
+
     def get_view_classes(self):  # pylint: disable=no-self-use
         """
         Returns the available views
@@ -134,6 +138,12 @@ class VegaCRUDView:
             "update": VegaUpdateView,
             "delete": VegaDeleteView,
         }
+
+    def get_protected_actions(self):
+        """get list of actions that have login protection"""
+        if isinstance(self.protected_actions, list):
+            return self.protected_actions
+        return []
 
     def get_search_fields(self):
         """Get search fields for list view"""
@@ -262,11 +272,16 @@ class VegaCRUDView:
                 options["form_class"] = self.get_search_form_class()
                 options["paginate_by"] = self.paginate_by
 
+            inherited_classes = (view_class,)
+            # login protection
+            if action in self.get_protected_actions():
+                inherited_classes = (LoginRequiredMixin, view_class,)
+
             # create and return the View class
             view_label = settings.VEGA_VIEW_LABEL
             return type(
                 f"{self.model_name.title()}{action.title()}{view_label}",
-                (view_class,),  # the classes that we should inherit
+                inherited_classes,  # the classes that we should inherit
                 options,
             )
 
@@ -288,7 +303,7 @@ class VegaCRUDView:
         Get list of tuples of (action, url_name)
         """
         if actions is None:
-            actions = self.actions
+            actions = self.get_actions()
         return [self.get_action_urlname(_) for _ in actions]
 
     def get_url_pattern_for_action(self, view_class, action: str):
@@ -307,7 +322,7 @@ class VegaCRUDView:
         Returns the URL patters for the selected actions in this CRUD view
         """
         if actions is None:
-            actions = self.actions
+            actions = self.get_actions()
         urls = []
         for action in actions:
             view_class = self.get_view_class_for_action(action=action)

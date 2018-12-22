@@ -50,7 +50,11 @@ TEMPLATES = [
     },
 ]
 
-MIDDLEWARE = ['django.contrib.messages.middleware.MessageMiddleware']
+MIDDLEWARE = [
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware'
+]
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 
 TIME_ZONE = 'Africa/Nairobi'
