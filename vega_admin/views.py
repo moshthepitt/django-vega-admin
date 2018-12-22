@@ -238,6 +238,15 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         """Get view class for delete action"""
         return VegaDeleteView
 
+    def get_success_url(self):  # pylint: disable=no-self-use
+        """Get success_url"""
+        return reverse_lazy(
+            self.get_url_name_for_action(settings.VEGA_LIST_ACTION))
+
+    def get_cancel_url(self):  # pylint: disable=no-self-use
+        """Get cancel_url"""
+        return self.get_success_url()
+
     # pylint: disable=no-self-use
     def enforce_login_protection(self, view_class: object):
         """ensures view class has login protection"""
@@ -292,15 +301,14 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
             self.get_url_name_for_action(settings.VEGA_LIST_ACTION))
         options["create_url"] = reverse_lazy(
             self.get_url_name_for_action(settings.VEGA_CREATE_ACTION))
-        options["cancel_url"] = options["list_url"]
+        options["cancel_url"] = self.get_cancel_url()
 
         # add the success url
         if action in [
                 settings.VEGA_CREATE_ACTION, settings.VEGA_UPDATE_ACTION,
                 settings.VEGA_DELETE_ACTION
         ]:
-            options["success_url"] = reverse_lazy(
-                self.get_url_name_for_action(settings.VEGA_LIST_ACTION))
+            options["success_url"] = self.get_success_url()
 
         # add the create form class
         if action == settings.VEGA_CREATE_ACTION:
