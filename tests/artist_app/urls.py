@@ -9,6 +9,8 @@ artist_crud_patterns = views.ArtistCRUD().url_patterns()
 custom_artist_crud_patterns = views.CustomArtistCRUD().url_patterns()
 song_crud_patterns = views.SongCRUD().url_patterns()
 protected_crud_song_patterns = views.CustomSongCRUD().url_patterns()
+custom_default_patterns = views.CustomDefaultActions().url_patterns()
+
 
 urlpatterns = [
     path('list/artists/', views.ArtistListView.as_view()),
@@ -16,4 +18,4 @@ urlpatterns = [
     path('edit/artists/edit/<int:pk>', views.ArtistUpdate.as_view()),
     path('edit/artists/delete/<int:pk>', views.ArtistDelete.as_view()),
 ] + artist_crud_patterns + song_crud_patterns + custom_artist_crud_patterns +\
-    protected_crud_song_patterns
+    protected_crud_song_patterns + custom_default_patterns

@@ -110,6 +110,35 @@ class ArtistCRUD(VegaCRUDView):
     protected_actions = None
 
 
+class CustomDefaultActions(ArtistCRUD):
+    """CRUD view with custom default actions"""
+
+    # pylint: disable=too-many-ancestors
+    class CustomCreateView(ArtistCreate):
+        """custom Create view"""
+        pass
+
+    class CustomUpdateView(ArtistUpdate):
+        """custom Update view"""
+        pass
+
+    class CustomListView(ArtistListView):
+        """custom list view"""
+        pass
+
+    class CustomDeleteView(ArtistDelete):
+        """custom Delete view"""
+        pass
+
+    view_classes = {
+        "list": CustomListView,
+        "update": CustomUpdateView,
+        "create": CustomCreateView,
+        "delete": CustomDeleteView,
+    }
+    crud_path = "custom-default-actions"
+
+
 class CustomArtistCRUD(VegaCRUDView):
     """
     CRUD view for artists with custom forms and table

@@ -5,7 +5,6 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase, override_settings
 from django.urls import reverse
-
 from model_mommy import mommy
 
 from vega_admin.views import (VegaCreateView, VegaCRUDView, VegaDeleteView,
@@ -15,7 +14,8 @@ from .artist_app.forms import ArtistForm, CustomSearchForm
 from .artist_app.models import Artist, Song
 from .artist_app.tables import ArtistTable
 from .artist_app.views import (ArtistCreate, ArtistDelete, ArtistListView,
-                               ArtistUpdate, CustomSongCRUD)
+                               ArtistUpdate, CustomDefaultActions,
+                               CustomSongCRUD)
 
 
 class TestViewsBase(TestCase):
@@ -400,6 +400,36 @@ class TestCRUD(TestViewsBase):
         res = self.client.get(template_view_url)
         self.assertEqual(res.status_code, 200)
         self.assertIsInstance(res.context["view"], CustomSongCRUD.FooView)
+
+    def test_custom_default_views(self):
+        """Test custom default views"""
+
+        artist = mommy.make("artist_app.Artist")
+        url = reverse("custom-default-actions-list")
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertIsInstance(res.context["view"],
+                              CustomDefaultActions.CustomListView)
+
+        url = reverse("custom-default-actions-create")
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertIsInstance(res.context["view"],
+                              CustomDefaultActions.CustomCreateView)
+
+        url = reverse(
+            "custom-default-actions-update", kwargs={"pk": artist.pk})
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertIsInstance(res.context["view"],
+                              CustomDefaultActions.CustomUpdateView)
+
+        url = reverse(
+            "custom-default-actions-delete", kwargs={"pk": artist.pk})
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertIsInstance(res.context["view"],
+                              CustomDefaultActions.CustomDeleteView)
 
     def test_list_options(self):
         """
