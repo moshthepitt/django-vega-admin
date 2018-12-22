@@ -433,3 +433,12 @@ class TestCRUD(TestViewsBase):
         self.assertEqual(ArtistTable, list_res.context["view"].table_class)
         self.assertEqual(["name"], list_res.context["view"].search_fields)
         self.assertEqual(CustomSearchForm, list_res.context["view"].form_class)
+
+    def test_paginate_by(self):
+        """
+        Test paginate_by
+        """
+        mommy.make("artist_app.Artist", _quantity=20)
+        list_url = reverse("custom-artist-list")
+        list_res = self.client.get(list_url)
+        self.assertEqual(list_res.context["object_list"].count(), 10)
