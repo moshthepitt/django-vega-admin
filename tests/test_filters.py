@@ -34,6 +34,7 @@ class TestFilters(TestViewsBase):
         bob_user = User.objects.get(pk=bob_user.pk)
         self.client.force_login(bob_user)
 
+        # using generated filter class
         res = self.client.get(reverse('filters-list'))
         self.assertEqual(200, res.status_code)
         self.assertEqual(res.context["object_list"].count(), 9)
@@ -51,5 +52,11 @@ class TestFilters(TestViewsBase):
         self.assertEqual(res.context["object_list"].count(), 1)
 
         res = self.client.get(f"{reverse('filters-list')}?name=2")
+        self.assertEqual(200, res.status_code)
+        self.assertEqual(res.context["object_list"].count(), 1)
+
+        # using a concrete filter class
+        res = self.client.get(
+            f"{reverse('filters2-list')}?artist={artist2.pk}")
         self.assertEqual(200, res.status_code)
         self.assertEqual(res.context["object_list"].count(), 1)

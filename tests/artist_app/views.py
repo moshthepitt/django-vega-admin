@@ -5,6 +5,7 @@ from django.views.generic import TemplateView
 
 from braces.views import LoginRequiredMixin, PermissionRequiredMixin
 
+from django_filters import FilterSet
 from vega_admin.mixins import SimpleURLPatternMixin
 from vega_admin.views import (VegaCreateView, VegaCRUDView, VegaDeleteView,
                               VegaListView, VegaUpdateView)
@@ -225,3 +226,21 @@ class FilterSongCRUD(VegaCRUDView):
     actions = ["list", ]
     filter_fields = ["name", "artist", ]
     crud_path = "filters"
+
+
+class Filter2SongCRUD(VegaCRUDView):
+    """
+    CRUD view for songs with filtering
+    """
+
+    class SongFilter(FilterSet):
+        """Song filter class"""
+
+        class Meta:
+            model = Song
+            fields = ["artist", ]
+
+    model = Song
+    actions = ["list", ]
+    filter_class = SongFilter
+    crud_path = "filters2"
