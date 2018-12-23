@@ -305,10 +305,6 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
             {},
         )
 
-    def get_permission_for_action(self, action: str):
-        """Get permission for action"""
-        return f"{self.app_label}.{action}_{self.model_name}"
-
     def get_default_action_view_classes(self, action: str):
         """Get view class for default actions"""
         if action == settings.VEGA_LIST_ACTION:
@@ -413,6 +409,10 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         Returns the url name for the action
         """
         return f"{self.crud_path}-{action}"
+
+    def get_permission_for_action(self, action: str):
+        """Get permission for action"""
+        return f"{self.app_label}.{action}_{self.model_name}"
 
     def get_action_urlname(self, action: str):
         """
