@@ -18,7 +18,7 @@ from vega_admin.mixins import (CRUDURLsMixin, DeleteViewMixin,
                                ListViewSearchMixin, ObjectURLPatternMixin,
                                PageTitleMixin, SimpleURLPatternMixin,
                                VegaFormMixin, VerboseNameMixin)
-from vega_admin.utils import get_modelform, get_table
+from vega_admin.utils import get_modelform, get_table, get_filterclass
 
 
 # pylint: disable=too-many-ancestors
@@ -104,6 +104,8 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
     view_classes = {}
     list_fields = None
     search_fields = None
+    filter_fields = None
+    filter_class = None
     search_form_class = ListViewSearchForm
     form_fields = None
     create_fields = None
@@ -156,6 +158,10 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
     def get_search_fields(self):
         """Get search fields for list view"""
         return self.search_fields
+
+    def get_filter_fields(self):
+        """Get filter fields for list view"""
+        return self.filter_fields
 
     def get_search_form_class(self):
         """Get search form for list view"""
@@ -231,6 +237,17 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
             tables_kwargs["attrs"] = self.table_attrs
 
         return get_table(**tables_kwargs)
+
+    def get_filter_class(self):
+        if self.filter_class:
+            return self.filter_class
+
+        filter_kwargs = {
+            "model": self.model,
+            "fields": self.get_filter_fields()
+        }
+
+        return get_filterclass(**filter_kwargs)
 
     def get_create_view_class(self):  # pylint: disable=no-self-use
         """Get view class for create action"""
@@ -380,6 +397,9 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
             options["search_fields"] = self.get_search_fields()
             options["form_class"] = self.get_search_form_class()
             options["paginate_by"] = self.paginate_by
+
+            if self.get_filter_fields() or self.filter_class:
+                options["filter_class"] = self.get_filter_class()
 
         inherited_classes = (view_class,)
 
