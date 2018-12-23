@@ -27,6 +27,7 @@ VEGA_FORM_INVALID_TXT = "Please correct the errors on the form."
 VEGA_DELETE_PROTECTED_ERROR_TXT = (
     "You cannot delete this item, it is referenced by other items."
 )
+VEGA_PERMREQUIRED_NOT_SET_TXT = "PermissionRequiredMixin not set for"
 VEGA_LISTVIEW_SEARCH_TXT = "Search"
 VEGA_LISTVIEW_SEARCH_QUERY_TXT = "Search Query"
 VEGA_NOTHING_TO_SHOW = "Nothing to show"

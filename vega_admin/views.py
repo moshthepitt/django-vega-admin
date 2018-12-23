@@ -1,12 +1,15 @@
 """
 Views module
 """
-from braces.views import FormMessagesMixin, LoginRequiredMixin
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.urls import path, reverse_lazy
 from django.utils.translation import ugettext as _
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
+
+from braces.views import (FormMessagesMixin, LoginRequiredMixin,
+                          PermissionRequiredMixin)
 from django_tables2 import SingleTableView
 from django_tables2.export.views import ExportMixin
 
@@ -97,6 +100,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
 
     actions = settings.VEGA_DEFAULT_ACTIONS
     protected_actions = actions  # actions that require login
+    permissions_actions = actions
     view_classes = {}
     list_fields = None
     search_fields = None
@@ -138,9 +142,15 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         return self.view_classes
 
     def get_protected_actions(self):
-        """get list of actions that have login protection"""
+        """Get list of actions that have login protection"""
         if isinstance(self.protected_actions, list):
             return self.protected_actions
+        return []
+
+    def get_permissions_actions(self):
+        """Get list of actions that have permissions protection"""
+        if isinstance(self.permissions_actions, list):
+            return self.permissions_actions
         return []
 
     def get_search_fields(self):
@@ -248,6 +258,41 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         return self.get_success_url()
 
     # pylint: disable=no-self-use
+    def enforce_permission_protection(self, view_class: object, action: str):
+        """ensures view class has permission protection"""
+        has_perms_mixin = issubclass(view_class, PermissionRequiredMixin)
+        has_login_mixin = issubclass(view_class, LoginRequiredMixin)
+
+        options = {
+            "permission_required": self.get_permission_for_action(action)
+        }
+
+        if not has_login_mixin and not has_perms_mixin:
+            # add LoginRequiredMixin and PermissionRequiredMixin
+            return type(
+                f"{view_class.__name__}{settings.VEGA_PROTECTED_LABEL}",
+                (LoginRequiredMixin, PermissionRequiredMixin, view_class,),
+                options,
+            )
+
+        if not has_login_mixin:
+            # add LoginRequiredMixin
+            return type(
+                f"{view_class.__name__}{settings.VEGA_PROTECTED_LABEL}",
+                (LoginRequiredMixin, view_class,),
+                options,
+            )
+
+        if not has_perms_mixin:
+            # in this case the LoginRequiredMixin was set but not
+            # PermissionRequiredMixin
+            raise ImproperlyConfigured(
+                _(f"{settings.VEGA_PERMREQUIRED_NOT_SET_TXT} {view_class.__name__}")  # noqa
+            )
+
+        return view_class
+
+    # pylint: disable=no-self-use
     def enforce_login_protection(self, view_class: object):
         """ensures view class has login protection"""
         if issubclass(view_class, LoginRequiredMixin):
@@ -290,8 +335,12 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
             # lets get the view class for the default actions
             view_class = self.get_default_action_view_classes(action)
         else:
+            if action in self.get_permissions_actions():
+                return self.enforce_permission_protection(view_class, action)
+
             if action in self.get_protected_actions():
                 return self.enforce_login_protection(view_class)
+
             return view_class
 
         # lets go on and create the view class(es)
@@ -333,8 +382,17 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
             options["paginate_by"] = self.paginate_by
 
         inherited_classes = (view_class,)
-        # login protection
-        if action in self.get_protected_actions():
+
+        # permissions and login protection
+        if action in self.get_permissions_actions():
+            inherited_classes = (
+                LoginRequiredMixin,
+                PermissionRequiredMixin,
+                view_class,
+            )
+            options["permission_required"] = self.get_permission_for_action(
+                action)
+        elif action in self.get_protected_actions():
             inherited_classes = (LoginRequiredMixin, view_class,)
 
         # create and return the View class
@@ -351,6 +409,10 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         Returns the url name for the action
         """
         return f"{self.crud_path}-{action}"
+
+    def get_permission_for_action(self, action: str):
+        """Get permission for action"""
+        return f"{self.app_label}.{action}_{self.model_name}"
 
     def get_action_urlname(self, action: str):
         """
