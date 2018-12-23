@@ -17,14 +17,12 @@ from vega_admin.forms import ListViewSearchForm
 from vega_admin.mixins import (CRUDURLsMixin, DeleteViewMixin,
                                ListViewSearchMixin, ObjectURLPatternMixin,
                                PageTitleMixin, SimpleURLPatternMixin,
-                               VegaFormMixin, VegaPermissionsMixin,
-                               VerboseNameMixin)
+                               VegaFormMixin, VerboseNameMixin)
 from vega_admin.utils import get_modelform, get_table
 
 
 # pylint: disable=too-many-ancestors
 class VegaListView(
-        VegaPermissionsMixin,
         VerboseNameMixin,
         ListViewSearchMixin,
         PageTitleMixin,
@@ -41,7 +39,6 @@ class VegaListView(
 
 
 class VegaCreateView(
-        VegaPermissionsMixin,
         FormMessagesMixin,
         PageTitleMixin,
         VerboseNameMixin,
@@ -59,7 +56,6 @@ class VegaCreateView(
 
 
 class VegaUpdateView(
-        VegaPermissionsMixin,
         FormMessagesMixin,
         PageTitleMixin,
         VerboseNameMixin,
@@ -77,7 +73,6 @@ class VegaUpdateView(
 
 
 class VegaDeleteView(
-        VegaPermissionsMixin,
         FormMessagesMixin,
         PageTitleMixin,
         VerboseNameMixin,
