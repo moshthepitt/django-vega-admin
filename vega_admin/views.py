@@ -263,7 +263,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         return self.get_success_url()
 
     # pylint: disable=no-self-use
-    def enforce_permission_protection(self, view_class: object):
+    def enforce_permission_protection(self, view_class: object, action: str):
         """ensures view class has permission protection"""
         has_perms_mixin = issubclass(view_class, PermissionRequiredMixin)
         has_login_mixin = issubclass(view_class, LoginRequiredMixin)
@@ -273,7 +273,10 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
             return type(
                 f"{view_class.__name__}{settings.VEGA_PROTECTED_LABEL}",
                 (LoginRequiredMixin, PermissionRequiredMixin, view_class,),
-                {},
+                {
+                    "permission_required": self.get_permission_for_action(
+                        action)
+                },
             )
 
         if not has_login_mixin:
@@ -306,6 +309,10 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
             {},
         )
 
+    def get_permission_for_action(self, action: str):
+        """Get permission for action"""
+        return f"{self.app_label}.{action}_{self.model_name}"
+
     def get_default_action_view_classes(self, action: str):
         """Get view class for default actions"""
         if action == settings.VEGA_LIST_ACTION:
@@ -336,8 +343,12 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
             # lets get the view class for the default actions
             view_class = self.get_default_action_view_classes(action)
         else:
+            if action in self.get_permissions_actions():
+                return self.enforce_permission_protection(view_class, action)
+
             if action in self.get_protected_actions():
                 return self.enforce_login_protection(view_class)
+
             return view_class
 
         # lets go on and create the view class(es)
@@ -387,6 +398,8 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
                 PermissionRequiredMixin,
                 view_class,
             )
+            options["permission_required"] = self.get_permission_for_action(
+                action)
         elif action in self.get_protected_actions():
             inherited_classes = (LoginRequiredMixin, view_class,)
 
