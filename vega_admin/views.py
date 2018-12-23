@@ -263,15 +263,16 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         has_perms_mixin = issubclass(view_class, PermissionRequiredMixin)
         has_login_mixin = issubclass(view_class, LoginRequiredMixin)
 
+        options = {
+            "permission_required": self.get_permission_for_action(action)
+        }
+
         if not has_login_mixin and not has_perms_mixin:
             # add LoginRequiredMixin and PermissionRequiredMixin
             return type(
                 f"{view_class.__name__}{settings.VEGA_PROTECTED_LABEL}",
                 (LoginRequiredMixin, PermissionRequiredMixin, view_class,),
-                {
-                    "permission_required": self.get_permission_for_action(
-                        action)
-                },
+                options,
             )
 
         if not has_login_mixin:
@@ -279,7 +280,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
             return type(
                 f"{view_class.__name__}{settings.VEGA_PROTECTED_LABEL}",
                 (LoginRequiredMixin, view_class,),
-                {},
+                options,
             )
 
         if not has_perms_mixin:
