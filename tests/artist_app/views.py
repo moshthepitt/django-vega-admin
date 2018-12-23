@@ -7,7 +7,7 @@ from vega_admin.mixins import SimpleURLPatternMixin
 from vega_admin.views import (VegaCreateView, VegaCRUDView, VegaDeleteView,
                               VegaListView, VegaUpdateView)
 
-from .forms import ArtistForm, CustomSearchForm
+from .forms import ArtistForm, CustomSearchForm, SongForm
 from .models import Artist, Song
 from .tables import ArtistTable
 
@@ -101,6 +101,7 @@ class CustomSongCRUD(SongCRUD):
         "artists": CustomListView,
         "template": FooView,
     }
+    form_fields = ["name", "artist"]
 
 
 class PermsSongCRUD(CustomSongCRUD):
@@ -111,6 +112,7 @@ class PermsSongCRUD(CustomSongCRUD):
     protected_actions = ["create", "update", "delete", "artists", "list"]
     permissions_actions = ["create", "update", "delete", "artists"]
     crud_path = "hidden-songs"
+    form_class = SongForm
 
 
 class ArtistCRUD(VegaCRUDView):
