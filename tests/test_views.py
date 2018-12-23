@@ -59,6 +59,23 @@ class TestViewsBase(TestCase):
         return [list_permission, create_permission, update_permission,
                 delete_permission, artists_permission, ]
 
+    def _artist_permissions(self):
+        """
+        Create permissions
+        """
+        content_type = ContentType.objects.get_for_model(Artist)
+        list_permission, _ = Permission.objects.get_or_create(
+            codename='list_artist',
+            content_type=content_type,
+            defaults=dict(name='Can List Artists'),
+        )
+        other_permission, _ = Permission.objects.get_or_create(
+            codename='other_artist',
+            content_type=content_type,
+            defaults=dict(name='Can `Other` Artists'),
+        )
+        return [list_permission, other_permission, ]
+
     def setUp(self):
         """setUp"""
         super().setUp()
@@ -76,6 +93,8 @@ class TestViewsBase(TestCase):
         Artist.objects.all().delete()
         Permission.objects.filter(
             content_type=ContentType.objects.get_for_model(Song)).delete()
+        Permission.objects.filter(
+            content_type=ContentType.objects.get_for_model(Artist)).delete()
         User.objects.all().delete()
 
 
@@ -701,3 +720,17 @@ class TestCRUD(TestViewsBase):
 
         with self.assertRaises(ImproperlyConfigured):
             reverse("broken-list")
+
+    def test_custom_permission_protection(self):
+        """Test custom views"""
+        bob_user = mommy.make('auth.User')
+        permissions = self._artist_permissions()
+        bob_user.user_permissions.add(*permissions)
+        bob_user = User.objects.get(pk=bob_user.pk)
+        self.client.force_login(bob_user)
+
+        res = self.client.get(reverse("42-list"))
+        self.assertEqual(200, res.status_code)
+
+        res = self.client.get(reverse("42-other"))
+        self.assertEqual(200, res.status_code)
