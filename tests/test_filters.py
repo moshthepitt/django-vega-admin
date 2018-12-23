@@ -40,7 +40,7 @@ class TestFilters(TestViewsBase):
 
         res = self.client.get(f"{reverse('filters-list')}?artist={artist1.pk}")
         self.assertEqual(200, res.status_code)
-        self.assertEqual(res.context["object_list"].count(), 2)
+        self.assertEqual(res.context["object_list"].count(), 8)
 
         res = self.client.get(f"{reverse('filters-list')}?artist={artist2.pk}")
         self.assertEqual(200, res.status_code)
