@@ -3,15 +3,16 @@ vega-admin forms module
 """
 from django import forms
 from django.conf import settings
-from django.utils.html import format_html
-from django.utils.translation import ugettext as _
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
+from django.utils.html import format_html
+from django.utils.translation import ugettext as _
 
 import django_tables2 as tables
 from crispy_forms.bootstrap import FormActions
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import HTML, Div, Layout, Submit
+from django_filters import FilterSet
 
 from vega_admin.mixins import VegaFormMixin
 
@@ -164,3 +165,31 @@ def get_table(
     )
 
     return table_class
+
+
+def get_filterclass(model: object, fields: list = None):
+    """
+    Get the Filter Class for the provided model
+
+    :param model: the model class
+    :param fields: list of the fields that you want included in the table
+    :return: filter class
+    """
+    # the Meta class
+    meta_options = {
+        "model": model,
+        "fields": fields,
+    }
+    meta_class = type("Meta", (), meta_options)
+
+    # the attributes of our new table class
+    options = {"Meta": meta_class}
+
+    # create the filter_class dynamically using type
+    filter_class = type(
+        f"{model.__name__.title()}{settings.VEGA_FILTER_LABEL}",
+        (FilterSet, ),
+        options,
+    )
+
+    return filter_class
