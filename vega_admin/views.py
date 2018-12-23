@@ -213,11 +213,23 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         return get_modelform(
             model=self.model, fields=self.get_updateform_fields())
 
+    def get_list_fields(self):
+        """
+        Get the list_fields
+        """
+        return self.list_fields
+
     def get_table_actions(self):
         """
         Get the table actions
         """
         return self.table_actions
+
+    def get_table_attrs(self):
+        """
+        Get the table_attrs
+        """
+        return self.table_attrs
 
     def get_table_class(self):
         """
@@ -227,14 +239,14 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
             return self.table_class
 
         tables_kwargs = {"model": self.model}
-        if isinstance(self.list_fields, list):
-            tables_kwargs["fields"] = self.list_fields
-        if isinstance(self.table_actions, list):
+        if isinstance(self.get_list_fields(), list):
+            tables_kwargs["fields"] = self.get_list_fields()
+        if isinstance(self.get_table_actions(), list):
             tables_kwargs["actions"] = self.get_action_urlnames(
-                actions=self.table_actions
+                actions=self.get_table_actions()
             )
-        if isinstance(self.table_attrs, dict):
-            tables_kwargs["attrs"] = self.table_attrs
+        if isinstance(self.get_table_attrs(), dict):
+            tables_kwargs["attrs"] = self.get_table_attrs()
 
         return get_table(**tables_kwargs)
 
