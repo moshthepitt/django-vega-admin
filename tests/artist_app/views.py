@@ -103,6 +103,16 @@ class CustomSongCRUD(SongCRUD):
     }
 
 
+class PermsSongCRUD(CustomSongCRUD):
+    """
+    CRUD view for songs with permissions protection
+    """
+
+    protected_actions = ["create", "update", "delete", "artists", "list"]
+    permissions_actions = ["create", "update", "delete", "artists"]
+    crud_path = "hidden-songs"
+
+
 class ArtistCRUD(VegaCRUDView):
     """
     CRUD view for artists

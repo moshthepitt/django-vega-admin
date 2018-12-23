@@ -2,9 +2,11 @@
 vega-admin module to test views
 """
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Permission, User
+from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase, override_settings
 from django.urls import reverse
+
 from model_mommy import mommy
 
 from vega_admin.views import (VegaCreateView, VegaCRUDView, VegaDeleteView,
@@ -23,6 +25,39 @@ class TestViewsBase(TestCase):
     Base test class for views
     """
 
+    def _song_permissions(self):
+        """
+        Create permissions
+        """
+        content_type = ContentType.objects.get_for_model(Song)
+        list_permission, _ = Permission.objects.get_or_create(
+            codename='list_song',
+            content_type=content_type,
+            defaults=dict(name='Can List Songs'),
+        )
+        create_permission, _ = Permission.objects.get_or_create(
+            codename='create_song',
+            content_type=content_type,
+            defaults=dict(name='Can Create Songs'),
+        )
+        update_permission, _ = Permission.objects.get_or_create(
+            codename='update_song',
+            content_type=content_type,
+            defaults=dict(name='Can Update Songs'),
+        )
+        delete_permission, _ = Permission.objects.get_or_create(
+            codename='delete_song',
+            content_type=content_type,
+            defaults=dict(name='Can Delete Songs'),
+        )
+        artists_permission, _ = Permission.objects.get_or_create(
+            codename='artists_song',
+            content_type=content_type,
+            defaults=dict(name='Can List Song Artists'),
+        )
+        return [list_permission, create_permission, update_permission,
+                delete_permission, artists_permission, ]
+
     def setUp(self):
         """setUp"""
         super().setUp()
@@ -38,6 +73,8 @@ class TestViewsBase(TestCase):
         super().setUp()
         Song.objects.all().delete()
         Artist.objects.all().delete()
+        Permission.objects.filter(
+            content_type=ContentType.objects.get_for_model(Song)).delete()
         User.objects.all().delete()
 
 
@@ -560,3 +597,94 @@ class TestCRUD(TestViewsBase):
 
         res2 = self.client.get(template_view_url)
         self.assertEqual(res2.status_code, 200)
+
+    @override_settings(LOGIN_URL='/list/artists/')
+    def test_permission_protection(self):
+        """
+        Test permission protection
+        """
+        artist = mommy.make("artist_app.Artist", name="Mosh")
+        song = mommy.make("artist_app.Song", name="Song 42", artist=artist)
+        create_url = reverse("hidden-songs-create")
+        update_url = reverse("hidden-songs-update", kwargs={"pk": song.id})
+        delete_url = reverse("hidden-songs-delete", kwargs={"pk": song.id})
+        artists_url = reverse("hidden-songs-artists")
+        list_url = reverse("hidden-songs-list")  # not protected
+        template_url = reverse("hidden-songs-template")  # not protected
+
+        # first check that login is required
+        create_res = self.client.get(create_url)
+        self.assertEqual(302, create_res.status_code)
+        self.assertRedirects(create_res, f"/list/artists/?next={create_url}")
+
+        update_res = self.client.get(update_url)
+        self.assertEqual(302, update_res.status_code)
+        self.assertRedirects(update_res, f"/list/artists/?next={update_url}")
+
+        delete_res = self.client.get(delete_url)
+        self.assertEqual(302, delete_res.status_code)
+        self.assertRedirects(delete_res, f"/list/artists/?next={delete_url}")
+
+        list_res = self.client.get(list_url)
+        self.assertEqual(302, list_res.status_code)
+        self.assertRedirects(list_res, f"/list/artists/?next={list_url}")
+
+        artists_res = self.client.get(artists_url)
+        self.assertEqual(302, artists_res.status_code)
+        self.assertRedirects(artists_res, f"/list/artists/?next={artists_url}")
+
+        # the template action is not set to be protected
+        template_res = self.client.get(template_url)
+        self.assertEqual(200, template_res.status_code)
+
+        # now login to ensure that even a logged in user needs perms
+        alice_user = mommy.make('auth.User', username='alice')
+        self.client.force_login(alice_user)
+
+        create_res = self.client.get(create_url)
+        self.assertEqual(302, create_res.status_code)
+        self.assertRedirects(create_res, f"/list/artists/?next={create_url}")
+
+        update_res = self.client.get(update_url)
+        self.assertEqual(302, update_res.status_code)
+        self.assertRedirects(update_res, f"/list/artists/?next={update_url}")
+
+        delete_res = self.client.get(delete_url)
+        self.assertEqual(302, delete_res.status_code)
+        self.assertRedirects(delete_res, f"/list/artists/?next={delete_url}")
+
+        list_res = self.client.get(list_url)
+        self.assertEqual(200, list_res.status_code)
+
+        artists_res = self.client.get(artists_url)
+        self.assertEqual(302, artists_res.status_code)
+        self.assertRedirects(artists_res, f"/list/artists/?next={artists_url}")
+
+        # the template action is not set to be protected
+        template_res = self.client.get(template_url)
+        self.assertEqual(200, template_res.status_code)
+
+        # now log in with a user who HAS the permissions
+        bob_user = mommy.make('auth.User')
+        permissions = self._song_permissions()
+        bob_user.user_permissions.add(*permissions)
+        bob_user = User.objects.get(pk=bob_user.pk)
+        self.client.force_login(bob_user)
+
+        create_res = self.client.get(create_url)
+        self.assertEqual(200, create_res.status_code)
+
+        update_res = self.client.get(update_url)
+        self.assertEqual(200, update_res.status_code)
+
+        delete_res = self.client.get(delete_url)
+        self.assertEqual(200, delete_res.status_code)
+
+        artists_res = self.client.get(artists_url)
+        self.assertEqual(200, artists_res.status_code)
+
+        list_res = self.client.get(list_url)
+        self.assertEqual(200, list_res.status_code)
+
+        template_res = self.client.get(template_url)
+        self.assertEqual(200, template_res.status_code)
