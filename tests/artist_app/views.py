@@ -73,6 +73,7 @@ class SongCRUD(VegaCRUDView):
 
     model = Song
     protected_actions = None
+    permissions_actions = None
     list_fields = ["name", "artist", ]
     table_attrs = {"class": "song-table"}
     table_actions = ["create", "update", "delete", ]
@@ -94,6 +95,7 @@ class CustomSongCRUD(SongCRUD):
         template_name = "artist_app/empty.html"
 
     protected_actions = ["create", "update", "delete", "template"]
+    permissions_actions = None
     crud_path = "private-songs"
     view_classes = {
         "artists": CustomListView,
@@ -108,6 +110,7 @@ class ArtistCRUD(VegaCRUDView):
 
     model = Artist
     protected_actions = None
+    permissions_actions = None
 
 
 class CustomDefaultActions(ArtistCRUD):
@@ -146,6 +149,7 @@ class CustomArtistCRUD(VegaCRUDView):
 
     model = Artist
     protected_actions = None
+    permissions_actions = None
     crud_path = "custom-artist"
     create_form_class = ArtistForm
     update_form_class = ArtistForm
