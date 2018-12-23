@@ -4,8 +4,12 @@
 #
 #    pip-compile --output-file requirements/dev.txt requirements/dev.in
 #
+appdirs==1.4.3            # via black
 astroid==2.0.4            # via pylint
+attrs==18.2.0             # via black
 backcall==0.1.0           # via ipython
+black==18.9b0
+click==7.0                # via black
 coverage==4.5.2
 decorator==4.3.0          # via ipython, traitlets
 django-braces==1.13.0
@@ -46,7 +50,7 @@ pytz==2018.7              # via django
 pyyaml==3.13              # via tablib
 six==1.11.0               # via astroid, model-mommy, prompt-toolkit, tox, traitlets
 tablib==0.12.1
-toml==0.10.0              # via tox
+toml==0.10.0              # via black, tox
 tox==3.5.3
 traitlets==4.3.2          # via ipython
 typed-ast==1.1.0          # via astroid
