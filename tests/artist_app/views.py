@@ -214,3 +214,14 @@ class CustomArtistCRUD(VegaCRUDView):
     search_fields = ["name"]
     search_form_class = CustomSearchForm
     paginate_by = 10
+
+
+class FilterSongCRUD(VegaCRUDView):
+    """
+    CRUD view for songs with filtering
+    """
+
+    model = Song
+    actions = ["list", ]
+    filter_fields = ["name", "artist", ]
+    crud_path = "filters"
