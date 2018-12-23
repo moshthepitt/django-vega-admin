@@ -3,6 +3,8 @@ Module for vega-admin test views
 """
 from django.views.generic import TemplateView
 
+from braces.views import LoginRequiredMixin
+
 from vega_admin.mixins import SimpleURLPatternMixin
 from vega_admin.views import (VegaCreateView, VegaCRUDView, VegaDeleteView,
                               VegaListView, VegaUpdateView)
@@ -152,6 +154,24 @@ class CustomDefaultActions(ArtistCRUD):
         "delete": CustomDeleteView,
     }
     crud_path = "custom-default-actions"
+
+
+class BrokenCRUD(VegaCRUDView):
+    """CRUD view with custom default actions"""
+
+    # pylint: disable=too-many-ancestors
+    class BrokenListView(LoginRequiredMixin, VegaListView):
+        """View that is broken"""
+
+        pass
+
+    model = Artist
+    actions = ["break"]
+    permissions_actions = actions
+    view_classes = {
+        "break": BrokenListView,
+    }
+    crud_path = "broken"
 
 
 class CustomArtistCRUD(VegaCRUDView):

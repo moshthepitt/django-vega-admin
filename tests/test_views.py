@@ -2,6 +2,7 @@
 vega-admin module to test views
 """
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase, override_settings
@@ -688,3 +689,15 @@ class TestCRUD(TestViewsBase):
 
         template_res = self.client.get(template_url)
         self.assertEqual(200, template_res.status_code)
+
+    @override_settings(ROOT_URLCONF="tests.artist_app.broken_urls")
+    def test_broken_permission_protection(self):
+        """Test custom views"""
+        bob_user = mommy.make('auth.User')
+        permissions = self._song_permissions()
+        bob_user.user_permissions.add(*permissions)
+        bob_user = User.objects.get(pk=bob_user.pk)
+        self.client.force_login(bob_user)
+
+        with self.assertRaises(ImproperlyConfigured):
+            reverse("broken-list")
