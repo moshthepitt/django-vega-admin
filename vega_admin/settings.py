@@ -14,6 +14,10 @@ VEGA_DEFAULT_ACTIONS = [
     VEGA_LIST_ACTION,
     VEGA_DELETE_ACTION,
 ]
+VEGA_CREATE_PERMISSION_NAME = "create"
+VEGA_UPDATE_PERMISSION_NAME = "update"
+VEGA_LIST_PERMISSION_NAME = "list"
+VEGA_DELETE_PERMISSION_NAME = "delete"
 
 # crispy forms
 VEGA_CRISPY_TEMPLATE_PACK = getattr(
@@ -27,6 +31,8 @@ VEGA_FORM_INVALID_TXT = "Please correct the errors on the form."
 VEGA_DELETE_PROTECTED_ERROR_TXT = (
     "You cannot delete this item, it is referenced by other items."
 )
+VEGA_ACTION_NOT_SET_TXT = "No action set for this view."
+VEGA_PERMREQUIRED_NOT_SET_TXT = "PermissionRequiredMixin not set for"
 VEGA_LISTVIEW_SEARCH_TXT = "Search"
 VEGA_LISTVIEW_SEARCH_QUERY_TXT = "Search Query"
 VEGA_NOTHING_TO_SHOW = "Nothing to show"
