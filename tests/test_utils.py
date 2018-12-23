@@ -1,11 +1,14 @@
 """
 vega-admin module to test utils
 """
+from django.forms import ModelForm
 from django.test import TestCase, override_settings
 
-from tests.artist_app.models import Artist
+from django_filters import FilterSet
+from django_tables2 import Table
+from tests.artist_app.models import Artist, Song
 
-from vega_admin.utils import get_table, get_modelform
+from vega_admin.utils import get_filterclass, get_modelform, get_table
 
 
 class TestUtils(TestCase):
@@ -17,6 +20,7 @@ class TestUtils(TestCase):
         """Test get_modelform"""
         # basic form
         form = get_modelform(model=Artist)
+        self.assertTrue(issubclass(form, ModelForm))
         self.assertEqual(Artist, form.model)
         self.assertEqual(["id", "name"], form.Meta.fields)
         # form with all options
@@ -31,6 +35,7 @@ class TestUtils(TestCase):
         """
         # basic table
         table = get_table(model=Artist)
+        self.assertTrue(issubclass(table, Table))
         self.assertEqual(Artist, table.Meta.model)
         self.assertEqual("Nothing here", table.Meta.empty_text)
         self.assertEqual(
@@ -45,3 +50,10 @@ class TestUtils(TestCase):
         self.assertEqual(["id"], table2.Meta.exclude)
         self.assertEqual({"class": "mytable"}, table2.Meta.attrs)
         self.assertEqual(("name", "..."), table2.Meta.sequence)
+
+    def test_get_filterclass(self):
+        """Test get_filterclass"""
+        filter_class = get_filterclass(model=Song, fields=["artist"])
+        self.assertEqual(Song, filter_class.Meta.model)
+        self.assertEqual(["artist"], filter_class.Meta.fields)
+        self.assertTrue(issubclass(filter_class, FilterSet))
