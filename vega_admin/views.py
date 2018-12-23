@@ -239,15 +239,19 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         return get_table(**tables_kwargs)
 
     def get_filter_class(self):
+        """Get the filter class"""
         if self.filter_class:
             return self.filter_class
 
-        filter_kwargs = {
-            "model": self.model,
-            "fields": self.get_filter_fields()
-        }
+        if self.filter_fields:
+            filter_kwargs = {
+                "model": self.model,
+                "fields": self.get_filter_fields()
+            }
 
-        return get_filterclass(**filter_kwargs)
+            return get_filterclass(**filter_kwargs)
+
+        return None
 
     def get_create_view_class(self):  # pylint: disable=no-self-use
         """Get view class for create action"""
@@ -397,9 +401,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
             options["search_fields"] = self.get_search_fields()
             options["form_class"] = self.get_search_form_class()
             options["paginate_by"] = self.paginate_by
-
-            if self.get_filter_fields() or self.filter_class:
-                options["filter_class"] = self.get_filter_class()
+            options["filter_class"] = self.get_filter_class()
 
         inherited_classes = (view_class,)
 
