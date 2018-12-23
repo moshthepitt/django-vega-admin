@@ -3,6 +3,7 @@ vega-admin mixins module
 """
 from django.conf import settings
 from django.contrib import messages
+from django.core.exceptions import ImproperlyConfigured
 from django.db.models import ProtectedError, Q
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -263,3 +264,23 @@ class ObjectURLPatternMixin:
         Derive the url pattern
         """
         return f"{crud_path}/{action}/<int:pk>/"
+
+
+class VegaPermissionsMixin:
+    """
+    Adds some utilities to views that require permissions protection
+    """
+    permission_required = None
+
+    # pylint: disable=unused-argument
+    def get_permission_required(self, *args, **kwargs):
+        """Get the required permission"""
+        if self.permission_required is not None:
+            return self.permission_required
+
+        action = kwargs.get('action')
+
+        if action is None:
+            raise ImproperlyConfigured(_(settings.VEGA_ACTION_NOT_SET_TXT))
+
+        return f"{self.app_label}.{action}_{self.model_name}"
