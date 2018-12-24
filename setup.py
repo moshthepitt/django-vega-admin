@@ -16,6 +16,7 @@ setup(
         'Django >= 2.0',
         'django-crispy-forms',
         'django-braces',
+        'django-filter',
         'django-tables2',
         'tablib',
     ],

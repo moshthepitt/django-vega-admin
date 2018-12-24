@@ -5,6 +5,7 @@ from django.views.generic import TemplateView
 
 from braces.views import LoginRequiredMixin, PermissionRequiredMixin
 
+from django_filters import FilterSet
 from vega_admin.mixins import SimpleURLPatternMixin
 from vega_admin.views import (VegaCreateView, VegaCRUDView, VegaDeleteView,
                               VegaListView, VegaUpdateView)
@@ -214,3 +215,35 @@ class CustomArtistCRUD(VegaCRUDView):
     search_fields = ["name"]
     search_form_class = CustomSearchForm
     paginate_by = 10
+
+
+class FilterSongCRUD(VegaCRUDView):
+    """
+    CRUD view for songs with filtering
+    """
+
+    model = Song
+    actions = ["list", ]
+    filter_fields = ["name", "artist", ]
+    crud_path = "filters"
+    search_form_class = None
+
+
+class Filter2SongCRUD(VegaCRUDView):
+    """
+    CRUD view for songs with filtering
+    """
+
+    class SongFilter(FilterSet):
+        """Song filter class"""
+
+        class Meta:
+            model = Song
+            fields = ["artist", ]
+
+    model = Song
+    actions = ["list", ]
+    search_fields = ["artist__name", ]
+    filter_class = SongFilter
+    crud_path = "filters2"
+    search_form_class = None

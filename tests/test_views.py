@@ -184,6 +184,13 @@ class TestViews(TestViewsBase):
         self.assertTemplateUsed(res, "vega_admin/basic/list.html")
 
         res = self.client.get("/list/artists/?q=Bob")
+        self.assertDictEqual({
+            "q": "Bob"
+        }, res.context["vega_listview_search_form"].initial)
+        self.assertEqual(
+            set(["q", ]),
+            set(res.context["vega_listview_search_form"].fields.keys())
+        )
         self.assertEqual(res.context["object_list"].count(), 1)
         self.assertEqual(res.context["object_list"].first(), artist)
 

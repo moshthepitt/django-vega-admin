@@ -18,6 +18,7 @@ INSTALLED_APPS = [
     # third party
     'crispy_forms',
     'django_tables2',
+    'django_filters',
     # custom
     'vega_admin',
     # tests

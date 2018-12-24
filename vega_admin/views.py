@@ -18,7 +18,8 @@ from vega_admin.mixins import (CRUDURLsMixin, DeleteViewMixin,
                                ListViewSearchMixin, ObjectURLPatternMixin,
                                PageTitleMixin, SimpleURLPatternMixin,
                                VegaFormMixin, VerboseNameMixin)
-from vega_admin.utils import get_modelform, get_table
+from vega_admin.utils import (get_filterclass, get_listview_form,
+                              get_modelform, get_table)
 
 
 # pylint: disable=too-many-ancestors
@@ -104,6 +105,8 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
     view_classes = {}
     list_fields = None
     search_fields = None
+    filter_fields = None
+    filter_class = None
     search_form_class = ListViewSearchForm
     form_fields = None
     create_fields = None
@@ -157,9 +160,24 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         """Get search fields for list view"""
         return self.search_fields
 
+    def get_filter_fields(self):
+        """Get filter fields for list view"""
+        return self.filter_fields
+
     def get_search_form_class(self):
         """Get search form for list view"""
-        return self.search_form_class
+        if self.search_form_class:
+            return self.search_form_class
+
+        # if there are filters then we generate the form
+        filter_class = self.get_filter_class()
+        if filter_class:
+            return get_listview_form(
+                model=self.model,
+                fields=filter_class.Meta.fields,
+                include_search=self.get_search_fields() is not None)
+
+        return None
 
     def get_createform_fields(self):
         """
@@ -207,11 +225,23 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         return get_modelform(
             model=self.model, fields=self.get_updateform_fields())
 
+    def get_list_fields(self):
+        """
+        Get the list_fields
+        """
+        return self.list_fields
+
     def get_table_actions(self):
         """
         Get the table actions
         """
         return self.table_actions
+
+    def get_table_attrs(self):
+        """
+        Get the table_attrs
+        """
+        return self.table_attrs
 
     def get_table_class(self):
         """
@@ -221,16 +251,31 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
             return self.table_class
 
         tables_kwargs = {"model": self.model}
-        if isinstance(self.list_fields, list):
-            tables_kwargs["fields"] = self.list_fields
-        if isinstance(self.table_actions, list):
+        if isinstance(self.get_list_fields(), list):
+            tables_kwargs["fields"] = self.get_list_fields()
+        if isinstance(self.get_table_actions(), list):
             tables_kwargs["actions"] = self.get_action_urlnames(
-                actions=self.table_actions
+                actions=self.get_table_actions()
             )
-        if isinstance(self.table_attrs, dict):
-            tables_kwargs["attrs"] = self.table_attrs
+        if isinstance(self.get_table_attrs(), dict):
+            tables_kwargs["attrs"] = self.get_table_attrs()
 
         return get_table(**tables_kwargs)
+
+    def get_filter_class(self):
+        """Get the filter class"""
+        if self.filter_class:
+            return self.filter_class
+
+        if self.filter_fields:
+            filter_kwargs = {
+                "model": self.model,
+                "fields": self.get_filter_fields()
+            }
+
+            return get_filterclass(**filter_kwargs)
+
+        return None
 
     def get_create_view_class(self):  # pylint: disable=no-self-use
         """Get view class for create action"""
@@ -319,7 +364,8 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         # this action is set as a default action but has no defined view class
         raise Exception(settings.VEGA_INVALID_ACTION)
 
-    def get_view_class_for_action(self, action: str):
+    def get_view_class_for_action(  # pylint: disable=too-many-branches
+            self, action: str):
         """
         Get the view for an action
         """
@@ -346,10 +392,12 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         # lets go on and create the view class(es)
         options = {"model": self.model}
         # add some common useful CRUD urls
-        options["list_url"] = reverse_lazy(
-            self.get_url_name_for_action(settings.VEGA_LIST_ACTION))
-        options["create_url"] = reverse_lazy(
-            self.get_url_name_for_action(settings.VEGA_CREATE_ACTION))
+        if settings.VEGA_LIST_ACTION in self.get_actions():
+            options["list_url"] = reverse_lazy(
+                self.get_url_name_for_action(settings.VEGA_LIST_ACTION))
+        if settings.VEGA_CREATE_ACTION in self.get_actions():
+            options["create_url"] = reverse_lazy(
+                self.get_url_name_for_action(settings.VEGA_CREATE_ACTION))
         options["cancel_url"] = self.get_cancel_url()
 
         # add the success url
@@ -380,6 +428,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
             options["search_fields"] = self.get_search_fields()
             options["form_class"] = self.get_search_form_class()
             options["paginate_by"] = self.paginate_by
+            options["filter_class"] = self.get_filter_class()
 
         inherited_classes = (view_class,)
 
