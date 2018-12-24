@@ -18,7 +18,8 @@ from vega_admin.mixins import (CRUDURLsMixin, DeleteViewMixin,
                                ListViewSearchMixin, ObjectURLPatternMixin,
                                PageTitleMixin, SimpleURLPatternMixin,
                                VegaFormMixin, VerboseNameMixin)
-from vega_admin.utils import get_modelform, get_table, get_filterclass
+from vega_admin.utils import (get_filterclass, get_listview_form,
+                              get_modelform, get_table)
 
 
 # pylint: disable=too-many-ancestors
@@ -165,7 +166,18 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
 
     def get_search_form_class(self):
         """Get search form for list view"""
-        return self.search_form_class
+        if self.search_form_class:
+            return self.search_form_class
+
+        # if there are filters then we generate the form
+        filter_class = self.get_filter_class()
+        if filter_class:
+            return get_listview_form(
+                model=self.model,
+                fields=filter_class.Meta.fields,
+                include_search=self.get_search_fields() is not None)
+
+        return None
 
     def get_createform_fields(self):
         """
@@ -379,10 +391,12 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         # lets go on and create the view class(es)
         options = {"model": self.model}
         # add some common useful CRUD urls
-        options["list_url"] = reverse_lazy(
-            self.get_url_name_for_action(settings.VEGA_LIST_ACTION))
-        options["create_url"] = reverse_lazy(
-            self.get_url_name_for_action(settings.VEGA_CREATE_ACTION))
+        if settings.VEGA_LIST_ACTION in self.get_actions():
+            options["list_url"] = reverse_lazy(
+                self.get_url_name_for_action(settings.VEGA_LIST_ACTION))
+        if settings.VEGA_CREATE_ACTION in self.get_actions():
+            options["create_url"] = reverse_lazy(
+                self.get_url_name_for_action(settings.VEGA_CREATE_ACTION))
         options["cancel_url"] = self.get_cancel_url()
 
         # add the success url
