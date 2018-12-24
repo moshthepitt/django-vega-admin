@@ -66,17 +66,32 @@ class ListViewSearchMixin:
 
         return queryset.distinct()
 
+    def get_search_form_values(self):
+        """Get search form values"""
+        fields = []
+        if self.filter_class:
+            for field in self.filter_class.Meta.fields:
+                fields.append(field)
+        if self.search_fields:
+            fields.append("q")
+        # build the form values dict
+        result = {}
+        for item in fields:
+            result[item] = self.request.GET.get(item)
+
+        return result
+
     def get_context_data(self, **kwargs):
         """
         Get context data
         """
         context = super().get_context_data(**kwargs)
-        if self.search_fields:
+        if self.search_fields or self.filter_class:
             form = self.form_class(request=self.request)
-            if self.request.GET.get('q'):
-                form = self.form_class(
-                    initial={'q': self.request.GET.get('q')})
+            initial_values = self.get_search_form_values()
+            form = self.form_class(initial=initial_values)
             context['vega_listview_search_form'] = form
+
         return context
 
 
