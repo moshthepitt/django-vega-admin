@@ -17,20 +17,28 @@ from django_filters import FilterSet
 from vega_admin.mixins import VegaFormMixin
 
 
-def get_modelform(model: object, fields: list = None):
+def get_modelform(
+        model: object, fields: list = None, extra_fields: list = None):
     """
     Get the a ModelForm for the provided model
 
     :param model: the model class
     :param fields: list of the fields that you want included in the form
+    :param extra_fields: extra fields that you want included in the form
     :return: model form
+
+    extra_fields needs to be a list of tuples, like so:
+
+    extra_fields = [("q", forms.CharField(
+            label=_(settings.VEGA_LISTVIEW_SEARCH_QUERY_TXT),
+            required=False,))]
     """
 
     # this is going to be our custom init method
     def _constructor(self, *args, **kwargs):
         self.request = kwargs.pop("request", None)
         self.vega_extra_kwargs = kwargs.pop("vega_extra_kwargs", dict())
-        cancel_url = self.vega_extra_kwargs["cancel_url"]
+        cancel_url = self.vega_extra_kwargs.get("cancel_url", "/")
         super(modelform_class, self).__init__(*args, **kwargs)
         # add crispy forms FormHelper
         self.helper = FormHelper()
@@ -80,11 +88,17 @@ def get_modelform(model: object, fields: list = None):
         (),  # inherit from object
         {
             "model": model,
-            "fields": fields},
+            "fields": fields,
+        },
     )
 
     # the attributes of our new modelform
     options = {"model": model, "__init__": _constructor, "Meta": meta_class}
+
+    # add extra fields
+    if extra_fields:
+        for extra_field in extra_fields:
+            options[extra_field[0]] = extra_field[1]
 
     # create the modelform dynamically using type
     modelform_class = type(
@@ -94,6 +108,28 @@ def get_modelform(model: object, fields: list = None):
     )
 
     return modelform_class
+
+
+def get_listview_form(model: object, fields: list):
+    """
+    Get a search and filter form for use in ListViews
+
+    This is essentially a model form with an additional field named `q`.
+
+    :param model: the model class
+    :param fields: list of the fields that you want included in the form
+    :return: model form
+    """
+
+    search_field = (
+        "q",
+        forms.CharField(
+            label=_(settings.VEGA_LISTVIEW_SEARCH_QUERY_TXT),
+            required=False,)
+    )
+
+    return get_modelform(
+        model=model, fields=fields, extra_fields=[search_field])
 
 
 def get_table(
