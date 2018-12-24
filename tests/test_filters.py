@@ -28,15 +28,19 @@ class TestFilters(TestViewsBase):
         mommy.make("artist_app.Song", _quantity=7, artist=artist1)
         mommy.make("artist_app.Song", name="2", artist=artist2)
 
-        bob_user = mommy.make('auth.User')
+        bob_user = mommy.make("auth.User")
         permissions = self._song_permissions()
         bob_user.user_permissions.add(*permissions)
         bob_user = User.objects.get(pk=bob_user.pk)
         self.client.force_login(bob_user)
 
         # using generated filter class
-        res = self.client.get(reverse('filters-list'))
+        res = self.client.get(reverse("filters-list"))
         self.assertEqual(200, res.status_code)
+        self.assertEqual(
+            list(set(["name", "artist", ])),
+            list(set(res.context["vega_listview_search_form"].fields.keys()))
+        )
         self.assertEqual(res.context["object_list"].count(), 9)
 
         res = self.client.get(f"{reverse('filters-list')}?artist={artist1.pk}")
@@ -45,10 +49,18 @@ class TestFilters(TestViewsBase):
 
         res = self.client.get(f"{reverse('filters-list')}?artist={artist2.pk}")
         self.assertEqual(200, res.status_code)
+        self.assertDictEqual({
+            "artist": str(artist2.pk),
+            "name": None
+        }, res.context["vega_listview_search_form"].initial)
         self.assertEqual(res.context["object_list"].count(), 1)
 
         res = self.client.get(f"{reverse('filters-list')}?name=1")
         self.assertEqual(200, res.status_code)
+        self.assertDictEqual({
+            "artist": None,
+            "name": "1"
+        }, res.context["vega_listview_search_form"].initial)
         self.assertEqual(res.context["object_list"].count(), 1)
 
         res = self.client.get(f"{reverse('filters-list')}?name=2")
@@ -59,4 +71,12 @@ class TestFilters(TestViewsBase):
         res = self.client.get(
             f"{reverse('filters2-list')}?artist={artist2.pk}")
         self.assertEqual(200, res.status_code)
+        self.assertEqual(
+            list(set(["q", "artist", ])),
+            list(set(res.context["vega_listview_search_form"].fields.keys()))
+        )
+        self.assertDictEqual({
+            "artist": str(artist2.pk),
+            "q": None
+        }, res.context["vega_listview_search_form"].initial)
         self.assertEqual(res.context["object_list"].count(), 1)
