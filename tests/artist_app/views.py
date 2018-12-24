@@ -226,6 +226,7 @@ class FilterSongCRUD(VegaCRUDView):
     actions = ["list", ]
     filter_fields = ["name", "artist", ]
     crud_path = "filters"
+    search_form_class = None
 
 
 class Filter2SongCRUD(VegaCRUDView):
@@ -242,5 +243,7 @@ class Filter2SongCRUD(VegaCRUDView):
 
     model = Song
     actions = ["list", ]
+    search_fields = ["artist__name", ]
     filter_class = SongFilter
     crud_path = "filters2"
+    search_form_class = None
