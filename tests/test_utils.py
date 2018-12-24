@@ -1,14 +1,19 @@
 """
 vega-admin module to test utils
 """
-from django.forms import ModelForm
+from unittest.mock import patch
+
+from django.conf import settings
+from django.forms import CharField, ModelForm
 from django.test import TestCase, override_settings
 
 from django_filters import FilterSet
 from django_tables2 import Table
+from model_mommy import mommy
 from tests.artist_app.models import Artist, Song
 
-from vega_admin.utils import get_filterclass, get_modelform, get_table
+from vega_admin.utils import (get_filterclass, get_listview_form,
+                              get_modelform, get_table)
 
 
 class TestUtils(TestCase):
@@ -27,6 +32,46 @@ class TestUtils(TestCase):
         form2 = get_modelform(model=Artist, fields=['name'])
         self.assertEqual(Artist, form2.model)
         self.assertEqual(["name"], form2.Meta.fields)
+        self.assertHTMLEqual(
+            """<p><label for="id_name">Name:</label> <input type="text" name="name" maxlength="100" required id="id_name"></p>""",  # noqa
+            form().as_p()
+        )
+
+    def test_get_modelform_extra_fields(self):
+        """Test get_modelform with extra fields"""
+        mommy.make('artist_app.Artist', name="Kylie", id=797)
+        form = get_modelform(
+            model=Song,
+            fields=["artist"],
+            extra_fields=[
+                ("q", CharField(label="Search Now", required=False, ))
+            ],
+        )
+        self.assertTrue(issubclass(form, ModelForm))
+        self.assertEqual(Song, form.model)
+        self.assertEqual(["artist"], form.Meta.fields)
+        self.assertHTMLEqual(
+            """<p><label for="id_artist">Artist:</label><select name="artist" required id="id_artist"><option value="" selected>---------</option><option value="797">Kylie</option></select></p><p><label for="id_q">Search Now:</label> <input type="text" name="q" id="id_q"></p>""",  # noqa
+            form().as_p()
+        )
+
+    @patch('vega_admin.utils.get_modelform')
+    @patch('vega_admin.utils.forms.CharField')
+    def test_get_listview_form(self, charfield_mock, mock):
+        """Test get_listview_form"""
+        # we need to mock the return value of CharField so that we can
+        # compare the test object with the object produced in get_listview_form
+        charfield = CharField(
+            label=settings.VEGA_LISTVIEW_SEARCH_QUERY_TXT,
+            required=False,)
+        charfield_mock.return_value = charfield
+        search_field = ("q", charfield)
+
+        get_listview_form(model=Song, fields=['artist'])
+
+        # assert that get_modelform is called with the expected params
+        mock.assert_called_once_with(
+            model=Song, fields=['artist'], extra_fields=[search_field])
 
     @override_settings(VEGA_NOTHING_TO_SHOW="Nothing here")
     def test_get_table(self):
