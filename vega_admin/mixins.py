@@ -21,7 +21,7 @@ class VegaFormKwargsMixin:  # pylint: disable=too-few-public-methods
         Adds kwargs to the form
         """
         kwargs = super().get_form_kwargs()
-        kwargs['request'] = self.request
+        kwargs["request"] = self.request
         return kwargs
 
 
@@ -38,6 +38,7 @@ class ListViewSearchMixin:
     """
     Adds search to listview
     """
+
     form_class = ListViewSearchForm
     search_fields = []
     filter_class = None
@@ -88,7 +89,7 @@ class ListViewSearchMixin:
             form = self.form_class(request=self.request)
             initial_values = self.get_search_form_values()
             form = self.form_class(initial=initial_values)
-            context['vega_listview_search_form'] = form
+            context["vega_listview_search_form"] = form
 
         return context
 
@@ -103,9 +104,9 @@ class VerboseNameMixin:
         Get context data
         """
         context = super().get_context_data(**kwargs)
-        context['vega_verbose_name'] = self.model._meta.verbose_name
-        context['vega_verbose_name_plural'] =\
-            self.model._meta.verbose_name_plural
+        context["vega_verbose_name"] = self.model._meta.verbose_name
+        context[
+            "vega_verbose_name_plural"] = self.model._meta.verbose_name_plural
         return context
 
 
@@ -119,7 +120,7 @@ class PageTitleMixin:
         Get context data
         """
         context = super().get_context_data(**kwargs)
-        context['vega_page_title'] = getattr(self, 'page_title', None)
+        context["vega_page_title"] = getattr(self, "page_title", None)
         return context
 
 
@@ -127,6 +128,7 @@ class CRUDURLsMixin:
     """
     Mixin that adds some CRUD helper urls
     """
+
     cancel_url = "/"
     cancel_url_name = None
     delete_url = "/"
@@ -188,7 +190,8 @@ class CRUDURLsMixin:
         return self.get_crud_url(
             url=self.update_url,
             url_name=self.update_url_name,
-            url_kwargs={"pk": self.object.pk})
+            url_kwargs={"pk": self.object.pk},
+        )
 
     def get_delete_url(self):
         """
@@ -199,7 +202,8 @@ class CRUDURLsMixin:
         return self.get_crud_url(
             url=self.delete_url,
             url_name=self.delete_url_name,
-            url_kwargs={"pk": self.object.pk})
+            url_kwargs={"pk": self.object.pk},
+        )
 
     def get_cancel_url(self):
         """
@@ -215,12 +219,12 @@ class CRUDURLsMixin:
         Get context data
         """
         context = super().get_context_data(**kwargs)
-        context['vega_create_url'] = self.get_create_url()
-        context['vega_list_url'] = self.get_list_url()
-        context['vega_cancel_url'] = self.get_cancel_url()
-        if hasattr(self, 'object') and self.object is not None:
-            context['vega_delete_url'] = self.get_delete_url()
-            context['vega_update_url'] = self.get_update_url()
+        context["vega_create_url"] = self.get_create_url()
+        context["vega_list_url"] = self.get_list_url()
+        context["vega_cancel_url"] = self.get_cancel_url()
+        if hasattr(self, "object") and self.object is not None:
+            context["vega_delete_url"] = self.get_delete_url()
+            context["vega_update_url"] = self.get_update_url()
         return context
 
     def get_form_kwargs(self):
@@ -228,8 +232,8 @@ class CRUDURLsMixin:
         Adds kwargs to the form
         """
         kwargs = super().get_form_kwargs()
-        url_kwargs = {'cancel_url': self.get_list_url()}
-        kwargs['vega_extra_kwargs'] = url_kwargs
+        url_kwargs = {"cancel_url": self.get_list_url()}
+        kwargs["vega_extra_kwargs"] = url_kwargs
         return kwargs
 
 
