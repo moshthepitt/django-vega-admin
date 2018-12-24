@@ -364,7 +364,8 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         # this action is set as a default action but has no defined view class
         raise Exception(settings.VEGA_INVALID_ACTION)
 
-    def get_view_class_for_action(self, action: str):
+    def get_view_class_for_action(  # pylint: disable=too-many-branches
+            self, action: str):
         """
         Get the view for an action
         """
