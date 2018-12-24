@@ -110,7 +110,8 @@ def get_modelform(
     return modelform_class
 
 
-def get_listview_form(model: object, fields: list):
+def get_listview_form(
+        model: object, fields: list, include_search: bool = True):
     """
     Get a search and filter form for use in ListViews
 
@@ -120,16 +121,22 @@ def get_listview_form(model: object, fields: list):
     :param fields: list of the fields that you want included in the form
     :return: model form
     """
+    search_field = None
+    if include_search:
+        search_field = (
+            "q",
+            forms.CharField(
+                label=_(settings.VEGA_LISTVIEW_SEARCH_QUERY_TXT),
+                required=False,)
+        )
 
-    search_field = (
-        "q",
-        forms.CharField(
-            label=_(settings.VEGA_LISTVIEW_SEARCH_QUERY_TXT),
-            required=False,)
-    )
+    if search_field:
+        extra_fields = [search_field]
+    else:
+        extra_fields = None
 
     return get_modelform(
-        model=model, fields=fields, extra_fields=[search_field])
+        model=model, fields=fields, extra_fields=extra_fields)
 
 
 def get_table(

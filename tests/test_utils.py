@@ -73,6 +73,38 @@ class TestUtils(TestCase):
         mock.assert_called_once_with(
             model=Song, fields=['artist'], extra_fields=[search_field])
 
+    @patch('vega_admin.utils.get_modelform')
+    @patch('vega_admin.utils.forms.CharField')
+    def test_get_listview_form_include_search(self, charfield_mock, mock):
+        """
+        Test get_listview_form with include_search=True
+        """
+        # we need to mock the return value of CharField so that we can
+        # compare the test object with the object produced in get_listview_form
+        charfield = CharField(
+            label=settings.VEGA_LISTVIEW_SEARCH_QUERY_TXT,
+            required=False,
+        )
+        charfield_mock.return_value = charfield
+        search_field = ("q", charfield)
+
+        get_listview_form(model=Song, fields=['artist'], include_search=True)
+
+        # assert that get_modelform is called with the expected params
+        mock.assert_called_once_with(
+            model=Song, fields=['artist'], extra_fields=[search_field])
+
+    @patch('vega_admin.utils.get_modelform')
+    def test_get_listview_form_dont_include_search(self, mock):
+        """
+        Test get_listview_form with include_search=False
+        """
+        get_listview_form(model=Song, fields=['artist'], include_search=False)
+
+        # assert that get_modelform is called with the expected params
+        mock.assert_called_once_with(
+            model=Song, fields=['artist'], extra_fields=None)
+
     @override_settings(VEGA_NOTHING_TO_SHOW="Nothing here")
     def test_get_table(self):
         """
