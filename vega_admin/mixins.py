@@ -53,15 +53,13 @@ class ListViewSearchMixin:
             the_filter = self.filter_class(self.request.GET, queryset=queryset)
             queryset = the_filter.qs
 
-        if self.request.GET.get('q'):
+        if self.request.GET.get("q"):
             form = self.form_class(self.request.GET)
             if form.is_valid() and self.search_fields:
-                search_terms = [
-                    "{}__icontains".format(x) for x in self.search_fields
-                ]
+                search_terms = [f"{x}__icontains" for x in self.search_fields]
                 query = Q()
                 for term in search_terms:
-                    query.add(Q(**{term: form.cleaned_data['q']}), Q.OR)
+                    query.add(Q(**{term: form.cleaned_data["q"]}), Q.OR)
                 queryset = queryset.filter(query)
 
         return queryset.distinct()
