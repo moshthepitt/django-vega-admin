@@ -188,8 +188,8 @@ class TestViews(TestViewsBase):
             "q": "Bob"
         }, res.context["vega_listview_search_form"].initial)
         self.assertEqual(
-            list(set(["q", ])),
-            list(set(res.context["vega_listview_search_form"].fields.keys()))
+            set(["q", ]),
+            set(res.context["vega_listview_search_form"].fields.keys())
         )
         self.assertEqual(res.context["object_list"].count(), 1)
         self.assertEqual(res.context["object_list"].first(), artist)

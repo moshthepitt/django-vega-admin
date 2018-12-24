@@ -38,8 +38,8 @@ class TestFilters(TestViewsBase):
         res = self.client.get(reverse("filters-list"))
         self.assertEqual(200, res.status_code)
         self.assertEqual(
-            list(set(["name", "artist", ])),
-            list(set(res.context["vega_listview_search_form"].fields.keys()))
+            set(["name", "artist", ]),
+            set(res.context["vega_listview_search_form"].fields.keys())
         )
         self.assertEqual(res.context["object_list"].count(), 9)
 
@@ -72,8 +72,8 @@ class TestFilters(TestViewsBase):
             f"{reverse('filters2-list')}?artist={artist2.pk}")
         self.assertEqual(200, res.status_code)
         self.assertEqual(
-            list(set(["q", "artist", ])),
-            list(set(res.context["vega_listview_search_form"].fields.keys()))
+            set(["q", "artist", ]),
+            set(res.context["vega_listview_search_form"].fields.keys())
         )
         self.assertDictEqual({
             "artist": str(artist2.pk),
