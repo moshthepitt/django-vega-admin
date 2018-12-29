@@ -133,6 +133,8 @@ class CRUDURLsMixin:
     cancel_url_name = None
     delete_url = "/"
     delete_url_name = None
+    read_url = "/"
+    read_url_name = None
     list_url = "/"
     list_url_name = None
     create_url = "/"
@@ -193,6 +195,18 @@ class CRUDURLsMixin:
             url_kwargs={"pk": self.object.pk},
         )
 
+    def get_read_url(self):
+        """
+        Get the read url for the object in question
+
+        :return: url
+        """
+        return self.get_crud_url(
+            url=self.read_url,
+            url_name=self.read_url_name,
+            url_kwargs={"pk": self.object.pk},
+        )
+
     def get_delete_url(self):
         """
         Get the delete url for the object in question
@@ -223,6 +237,7 @@ class CRUDURLsMixin:
         context["vega_list_url"] = self.get_list_url()
         context["vega_cancel_url"] = self.get_cancel_url()
         if hasattr(self, "object") and self.object is not None:
+            context["vega_read_url"] = self.get_read_url()
             context["vega_delete_url"] = self.get_delete_url()
             context["vega_update_url"] = self.get_update_url()
         return context
