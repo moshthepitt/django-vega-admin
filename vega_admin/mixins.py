@@ -252,6 +252,47 @@ class CRUDURLsMixin:
         return kwargs
 
 
+class ObjectTitleMixin:
+    """Mixin for getting object title"""
+
+    def get_title(self):
+        """
+        By default we just return the string representation of our object
+        """
+        return str(self.object)
+
+    def get_context_data(self, **kwargs):
+        """
+        Get context data
+        """
+        context = super().get_context_data(**kwargs)
+        context["vega_object_title"] = self.get_title()
+        return context
+
+
+class DetailViewMixin:
+    """Mixin for detail views"""
+
+    fields = None
+
+    def get_fields(self):
+        """
+        We first default to using our 'fields' variable if available,
+        otherwise we figure it out from our object.
+        """
+        if self.fields and isinstance(self.fields, list):
+            return self.fields
+        return [_.name for _ in self.object._meta.fields]
+
+    def get_context_data(self, **kwargs):
+        """
+        Get context data
+        """
+        context = super().get_context_data(**kwargs)
+        context["vega_read_fields"] = self.get_fields()
+        return context
+
+
 class DeleteViewMixin:
     """
     Mixin for delete views that adds in missing elements
