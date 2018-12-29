@@ -5,6 +5,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import path, reverse_lazy
 from django.utils.translation import ugettext as _
+from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
@@ -14,10 +15,11 @@ from django_tables2 import SingleTableView
 from django_tables2.export.views import ExportMixin
 
 from vega_admin.forms import ListViewSearchForm
-from vega_admin.mixins import (CRUDURLsMixin, DeleteViewMixin,
-                               ListViewSearchMixin, ObjectURLPatternMixin,
-                               PageTitleMixin, SimpleURLPatternMixin,
-                               VegaFormMixin, VerboseNameMixin)
+from vega_admin.mixins import (CRUDURLsMixin, DeleteViewMixin, DetailViewMixin,
+                               ListViewSearchMixin, ObjectTitleMixin,
+                               ObjectURLPatternMixin, PageTitleMixin,
+                               SimpleURLPatternMixin, VegaFormMixin,
+                               VerboseNameMixin)
 from vega_admin.utils import (get_filterclass, get_listview_form,
                               get_modelform, get_table)
 
@@ -56,6 +58,21 @@ class VegaCreateView(
     form_invalid_message = _(settings.VEGA_FORM_INVALID_TXT)
 
 
+class VegaDetailView(
+        PageTitleMixin,
+        VerboseNameMixin,
+        CRUDURLsMixin,
+        ObjectURLPatternMixin,
+        ObjectTitleMixin,
+        DetailViewMixin,
+        DetailView,):
+    """
+    vega-admin Generic Detail View
+    """
+
+    template_name = "vega_admin/basic/read.html"
+
+
 class VegaUpdateView(
         FormMessagesMixin,
         PageTitleMixin,
@@ -63,6 +80,7 @@ class VegaUpdateView(
         VegaFormMixin,
         CRUDURLsMixin,
         ObjectURLPatternMixin,
+        ObjectTitleMixin,
         UpdateView,):
     """
     vega-admin Generic Update View
@@ -80,6 +98,7 @@ class VegaDeleteView(
         DeleteViewMixin,
         CRUDURLsMixin,
         ObjectURLPatternMixin,
+        ObjectTitleMixin,
         DeleteView,):
     """
     vega-admin Generic Delete View
@@ -104,6 +123,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
     permissions_actions = actions
     view_classes = {}
     list_fields = None
+    read_fields = None
     search_fields = None
     filter_fields = None
     filter_class = None
@@ -159,6 +179,10 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
     def get_search_fields(self):
         """Get search fields for list view"""
         return self.search_fields
+
+    def get_read_fields(self):
+        """Get read fields for read view"""
+        return self.read_fields
 
     def get_filter_fields(self):
         """Get filter fields for list view"""
@@ -285,6 +309,10 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         """Get view class for update action"""
         return VegaUpdateView
 
+    def get_read_view_class(self):  # pylint: disable=no-self-use
+        """Get view class for read action"""
+        return VegaDetailView
+
     def get_list_view_class(self):  # pylint: disable=no-self-use
         """Get view class for list action"""
         return VegaListView
@@ -356,6 +384,8 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
             return self.get_list_view_class()
         if action == settings.VEGA_CREATE_ACTION:
             return self.get_create_view_class()
+        if action == settings.VEGA_READ_ACTION:
+            return self.get_read_view_class()
         if action == settings.VEGA_UPDATE_ACTION:
             return self.get_update_view_class()
         if action == settings.VEGA_DELETE_ACTION:
@@ -416,6 +446,12 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
             options["form_class"] = self.get_updateform_class()
             options["update_url_name"] = self.get_url_name_for_action(
                 settings.VEGA_UPDATE_ACTION)
+
+        # add the read url
+        if action == settings.VEGA_READ_ACTION:
+            options["read_url_name"] = self.get_url_name_for_action(
+                settings.VEGA_READ_ACTION)
+            options["fields"] = self.get_read_fields()
 
         # add the delete url
         if action == settings.VEGA_DELETE_ACTION:

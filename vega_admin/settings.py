@@ -5,11 +5,13 @@ from django.conf import settings
 
 # general
 VEGA_CREATE_ACTION = "create"
+VEGA_READ_ACTION = "read"
 VEGA_UPDATE_ACTION = "update"
 VEGA_LIST_ACTION = "list"
 VEGA_DELETE_ACTION = "delete"
 VEGA_DEFAULT_ACTIONS = [
     VEGA_CREATE_ACTION,
+    VEGA_READ_ACTION,
     VEGA_UPDATE_ACTION,
     VEGA_LIST_ACTION,
     VEGA_DELETE_ACTION,

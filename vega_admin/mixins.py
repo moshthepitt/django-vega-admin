@@ -3,6 +3,7 @@ vega-admin mixins module
 """
 from django.conf import settings
 from django.contrib import messages
+from django.core.exceptions import FieldDoesNotExist
 from django.db.models import ProtectedError, Q
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -133,6 +134,8 @@ class CRUDURLsMixin:
     cancel_url_name = None
     delete_url = "/"
     delete_url_name = None
+    read_url = "/"
+    read_url_name = None
     list_url = "/"
     list_url_name = None
     create_url = "/"
@@ -193,6 +196,18 @@ class CRUDURLsMixin:
             url_kwargs={"pk": self.object.pk},
         )
 
+    def get_read_url(self):
+        """
+        Get the read url for the object in question
+
+        :return: url
+        """
+        return self.get_crud_url(
+            url=self.read_url,
+            url_name=self.read_url_name,
+            url_kwargs={"pk": self.object.pk},
+        )
+
     def get_delete_url(self):
         """
         Get the delete url for the object in question
@@ -223,6 +238,7 @@ class CRUDURLsMixin:
         context["vega_list_url"] = self.get_list_url()
         context["vega_cancel_url"] = self.get_cancel_url()
         if hasattr(self, "object") and self.object is not None:
+            context["vega_read_url"] = self.get_read_url()
             context["vega_delete_url"] = self.get_delete_url()
             context["vega_update_url"] = self.get_update_url()
         return context
@@ -235,6 +251,74 @@ class CRUDURLsMixin:
         url_kwargs = {"cancel_url": self.get_list_url()}
         kwargs["vega_extra_kwargs"] = url_kwargs
         return kwargs
+
+
+class ObjectTitleMixin:
+    """Mixin for getting object title"""
+
+    def get_title(self):
+        """
+        By default we just return the string representation of our object
+        """
+        return str(self.object)
+
+    def get_context_data(self, **kwargs):
+        """
+        Get context data
+        """
+        context = super().get_context_data(**kwargs)
+        context["vega_object_title"] = self.get_title()
+        return context
+
+
+class DetailViewMixin:
+    """Mixin for detail views"""
+
+    fields = None
+
+    def get_fields(self):
+        """
+        We first default to using our 'fields' variable if available,
+        otherwise we figure it out from our object.
+        """
+        if self.fields and isinstance(self.fields, list):
+            return self.fields
+        return [
+            _.name for _ in self.object._meta.fields
+        ]
+
+    def get_field_value(self, field):
+        """Get the value of a field"""
+        if field.is_relation:
+            try:
+                return str(getattr(self.object, field.name))
+            except AttributeError:
+                return None
+        # pylint: disable=protected-access
+        return self.object._get_FIELD_display(field)
+
+    def get_object_data(self):
+        """Returns a dict of the data in the object"""
+        result = {}
+        fields_list = self.get_fields()
+        for item in fields_list:
+            try:
+                field = self.object._meta.get_field(item)
+            except FieldDoesNotExist:
+                pass
+            else:
+                result[field.verbose_name] = self.get_field_value(field)
+
+        return result
+
+    def get_context_data(self, **kwargs):
+        """
+        Get context data
+        """
+        context = super().get_context_data(**kwargs)
+        context["vega_read_fields"] = self.get_fields()
+        context["vega_object_data"] = self.get_object_data()
+        return context
 
 
 class DeleteViewMixin:

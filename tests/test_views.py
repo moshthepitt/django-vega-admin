@@ -9,12 +9,12 @@ from django.test import TestCase, override_settings
 from model_mommy import mommy
 
 from vega_admin.views import (VegaCreateView, VegaCRUDView, VegaDeleteView,
-                              VegaListView, VegaUpdateView)
+                              VegaListView, VegaDetailView, VegaUpdateView)
 
 from .artist_app.forms import ArtistForm
 from .artist_app.models import Artist, Song
 from .artist_app.views import (ArtistCreate, ArtistDelete, ArtistListView,
-                               ArtistUpdate)
+                               ArtistRead, ArtistUpdate)
 
 
 class TestViewsBase(TestCase):
@@ -37,6 +37,11 @@ class TestViewsBase(TestCase):
             content_type=content_type,
             defaults=dict(name='Can Create Songs'),
         )
+        read_permission, _ = Permission.objects.get_or_create(
+            codename='read_song',
+            content_type=content_type,
+            defaults=dict(name='Can View Songs'),
+        )
         update_permission, _ = Permission.objects.get_or_create(
             codename='update_song',
             content_type=content_type,
@@ -53,7 +58,7 @@ class TestViewsBase(TestCase):
             defaults=dict(name='Can List Song Artists'),
         )
         return [list_permission, create_permission, update_permission,
-                delete_permission, artists_permission, ]
+                delete_permission, artists_permission, read_permission, ]
 
     def _artist_permissions(self):
         """
@@ -84,7 +89,7 @@ class TestViewsBase(TestCase):
 
     def tearDown(self):
         """tearDown"""
-        super().setUp()
+        super().tearDown()
         Song.objects.all().delete()
         Artist.objects.all().delete()
         Permission.objects.filter(
@@ -104,7 +109,7 @@ class TestViews(TestViewsBase):
         """
         Test VegaCRUDView
         """
-        default_actions = ["create", "update", "list", "delete"]
+        default_actions = ["create", "read", "update", "list", "delete"]
 
         class ArtistCrud(VegaCRUDView):
             model = Artist
@@ -126,6 +131,8 @@ class TestViews(TestViewsBase):
             Artist, view.get_view_class_for_action("delete")().model)
         self.assertEqual(
             Artist, view.get_view_class_for_action("list")().model)
+        self.assertEqual(
+            Artist, view.get_view_class_for_action("read")().model)
 
         self.assertIsInstance(
             view.get_view_class_for_action("create")(), VegaCreateView
@@ -138,11 +145,19 @@ class TestViews(TestViewsBase):
         )
         self.assertIsInstance(
             view.get_view_class_for_action("list")(), VegaListView)
+        self.assertIsInstance(
+            view.get_view_class_for_action("read")(), VegaDetailView)
 
         self.assertEqual(
             f"{view.crud_path}/create/",
             view.get_url_pattern_for_action(
                 view.get_view_class_for_action("create"), "create"
+            ),
+        )
+        self.assertEqual(
+            f"{view.crud_path}/read/<int:pk>/",
+            view.get_url_pattern_for_action(
+                view.get_view_class_for_action("read"), "read"
             ),
         )
         self.assertEqual(
@@ -193,6 +208,17 @@ class TestViews(TestViewsBase):
         )
         self.assertEqual(res.context["object_list"].count(), 1)
         self.assertEqual(res.context["object_list"].first(), artist)
+
+    def test_vega_read_view(self):
+        """
+        Test VegaReadView
+        """
+        artist = mommy.make("artist_app.Artist", name="Bob")
+        res = self.client.get(f"/view/artists/read/{artist.id}")
+        self.assertEqual(res.status_code, 200)
+        self.assertIsInstance(res.context["view"], ArtistRead)
+        self.assertIsInstance(res.context["view"], VegaDetailView)
+        self.assertTemplateUsed(res, "vega_admin/basic/read.html")
 
     def test_vega_create_view(self):
         """

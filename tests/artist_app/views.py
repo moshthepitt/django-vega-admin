@@ -8,7 +8,7 @@ from braces.views import LoginRequiredMixin, PermissionRequiredMixin
 from django_filters import FilterSet
 from vega_admin.mixins import SimpleURLPatternMixin
 from vega_admin.views import (VegaCreateView, VegaCRUDView, VegaDeleteView,
-                              VegaListView, VegaUpdateView)
+                              VegaListView, VegaUpdateView, VegaDetailView)
 
 from .forms import ArtistForm, CustomSearchForm, SongForm
 from .models import Artist, Song
@@ -59,6 +59,14 @@ class ArtistDelete(VegaDeleteView):  # pylint: disable=too-many-ancestors
         return "/edit/artists/create/"
 
 
+class ArtistRead(VegaDetailView):  # pylint: disable=too-many-ancestors
+    """
+    Artist detail view
+    """
+
+    model = Artist
+
+
 class ArtistListView(VegaListView):  # pylint: disable=too-many-ancestors
     """
     Artist list view
@@ -78,6 +86,7 @@ class SongCRUD(VegaCRUDView):
     protected_actions = None
     permissions_actions = None
     list_fields = ["name", "artist", ]
+    read_fields = ["name", "artist", ]
     table_attrs = {"class": "song-table"}
     table_actions = ["create", "update", "delete", ]
     create_fields = ["name", "artist", ]
@@ -97,7 +106,7 @@ class CustomSongCRUD(SongCRUD):
         """random template view"""
         template_name = "artist_app/empty.html"
 
-    protected_actions = ["create", "update", "delete", "template"]
+    protected_actions = ["create", "update", "delete", "template", "read", ]
     permissions_actions = None
     crud_path = "private-songs"
     view_classes = {
@@ -112,8 +121,9 @@ class PermsSongCRUD(CustomSongCRUD):
     CRUD view for songs with permissions protection
     """
 
-    protected_actions = ["create", "update", "delete", "artists", "list"]
-    permissions_actions = ["create", "update", "delete", "artists"]
+    protected_actions = [
+        "create", "update", "delete", "artists", "list", "read", ]
+    permissions_actions = ["create", "update", "delete", "artists", "read", ]
     crud_path = "hidden-songs"
     form_class = SongForm
 
@@ -148,8 +158,13 @@ class CustomDefaultActions(ArtistCRUD):
         """custom Delete view"""
         pass
 
+    class CustomReadView(ArtistRead):
+        """custom Read view"""
+        pass
+
     view_classes = {
         "list": CustomListView,
+        "read": CustomReadView,
         "update": CustomUpdateView,
         "create": CustomCreateView,
         "delete": CustomDeleteView,
