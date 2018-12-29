@@ -9,7 +9,7 @@ from django.test import TestCase, override_settings
 from model_mommy import mommy
 
 from vega_admin.views import (VegaCreateView, VegaCRUDView, VegaDeleteView,
-                              VegaListView, VegaReadView, VegaUpdateView)
+                              VegaListView, VegaDetailView, VegaUpdateView)
 
 from .artist_app.forms import ArtistForm
 from .artist_app.models import Artist, Song
@@ -141,7 +141,7 @@ class TestViews(TestViewsBase):
         self.assertIsInstance(
             view.get_view_class_for_action("list")(), VegaListView)
         self.assertIsInstance(
-            view.get_view_class_for_action("read")(), VegaReadView)
+            view.get_view_class_for_action("read")(), VegaDetailView)
 
         self.assertEqual(
             f"{view.crud_path}/create/",
@@ -209,10 +209,10 @@ class TestViews(TestViewsBase):
         Test VegaReadView
         """
         artist = mommy.make("artist_app.Artist", name="Bob")
-        res = self.client.get(f"/read/artists/read/{artist.id}")
+        res = self.client.get(f"/view/artists/read/{artist.id}")
         self.assertEqual(res.status_code, 200)
         self.assertIsInstance(res.context["view"], ArtistRead)
-        self.assertIsInstance(res.context["view"], VegaReadView)
+        self.assertIsInstance(res.context["view"], VegaDetailView)
         self.assertTemplateUsed(res, "vega_admin/basic/read.html")
 
     def test_vega_create_view(self):
