@@ -37,6 +37,11 @@ class TestViewsBase(TestCase):
             content_type=content_type,
             defaults=dict(name='Can Create Songs'),
         )
+        read_permission, _ = Permission.objects.get_or_create(
+            codename='read_song',
+            content_type=content_type,
+            defaults=dict(name='Can View Songs'),
+        )
         update_permission, _ = Permission.objects.get_or_create(
             codename='update_song',
             content_type=content_type,
@@ -53,7 +58,7 @@ class TestViewsBase(TestCase):
             defaults=dict(name='Can List Song Artists'),
         )
         return [list_permission, create_permission, update_permission,
-                delete_permission, artists_permission, ]
+                delete_permission, artists_permission, read_permission, ]
 
     def _artist_permissions(self):
         """
