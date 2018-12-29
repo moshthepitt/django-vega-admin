@@ -3,6 +3,7 @@ vega-admin mixins module
 """
 from django.conf import settings
 from django.contrib import messages
+from django.core.exceptions import FieldDoesNotExist
 from django.db.models import ProtectedError, Q
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -282,7 +283,33 @@ class DetailViewMixin:
         """
         if self.fields and isinstance(self.fields, list):
             return self.fields
-        return [_.name for _ in self.object._meta.fields]
+        return [
+            _.name for _ in self.object._meta.fields
+        ]
+
+    def get_field_value(self, field):
+        """Get the value of a field"""
+        if field.is_relation:
+            try:
+                return str(getattr(self.object, field.name))
+            except AttributeError:
+                return None
+        # pylint: disable=protected-access
+        return self.object._get_FIELD_display(field)
+
+    def get_object_data(self):
+        """Returns a dict of the data in the object"""
+        result = {}
+        fields_list = self.get_fields()
+        for item in fields_list:
+            try:
+                field = self.object._meta.get_field(item)
+            except FieldDoesNotExist:
+                pass
+            else:
+                result[field.verbose_name] = self.get_field_value(field)
+
+        return result
 
     def get_context_data(self, **kwargs):
         """
@@ -290,6 +317,7 @@ class DetailViewMixin:
         """
         context = super().get_context_data(**kwargs)
         context["vega_read_fields"] = self.get_fields()
+        context["vega_object_data"] = self.get_object_data()
         return context
 
 
