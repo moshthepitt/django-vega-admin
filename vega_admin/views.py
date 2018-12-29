@@ -6,6 +6,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.urls import path, reverse_lazy
 from django.utils.translation import ugettext as _
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
+from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 
 from braces.views import (FormMessagesMixin, LoginRequiredMixin,
@@ -54,6 +55,19 @@ class VegaCreateView(
     template_name = "vega_admin/basic/create.html"
     form_valid_message = _(settings.VEGA_FORM_VALID_CREATE_TXT)
     form_invalid_message = _(settings.VEGA_FORM_INVALID_TXT)
+
+
+class VegaDetailView(
+        PageTitleMixin,
+        VerboseNameMixin,
+        CRUDURLsMixin,
+        ObjectURLPatternMixin,
+        DetailView,):
+    """
+    vega-admin Generic Detail View
+    """
+
+    template_name = "vega_admin/basic/read.html"
 
 
 class VegaUpdateView(
@@ -285,6 +299,10 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         """Get view class for update action"""
         return VegaUpdateView
 
+    def get_read_view_class(self):  # pylint: disable=no-self-use
+        """Get view class for read action"""
+        return VegaDetailView
+
     def get_list_view_class(self):  # pylint: disable=no-self-use
         """Get view class for list action"""
         return VegaListView
@@ -356,6 +374,8 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
             return self.get_list_view_class()
         if action == settings.VEGA_CREATE_ACTION:
             return self.get_create_view_class()
+        if action == settings.VEGA_READ_ACTION:
+            return self.get_read_view_class()
         if action == settings.VEGA_UPDATE_ACTION:
             return self.get_update_view_class()
         if action == settings.VEGA_DELETE_ACTION:
@@ -416,6 +436,11 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
             options["form_class"] = self.get_updateform_class()
             options["update_url_name"] = self.get_url_name_for_action(
                 settings.VEGA_UPDATE_ACTION)
+
+        # add the update read url
+        if action == settings.VEGA_READ_ACTION:
+            options["read_url_name"] = self.get_url_name_for_action(
+                settings.VEGA_READ_ACTION)
 
         # add the delete url
         if action == settings.VEGA_DELETE_ACTION:
