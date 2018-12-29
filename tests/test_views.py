@@ -89,7 +89,7 @@ class TestViewsBase(TestCase):
 
     def tearDown(self):
         """tearDown"""
-        super().setUp()
+        super().tearDown()
         Song.objects.all().delete()
         Artist.objects.all().delete()
         Permission.objects.filter(
