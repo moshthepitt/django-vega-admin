@@ -86,6 +86,7 @@ class SongCRUD(VegaCRUDView):
     protected_actions = None
     permissions_actions = None
     list_fields = ["name", "artist", ]
+    read_fields = ["name", "artist", ]
     table_attrs = {"class": "song-table"}
     table_actions = ["create", "update", "delete", ]
     create_fields = ["name", "artist", ]
