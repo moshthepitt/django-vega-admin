@@ -90,7 +90,7 @@ class TestCRUD(TestViewsBase):
         """
         Test CRUD read
         """
-        artist = mommy.make("artist_app.Artist")
+        artist = mommy.make("artist_app.Artist", name="tt", id=436)
         url = reverse("artist_app.artist-read", kwargs={"pk": artist.id})
 
         # test content
@@ -103,11 +103,15 @@ class TestCRUD(TestViewsBase):
         self.assertEqual(artist.name, res.context_data["vega_object_title"])
         self.assertEqual(
             ["id", "name", ], res.context_data["vega_read_fields"])
+        self.assertDictEqual(
+            {"name": artist.name, "ID": artist.id},
+            res.context_data["vega_object_data"]
+        )
         self.assertEqual(
             f"/artist_app.artist/read/{artist.pk}/",
             res.context_data["vega_read_url"],
         )
-        html = f""""""  # noqa
+        html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title> tt | professional artist</title></head><body><h3>tt</h3> <strong>ID</strong>: 436 <br /> <strong>name</strong>: tt <br /></body></html>"""  # noqa
         self.assertHTMLEqual(html, res.content.decode("utf-8"))
 
     def test_update(self):
@@ -300,8 +304,14 @@ class TestCRUD(TestViewsBase):
         url = reverse("artist_app.song-read", kwargs={"pk": song.id})
         # test content
         res = self.client.get(url)
+        self.assertEqual(
+            ["name", "artist", ], res.context_data["vega_read_fields"])
+        self.assertDictEqual(
+            {"name": song.name, "artist": str(artist)},
+            res.context_data["vega_object_data"]
+        )
         self.assertEqual(res.status_code, 200)
-        html = f""""""  # noqa
+        html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title> Song 1 | Song</title></head><body><h3>Song 1</h3> <strong>name</strong>: Song 1 <br /> <strong>artist</strong>: Mosh <br /></body></html>"""  # noqa
         self.assertHTMLEqual(html, res.content.decode("utf-8"))
 
     def test_update_options(self):
