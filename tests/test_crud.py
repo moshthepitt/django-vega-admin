@@ -100,6 +100,9 @@ class TestCRUD(TestViewsBase):
         self.assertEqual(
             "/artist_app.artist/create/", res.context_data["vega_create_url"]
         )
+        self.assertEqual(artist.name, res.context_data["vega_object_title"])
+        self.assertEqual(
+            ["id", "name", ], res.context_data["vega_read_fields"])
         self.assertEqual(
             f"/artist_app.artist/read/{artist.pk}/",
             res.context_data["vega_read_url"],
@@ -133,6 +136,7 @@ class TestCRUD(TestViewsBase):
                          res.context_data["vega_create_url"])
         self.assertEqual("/artist_app.artist/list/",
                          res.context_data["vega_cancel_url"])
+        self.assertEqual(artist.name, res.context_data["vega_object_title"])
         self.assertEqual(
             f"/artist_app.artist/update/{artist.pk}/",
             res.context_data["vega_update_url"],
@@ -178,6 +182,7 @@ class TestCRUD(TestViewsBase):
         self.assertEqual(
             "/artist_app.artist/list/", res.context_data["vega_cancel_url"]
         )
+        self.assertEqual(str(artist2), res.context_data["vega_object_title"])
         self.assertEqual(
             f"/artist_app.artist/delete/{artist2.pk}/",
             res.context_data["vega_delete_url"],
@@ -290,7 +295,14 @@ class TestCRUD(TestViewsBase):
         """
         Test CRUD update with options
         """
-        self.fail()
+        artist = mommy.make("artist_app.Artist", name="Mosh")
+        song = mommy.make("artist_app.Song", name="Song 1", artist=artist)
+        url = reverse("artist_app.song-read", kwargs={"pk": song.id})
+        # test content
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        html = f""""""  # noqa
+        self.assertHTMLEqual(html, res.content.decode("utf-8"))
 
     def test_update_options(self):
         """
