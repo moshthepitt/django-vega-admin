@@ -8,7 +8,7 @@ from braces.views import LoginRequiredMixin, PermissionRequiredMixin
 from django_filters import FilterSet
 from vega_admin.mixins import SimpleURLPatternMixin
 from vega_admin.views import (VegaCreateView, VegaCRUDView, VegaDeleteView,
-                              VegaListView, VegaUpdateView)
+                              VegaListView, VegaUpdateView, VegaDetailView)
 
 from .forms import ArtistForm, CustomSearchForm, SongForm
 from .models import Artist, Song
@@ -57,6 +57,14 @@ class ArtistDelete(VegaDeleteView):  # pylint: disable=too-many-ancestors
         Method to get success url
         """
         return "/edit/artists/create/"
+
+
+class ArtistRead(VegaDetailView):  # pylint: disable=too-many-ancestors
+    """
+    Artist detail view
+    """
+
+    model = Artist
 
 
 class ArtistListView(VegaListView):  # pylint: disable=too-many-ancestors
@@ -148,8 +156,13 @@ class CustomDefaultActions(ArtistCRUD):
         """custom Delete view"""
         pass
 
+    class CustomReadView(ArtistRead):
+        """custom Read view"""
+        pass
+
     view_classes = {
         "list": CustomListView,
+        "read": CustomReadView,
         "update": CustomUpdateView,
         "create": CustomCreateView,
         "delete": CustomDeleteView,
