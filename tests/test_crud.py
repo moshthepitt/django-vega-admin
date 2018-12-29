@@ -41,6 +41,10 @@ class TestCRUD(TestViewsBase):
             reverse("artist_app.artist-delete", kwargs={"pk": artist.pk}),
         )
         self.assertEqual(
+            f"/artist_app.artist/read/{artist.pk}/",
+            reverse("artist_app.artist-read", kwargs={"pk": artist.pk}),
+        )
+        self.assertEqual(
             f"/artist_app.artist/update/{artist.pk}/",
             reverse("artist_app.artist-update", kwargs={"pk": artist.pk}),
         )
@@ -82,6 +86,27 @@ class TestCRUD(TestViewsBase):
         html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title> Create professional artist</title></head><body><form id="artist-form" method="post" > <input type="hidden" name="csrfmiddlewaretoken" value="{csrf_token}"><div id="div_id_name" class="control-group"> <label for="id_name" class="control-label requiredField"> Name<span class="asteriskField">*</span> </label><div class="controls"> <input type="text" name="name" maxlength="100" class="textinput textInput" required id="id_name"></div></div><div class="form-actions"><div class="row" ><div class="col-md-12" ><div class="col-md-6" > <a href="/artist_app.artist/list/" class="btn vega-cancel"> Cancel </a></div><div class="col-md-6" > <input type="submit" name="submit" value="Submit" class="btn btn-primary vega-submit" id="submit-id-submit" /></div></div></div></div></form></body></html>"""  # noqa
         self.assertHTMLEqual(html, res.content.decode("utf-8"))
 
+    def test_read(self):
+        """
+        Test CRUD read
+        """
+        artist = mommy.make("artist_app.Artist")
+        url = reverse("artist_app.artist-read", kwargs={"pk": artist.id})
+
+        # test content
+        res = self.client.get(url)
+        self.assertEqual(
+            "/artist_app.artist/list/", res.context_data["vega_list_url"])
+        self.assertEqual(
+            "/artist_app.artist/create/", res.context_data["vega_create_url"]
+        )
+        self.assertEqual(
+            f"/artist_app.artist/read/{artist.pk}/",
+            res.context_data["vega_read_url"],
+        )
+        html = f""""""  # noqa
+        self.assertHTMLEqual(html, res.content.decode("utf-8"))
+
     def test_update(self):
         """
         Test CRUD update
@@ -102,14 +127,12 @@ class TestCRUD(TestViewsBase):
 
         # test content
         res = self.client.get(url)
-        self.assertEqual(
-            "/artist_app.artist/list/", res.context_data["vega_list_url"])
-        self.assertEqual(
-            "/artist_app.artist/create/", res.context_data["vega_create_url"]
-        )
-        self.assertEqual(
-            "/artist_app.artist/list/", res.context_data["vega_cancel_url"]
-        )
+        self.assertEqual("/artist_app.artist/list/",
+                         res.context_data["vega_list_url"])
+        self.assertEqual("/artist_app.artist/create/",
+                         res.context_data["vega_create_url"])
+        self.assertEqual("/artist_app.artist/list/",
+                         res.context_data["vega_cancel_url"])
         self.assertEqual(
             f"/artist_app.artist/update/{artist.pk}/",
             res.context_data["vega_update_url"],
@@ -222,6 +245,13 @@ class TestCRUD(TestViewsBase):
                               CustomDefaultActions.CustomUpdateView)
 
         url = reverse(
+            "custom-default-actions-read", kwargs={"pk": artist.pk})
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertIsInstance(res.context["view"],
+                              CustomDefaultActions.CustomReadView)
+
+        url = reverse(
             "custom-default-actions-delete", kwargs={"pk": artist.pk})
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
@@ -255,6 +285,12 @@ class TestCRUD(TestViewsBase):
         csrf_token = str(res.context["csrf_token"])
         html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title> Create Song</title></head><body><form id="song-form" method="post" > <input type="hidden" name="csrfmiddlewaretoken" value="{csrf_token}"><div id="div_id_name" class="control-group"> <label for="id_name" class="control-label requiredField"> Name<span class="asteriskField">*</span> </label><div class="controls"> <input type="text" name="name" maxlength="100" class="textinput textInput" required id="id_name"></div></div><div id="div_id_artist" class="control-group"> <label for="id_artist" class="control-label requiredField"> Artist<span class="asteriskField">*</span> </label><div class="controls"> <select name="artist" class="select" required id="id_artist"><option value="" selected>---------</option></select></div></div><div class="form-actions"><div class="row" ><div class="col-md-12" ><div class="col-md-6" > <a href="/artist_app.song/list/" class="btn vega-cancel"> Cancel </a></div><div class="col-md-6" > <input type="submit" name="submit" value="Submit" class="btn btn-primary vega-submit" id="submit-id-submit" /></div></div></div></div></form></body></html>"""  # noqa
         self.assertHTMLEqual(html, res.content.decode("utf-8"))
+
+    def test_read_options(self):
+        """
+        Test CRUD update with options
+        """
+        self.fail()
 
     def test_update_options(self):
         """
@@ -309,6 +345,7 @@ class TestCRUD(TestViewsBase):
         song = mommy.make("artist_app.Song", name="Song 1", artist=artist)
         create_url = reverse("private-songs-create")
         update_url = reverse("private-songs-update", kwargs={"pk": song.id})
+        read_url = reverse("private-songs-read", kwargs={"pk": song.id})
         delete_url = reverse("private-songs-delete", kwargs={"pk": song.id})
         list_url = reverse("private-songs-list")
 
@@ -316,12 +353,19 @@ class TestCRUD(TestViewsBase):
         create_res = self.client.get(create_url)
         self.assertEqual(302, create_res.status_code)
         self.assertRedirects(create_res, f"/list/artists/?next={create_url}")
+
         update_res = self.client.get(update_url)
         self.assertEqual(302, update_res.status_code)
         self.assertRedirects(update_res, f"/list/artists/?next={update_url}")
+
+        read_res = self.client.get(read_url)
+        self.assertEqual(302, read_res.status_code)
+        self.assertRedirects(read_res, f"/list/artists/?next={read_url}")
+
         delete_res = self.client.get(delete_url)
         self.assertEqual(302, delete_res.status_code)
         self.assertRedirects(delete_res, f"/list/artists/?next={delete_url}")
+
         list_res = self.client.get(list_url)
         # the list action is not set to be protected
         self.assertEqual(200, list_res.status_code)
@@ -335,6 +379,8 @@ class TestCRUD(TestViewsBase):
         self.assertEqual(200, update_res.status_code)
         delete_res = self.client.get(delete_url)
         self.assertEqual(200, delete_res.status_code)
+        read_res = self.client.get(read_url)
+        self.assertEqual(200, read_res.status_code)
         list_res = self.client.get(list_url)
         self.assertEqual(200, list_res.status_code)
 
@@ -367,6 +413,7 @@ class TestCRUD(TestViewsBase):
         song = mommy.make("artist_app.Song", name="Song 42", artist=artist)
         create_url = reverse("hidden-songs-create")
         update_url = reverse("hidden-songs-update", kwargs={"pk": song.id})
+        read_url = reverse("hidden-songs-read", kwargs={"pk": song.id})
         delete_url = reverse("hidden-songs-delete", kwargs={"pk": song.id})
         artists_url = reverse("hidden-songs-artists")
         list_url = reverse("hidden-songs-list")  # not protected
@@ -380,6 +427,10 @@ class TestCRUD(TestViewsBase):
         update_res = self.client.get(update_url)
         self.assertEqual(302, update_res.status_code)
         self.assertRedirects(update_res, f"/list/artists/?next={update_url}")
+
+        read_res = self.client.get(read_url)
+        self.assertEqual(302, read_res.status_code)
+        self.assertRedirects(read_res, f"/list/artists/?next={read_url}")
 
         delete_res = self.client.get(delete_url)
         self.assertEqual(302, delete_res.status_code)
@@ -409,6 +460,10 @@ class TestCRUD(TestViewsBase):
         self.assertEqual(302, update_res.status_code)
         self.assertRedirects(update_res, f"/list/artists/?next={update_url}")
 
+        read_res = self.client.get(read_url)
+        self.assertEqual(302, read_res.status_code)
+        self.assertRedirects(read_res, f"/list/artists/?next={read_url}")
+
         delete_res = self.client.get(delete_url)
         self.assertEqual(302, delete_res.status_code)
         self.assertRedirects(delete_res, f"/list/artists/?next={delete_url}")
@@ -436,6 +491,9 @@ class TestCRUD(TestViewsBase):
 
         update_res = self.client.get(update_url)
         self.assertEqual(200, update_res.status_code)
+
+        read_res = self.client.get(read_url)
+        self.assertEqual(200, read_res.status_code)
 
         delete_res = self.client.get(delete_url)
         self.assertEqual(200, delete_res.status_code)
