@@ -132,7 +132,10 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
     create_fields = None
     update_fields = None
     table_attrs = None
-    table_actions = None
+    table_actions = [
+        settings.VEGA_READ_ACTION, settings.VEGA_UPDATE_ACTION,
+        settings.VEGA_DELETE_ACTION,
+    ]
     form_class = None
     create_form_class = None
     update_form_class = None
