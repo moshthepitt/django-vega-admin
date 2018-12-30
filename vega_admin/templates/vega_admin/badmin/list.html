@@ -1,0 +1,38 @@
+{% extends "vega_admin/badmin/base.html" %}
+{% load i18n django_tables2 crispy_forms_tags %}
+
+{% block title %}{{ vega_verbose_name_plural }}{% endblock %}
+
+{% block main_content %}
+    <div class="section-title-wrapper style-1 v1">
+		<h3 class="section-title left">{{ vega_verbose_name_plural }}</h3>
+		{% if create_view_url %}
+		<div class="btn-group pull-right margin-left-10">
+			<a href="{{create_view_url}}" class="btn btn-primary btn-sm btn-100">{% trans 'Add New' %}</a>
+		</div>
+		{% endif %}
+		<div class="btn-group pull-right">
+			
+		</div>
+    </div>
+    <div>
+		<div class="clearfix"></div>
+		<div class="table-responsive">
+			{% render_table table "django_tables2/bootstrap.html" %}
+		</div>
+		{% if request.GET.q %}
+			<a href="{{list_view_url}}" class="btn btn-default btn-sm btn-100">{% trans 'Clear Search' %}</a>
+		{% endif %}
+	</div>
+{% endblock %}
+
+{% block footerjs %}
+<script>
+	$(function() {
+		$('.table').stacktable({
+			myClass:'stacked-table',
+			headIndex: 2
+		});
+	});
+</script>
+{% endblock %}
