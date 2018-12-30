@@ -18,7 +18,8 @@ from .test_views import TestViewsBase
 
 @override_settings(
     VEGA_ACTION_COLUMN_NAME="Actions",
-    ROOT_URLCONF="tests.artist_app.urls"
+    ROOT_URLCONF="tests.artist_app.urls",
+    VEGA_TEMPLATE="basic",
 )
 class TestCRUD(TestViewsBase):
     """

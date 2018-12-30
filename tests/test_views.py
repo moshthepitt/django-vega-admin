@@ -99,7 +99,10 @@ class TestViewsBase(TestCase):
         User.objects.all().delete()
 
 
-@override_settings(ROOT_URLCONF="tests.artist_app.urls")
+@override_settings(
+    ROOT_URLCONF="tests.artist_app.urls",
+    VEGA_TEMPLATE="basic",
+)
 class TestViews(TestViewsBase):
     """
     Test class for views
