@@ -38,7 +38,7 @@ class VegaListView(
     vega-admin Generic List View
     """
 
-    template_name = "vega_admin/basic/list.html"
+    template_name = f"vega_admin/{settings.VEGA_TEMPLATE}/list.html"
 
 
 class VegaCreateView(
@@ -53,7 +53,7 @@ class VegaCreateView(
     vega-admin Generic Create View
     """
 
-    template_name = "vega_admin/basic/create.html"
+    template_name = f"vega_admin/{settings.VEGA_TEMPLATE}/create.html"
     form_valid_message = _(settings.VEGA_FORM_VALID_CREATE_TXT)
     form_invalid_message = _(settings.VEGA_FORM_INVALID_TXT)
 
@@ -70,7 +70,7 @@ class VegaDetailView(
     vega-admin Generic Detail View
     """
 
-    template_name = "vega_admin/basic/read.html"
+    template_name = f"vega_admin/{settings.VEGA_TEMPLATE}/read.html"
 
 
 class VegaUpdateView(
@@ -86,7 +86,7 @@ class VegaUpdateView(
     vega-admin Generic Update View
     """
 
-    template_name = "vega_admin/basic/update.html"
+    template_name = f"vega_admin/{settings.VEGA_TEMPLATE}/update.html"
     form_valid_message = _(settings.VEGA_FORM_VALID_UPDATE_TXT)
     form_invalid_message = _(settings.VEGA_FORM_INVALID_TXT)
 
@@ -104,7 +104,7 @@ class VegaDeleteView(
     vega-admin Generic Delete View
     """
 
-    template_name = "vega_admin/basic/delete.html"
+    template_name = f"vega_admin/{settings.VEGA_TEMPLATE}/delete.html"
     form_valid_message = _(settings.VEGA_FORM_VALID_DELETE_TXT)
     form_invalid_message = _(settings.VEGA_FORM_INVALID_TXT)
 
