@@ -37,8 +37,8 @@ class TestViewsBase(TestCase):
             content_type=content_type,
             defaults=dict(name='Can Create Songs'),
         )
-        read_permission, _ = Permission.objects.get_or_create(
-            codename='read_song',
+        view_permission, _ = Permission.objects.get_or_create(
+            codename='view_song',
             content_type=content_type,
             defaults=dict(name='Can View Songs'),
         )
@@ -58,7 +58,7 @@ class TestViewsBase(TestCase):
             defaults=dict(name='Can List Song Artists'),
         )
         return [list_permission, create_permission, update_permission,
-                delete_permission, artists_permission, read_permission, ]
+                delete_permission, artists_permission, view_permission, ]
 
     def _artist_permissions(self):
         """
@@ -112,7 +112,7 @@ class TestViews(TestViewsBase):
         """
         Test VegaCRUDView
         """
-        default_actions = ["create", "read", "update", "list", "delete"]
+        default_actions = ["create", "view", "update", "list", "delete"]
 
         class ArtistCrud(VegaCRUDView):
             model = Artist
@@ -135,7 +135,7 @@ class TestViews(TestViewsBase):
         self.assertEqual(
             Artist, view.get_view_class_for_action("list")().model)
         self.assertEqual(
-            Artist, view.get_view_class_for_action("read")().model)
+            Artist, view.get_view_class_for_action("view")().model)
 
         self.assertIsInstance(
             view.get_view_class_for_action("create")(), VegaCreateView
@@ -149,7 +149,7 @@ class TestViews(TestViewsBase):
         self.assertIsInstance(
             view.get_view_class_for_action("list")(), VegaListView)
         self.assertIsInstance(
-            view.get_view_class_for_action("read")(), VegaDetailView)
+            view.get_view_class_for_action("view")(), VegaDetailView)
 
         self.assertEqual(
             f"{view.crud_path}/create/",
@@ -158,9 +158,9 @@ class TestViews(TestViewsBase):
             ),
         )
         self.assertEqual(
-            f"{view.crud_path}/read/<int:pk>/",
+            f"{view.crud_path}/view/<int:pk>/",
             view.get_url_pattern_for_action(
-                view.get_view_class_for_action("read"), "read"
+                view.get_view_class_for_action("view"), "view"
             ),
         )
         self.assertEqual(
@@ -212,12 +212,12 @@ class TestViews(TestViewsBase):
         self.assertEqual(res.context["object_list"].count(), 1)
         self.assertEqual(res.context["object_list"].first(), artist)
 
-    def test_vega_read_view(self):
+    def test_vega_view_view(self):
         """
         Test VegaReadView
         """
         artist = mommy.make("artist_app.Artist", name="Bob")
-        res = self.client.get(f"/view/artists/read/{artist.id}")
+        res = self.client.get(f"/view/artists/view/{artist.id}")
         self.assertEqual(res.status_code, 200)
         self.assertIsInstance(res.context["view"], ArtistRead)
         self.assertIsInstance(res.context["view"], VegaDetailView)
