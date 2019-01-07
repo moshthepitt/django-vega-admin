@@ -8,10 +8,18 @@
 {% block title %}{% trans "Update" %} {{ vega_verbose_name }}: {{vega_object_title}}{% endblock %}
 
 {% block main_content %}
-    <div class="section-title-wrapper style-1 v1">
-        <h3 class="section-title left">{% trans "Update" %}: {{vega_object_title}}</h3>
+    <div class="row">
+        <div class="col-md-12 content-box-info">
+            <div class="content-box-header panel-heading">
+                <div class="panel-title">{% trans "Update" %}: {{vega_object_title}}</div>
+            </div>
+            <div class="content-box-large box-with-header">
+                <div class="vega-content">
+                    {% crispy form %}
+                </div>
+            </div>
+        </div>
     </div>
-    <div>{% crispy form %}</div>
 {% endblock %}
 
 {% block footerjs %}

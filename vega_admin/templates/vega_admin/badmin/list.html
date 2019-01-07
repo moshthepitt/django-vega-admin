@@ -4,25 +4,21 @@
 {% block title %}{{ vega_verbose_name_plural }}{% endblock %}
 
 {% block main_content %}
-    <div class="section-title-wrapper style-1 v1">
-		<h3 class="section-title left">{{ vega_verbose_name_plural }}</h3>
-		{% if create_view_url %}
-		<div class="btn-group pull-right margin-left-10">
-			<a href="{{create_view_url}}" class="btn btn-primary btn-sm btn-100">{% trans 'Add New' %}</a>
+	<div class="row">
+		<div class="col-md-12 content-box-info">
+			<div class="content-box-header panel-heading">
+				<div class="panel-title">
+					{{ vega_verbose_name_plural }}
+				</div>
+			</div>
+			<div class="content-box-large box-with-header">
+				<div class="vega-content">
+					<div class="table-responsive">
+						{% render_table table "django_tables2/bootstrap.html" %}
+					</div>
+				</div>
+			</div>
 		</div>
-		{% endif %}
-		<div class="btn-group pull-right">
-			
-		</div>
-    </div>
-    <div>
-		<div class="clearfix"></div>
-		<div class="table-responsive">
-			{% render_table table "django_tables2/bootstrap.html" %}
-		</div>
-		{% if request.GET.q %}
-			<a href="{{list_view_url}}" class="btn btn-default btn-sm btn-100">{% trans 'Clear Search' %}</a>
-		{% endif %}
 	</div>
 {% endblock %}
 

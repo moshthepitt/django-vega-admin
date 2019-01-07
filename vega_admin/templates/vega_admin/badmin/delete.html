@@ -5,14 +5,21 @@
 
 
 {% block main_content %}
-    <div class="section-title-wrapper style-1 v1">
-        <h3 class="section-title left">{% trans "Delete" %}: {{vega_object_title}}</h3>
+    <div class="row">
+        <div class="col-md-12 content-box-info">
+            <div class="content-box-header panel-heading">
+                <div class="panel-title">{% trans "Delete" %}: {{vega_object_title}}</div>
+            </div>
+            <div class="content-box-large box-with-header">
+                <div class="vega-content">
+					<form action="" method="post">
+						{% csrf_token %}
+						<p>{% trans 'Are you sure you want to delete' %} "{{ vega_object_title }}"?</p>
+						<input type="submit" class="btn btn-danger btn-250" value="{% trans 'Confirm' %}" />
+						<a class='btn btn-default btn-250' href='{{vega_list_url}}'>{% trans "Cancel" %}</a>
+					</form>
+                </div>
+            </div>
+        </div>
     </div>
-    <div>
-		<form action="" method="post">{% csrf_token %}
-			<p>{% trans 'Are you sure you want to delete' %} "{{ vega_object_title }}"?</p>
-			<input type="submit" class="btn btn-danger btn-250" value="{% trans 'Confirm' %}" />
-			<a class='btn btn-default btn-250' href='{{vega_list_url}}'>{% trans "Cancel" %}</a>
-		</form>
-	</div>
 {% endblock %}
