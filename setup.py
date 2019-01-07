@@ -19,6 +19,7 @@ setup(
         'django-filter',
         'django-tables2',
         'tablib',
+        'pyyaml>=4.2b1',  # fixes security vulnerability
     ],
     classifiers=[
         'Programming Language :: Python',

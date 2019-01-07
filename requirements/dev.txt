@@ -47,7 +47,7 @@ pylint-django==2.0.2
 pylint-plugin-utils==0.4  # via pylint-django
 pylint==2.1.1
 pytz==2018.7              # via django
-pyyaml==3.13              # via tablib
+pyyaml==4.2b4             # via tablib
 six==1.11.0               # via astroid, model-mommy, prompt-toolkit, tox, traitlets
 tablib==0.12.1
 toml==0.10.0              # via black, tox

@@ -14,7 +14,7 @@ jdcal==1.4                # via openpyxl
 odfpy==1.3.6              # via tablib
 openpyxl==2.5.10          # via tablib
 pytz==2018.7              # via django
-pyyaml==3.13              # via tablib
+pyyaml==4.2b4
 tablib==0.12.1
 unicodecsv==0.14.1        # via tablib
 xlrd==1.1.0               # via tablib

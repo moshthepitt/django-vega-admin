@@ -58,7 +58,7 @@ def get_modelform(
                             HTML(
                                 f"""
                                 <a href="{cancel_url}"
-                                class="btn vega-cancel">
+                                class="btn btn-default btn-block vega-cancel">
                                 {_(settings.VEGA_CANCEL_TEXT)}
                                 </a>"""
                             ),
@@ -68,7 +68,7 @@ def get_modelform(
                             Submit(
                                 "submit",
                                 _(settings.VEGA_SUBMIT_TEXT),
-                                css_class="vega-submit"
+                                css_class="btn-block vega-submit"
                             ),
                             css_class="col-md-6",
                         ),

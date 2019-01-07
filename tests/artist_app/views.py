@@ -106,7 +106,7 @@ class CustomSongCRUD(SongCRUD):
         """random template view"""
         template_name = "artist_app/empty.html"
 
-    protected_actions = ["create", "update", "delete", "template", "read", ]
+    protected_actions = ["create", "update", "delete", "template", "view", ]
     permissions_actions = None
     crud_path = "private-songs"
     view_classes = {
@@ -122,8 +122,8 @@ class PermsSongCRUD(CustomSongCRUD):
     """
 
     protected_actions = [
-        "create", "update", "delete", "artists", "list", "read", ]
-    permissions_actions = ["create", "update", "delete", "artists", "read", ]
+        "create", "update", "delete", "artists", "list", "view", ]
+    permissions_actions = ["create", "update", "delete", "artists", "view", ]
     crud_path = "hidden-songs"
     form_class = SongForm
 
@@ -164,7 +164,7 @@ class CustomDefaultActions(ArtistCRUD):
 
     view_classes = {
         "list": CustomListView,
-        "read": CustomReadView,
+        "view": CustomReadView,
         "update": CustomUpdateView,
         "create": CustomCreateView,
         "delete": CustomDeleteView,

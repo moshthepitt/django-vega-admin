@@ -17,7 +17,7 @@ patterns_42 = views.Artist42CRUD().url_patterns()
 urlpatterns = [
     path('list/artists/', views.ArtistListView.as_view()),
     path('edit/artists/create/', views.ArtistCreate.as_view()),
-    path('view/artists/read/<int:pk>', views.ArtistRead.as_view()),
+    path('view/artists/view/<int:pk>', views.ArtistRead.as_view()),
     path('edit/artists/edit/<int:pk>', views.ArtistUpdate.as_view()),
     path('edit/artists/delete/<int:pk>', views.ArtistDelete.as_view()),
 ] + artist_crud_patterns + song_crud_patterns + custom_artist_crud_patterns +\
