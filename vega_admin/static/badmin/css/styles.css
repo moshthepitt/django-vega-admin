@@ -249,6 +249,21 @@ footer .copy{
    border-right:2px solid #eee;
 }
 
+.content-box-info .content-box-header {
+      background:#d9edf7;
+      color: #31708f;
+      border-left:1px solid #bce8f1;
+      border-top:1px solid #bce8f1;
+      border-right:2px solid #bce8f1;
+}
+
+.content-box-info .content-box-large {
+   border-left: 1px solid #bce8f1;
+   border-top: 1px solid #bce8f1;
+   border-right: 1px solid #bce8f1;
+   border-bottom: 1px solid #bce8f1;
+}
+
 .content-box-header:after {
   clear:both;
 }
@@ -649,4 +664,8 @@ body {
       box-shadow:0px 0px 1px #0fa6bc;
       border-radius:10px;
    }  
+}
+
+.page-content {
+   min-height: 85vh;
 }
