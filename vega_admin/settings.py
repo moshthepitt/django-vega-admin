@@ -5,7 +5,7 @@ from django.conf import settings
 
 # general
 VEGA_CREATE_ACTION = "create"
-VEGA_READ_ACTION = "read"
+VEGA_READ_ACTION = "view"
 VEGA_UPDATE_ACTION = "update"
 VEGA_LIST_ACTION = "list"
 VEGA_DELETE_ACTION = "delete"

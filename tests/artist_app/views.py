@@ -122,8 +122,8 @@ class PermsSongCRUD(CustomSongCRUD):
     """
 
     protected_actions = [
-        "create", "update", "delete", "artists", "list", "read", ]
-    permissions_actions = ["create", "update", "delete", "artists", "read", ]
+        "create", "update", "delete", "artists", "list", "view", ]
+    permissions_actions = ["create", "update", "delete", "artists", "view", ]
     crud_path = "hidden-songs"
     form_class = SongForm
 
