@@ -29,26 +29,7 @@
              <div class="col-md-5 pull-left">
                 <!-- Logo -->
                 <div class="logo">
-                   <h1><a href="/">{% if current_customer %}{{current_customer.name}}{% else %}{{site.name}}{% endif %}</a></h1>
-                </div>
-             </div>
-             <div class="col-sm-6 col-md-2 pull-right">
-                <div class="navbar navbar-inverse" role="banner">
-                    <nav class="collapse navbar-collapse bs-navbar-collapse navbar-right" role="navigation">
-                      <ul class="nav navbar-nav">
-                        <li class="dropdown">
-                          <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "Account" %} <b class="caret"></b></a>
-                          <ul class="dropdown-menu animated fadeInUp">
-                            {% if request.user.is_authenticated %}
-                            <li><a href="/">{% trans "Change password" %}</a></li>
-                            <li><a href="/">{% trans "Logout" %}</a></li>
-                            {% else %}
-                            <li><a href="/">{% trans "Login" %}</a></li>
-                            {% endif %}
-                          </ul>
-                        </li>
-                      </ul>
-                    </nav>
+                   <h1><a href="/">Vega Admin</a></h1>
                 </div>
              </div>
              <div class="clearfix"></div>
@@ -81,9 +62,11 @@
           {% endblock %}
           {% block page_content %}
           <div class="row page-content">
-            <div class="col-md-12 panel-defalt">
+            <div class="col-md-12 panel-info">
               {% block all_content %}
-              <div class="content-box">{% block main_content %}{% endblock %}</div>
+              <div class="vega-content-box">
+                {% block main_content %}{% endblock %}
+              </div>
             {% endblock %}
             </div>
           </div>
@@ -94,7 +77,7 @@
     <footer>
          <div class="container">         
             <div class="copy text-center">
-               &copy; {{ site.name }} {% trans "2018" %} - {% now "Y" %}
+               &copy; Vega Admin {% trans "2018" %} - {% now "Y" %}
             </div>            
          </div>
     </footer>
