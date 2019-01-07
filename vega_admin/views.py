@@ -133,7 +133,8 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
     update_fields = None
     table_attrs = None
     table_actions = [
-        settings.VEGA_READ_ACTION, settings.VEGA_UPDATE_ACTION,
+        settings.VEGA_READ_ACTION,
+        settings.VEGA_UPDATE_ACTION,
         settings.VEGA_DELETE_ACTION,
     ]
     form_class = None
@@ -281,9 +282,10 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         if isinstance(self.get_list_fields(), list):
             tables_kwargs["fields"] = self.get_list_fields()
         if isinstance(self.get_table_actions(), list):
+            table_actions = [
+                _ for _ in self.get_table_actions() if _ in self.get_actions()]
             tables_kwargs["actions"] = self.get_action_urlnames(
-                actions=self.get_table_actions()
-            )
+                actions=table_actions)
         if isinstance(self.get_table_attrs(), dict):
             tables_kwargs["attrs"] = self.get_table_attrs()
 
