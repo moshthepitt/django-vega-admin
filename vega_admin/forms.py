@@ -9,6 +9,8 @@ from crispy_forms.bootstrap import Field, FieldWithButtons
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit
 
+from vega_admin.settings import VEGA_LISTVIEW_SEARCH_QUERY_TXT
+
 
 class ListViewSearchForm(forms.Form):
     """
@@ -16,7 +18,10 @@ class ListViewSearchForm(forms.Form):
     """
 
     q = forms.CharField(
-        label=_(settings.VEGA_LISTVIEW_SEARCH_QUERY_TXT), required=False)
+        label=_(
+            getattr(settings, 'VEGA_LISTVIEW_SEARCH_QUERY_TXT',
+                    VEGA_LISTVIEW_SEARCH_QUERY_TXT)),
+        required=False)
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request', None)
