@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'django_filters',
     # custom
     'vega_admin',
+    'vega_admin.contrib.users',
     # tests
     'tests.artist_app'
 ]
