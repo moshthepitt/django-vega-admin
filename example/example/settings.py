@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django_tables2',
     'django_filters',
     'vega_admin',
+    'vega_admin.contrib.users',
     'artists',
 ]
 
