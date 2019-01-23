@@ -17,6 +17,38 @@ from django_filters import FilterSet
 from vega_admin.mixins import VegaFormMixin
 
 
+def get_form_actions(cancel_url: str):
+    """
+    Returns the FormActions class, for use in model forms in VegaCRUD
+    """
+    return FormActions(
+        Div(
+            Div(
+                Div(
+                    HTML(
+                        f"""
+                        <a href="{cancel_url}"
+                        class="btn btn-default btn-block vega-cancel">
+                        {_(settings.VEGA_CANCEL_TEXT)}
+                        </a>"""
+                    ),
+                    css_class="col-md-6",
+                ),
+                Div(
+                    Submit(
+                        "submit",
+                        _(settings.VEGA_SUBMIT_TEXT),
+                        css_class="btn-block vega-submit"
+                    ),
+                    css_class="col-md-6",
+                ),
+                css_class="col-md-12",
+            ),
+            css_class="row",
+        )
+    )
+
+
 def get_modelform(
         model: object, fields: list = None, extra_fields: list = None):
     """
@@ -39,6 +71,7 @@ def get_modelform(
         self.request = kwargs.pop("request", None)
         self.vega_extra_kwargs = kwargs.pop("vega_extra_kwargs", dict())
         cancel_url = self.vega_extra_kwargs.get("cancel_url", "/")
+        form_actions_class = get_form_actions(cancel_url=cancel_url)
         super(modelform_class, self).__init__(*args, **kwargs)
         # add crispy forms FormHelper
         self.helper = FormHelper()
@@ -50,34 +83,7 @@ def get_modelform(
         self.helper.include_media = False
         self.helper.form_id = f"{self.model._meta.model_name}-form"
         self.helper.layout = Layout(*self.fields.keys())
-        self.helper.layout.append(
-            FormActions(
-                Div(
-                    Div(
-                        Div(
-                            HTML(
-                                f"""
-                                <a href="{cancel_url}"
-                                class="btn btn-default btn-block vega-cancel">
-                                {_(settings.VEGA_CANCEL_TEXT)}
-                                </a>"""
-                            ),
-                            css_class="col-md-6",
-                        ),
-                        Div(
-                            Submit(
-                                "submit",
-                                _(settings.VEGA_SUBMIT_TEXT),
-                                css_class="btn-block vega-submit"
-                            ),
-                            css_class="col-md-6",
-                        ),
-                        css_class="col-md-12",
-                    ),
-                    css_class="row",
-                )
-            )
-        )
+        self.helper.layout.append(form_actions_class)
 
     if fields is None:
         fields = [_.name for _ in model._meta.concrete_fields]
