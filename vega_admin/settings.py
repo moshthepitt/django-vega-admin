@@ -47,3 +47,11 @@ VEGA_ACTION_LINK_SEPARATOR = " | "
 
 # exceptions
 VEGA_INVALID_ACTION = "Invalid Action"
+
+# contrib
+# users
+VEGA_USERNAME_HELP_TEXT =\
+    "Optional. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+VEGA_OPTIONAL_TXT = "Optional."
+VEGA_EMAIL_OR_USERNAME_REQUIRED_TXT =\
+    "You must provide one of email or username"
