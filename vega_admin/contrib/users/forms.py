@@ -2,6 +2,7 @@
 from django import forms
 from django.contrib.auth import password_validation
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import AdminPasswordChangeForm
 from django.utils.translation import ugettext as _
 from django.conf import settings
 
@@ -169,3 +170,24 @@ class EditUserForm(UserFormMixin, forms.ModelForm):
                 value, user=self.instance)
         except NameError:
             return value
+
+
+class PasswordChangeForm(AdminPasswordChangeForm):
+    """Custom form for admins to change user passwords"""
+
+    def __init__(self, *args, **kwargs):
+        """init method for password change form"""
+        self.instance = kwargs.pop("instance", None)
+        self.request = kwargs.pop("request", None)
+        self.vega_extra_kwargs = kwargs.pop("vega_extra_kwargs", dict())
+        super().__init__(user=self.instance, *args, **kwargs)
+        self.helper = get_form_helper_class(
+            form_tag=True, form_method="POST", render_required_fields=True,
+            form_show_labels=True, html5_required=True, include_media=True)
+        self.helper.form_id = "change-password-form"
+        self.helper.layout = Layout(
+            Field("password1"),
+            Field("password2"),
+            get_form_actions(
+                cancel_url=self.vega_extra_kwargs.get("cancel_url", "/")),
+        )
