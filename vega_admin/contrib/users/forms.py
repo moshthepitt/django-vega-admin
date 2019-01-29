@@ -6,10 +6,9 @@ from django.utils.translation import ugettext as _
 from django.conf import settings
 
 from crispy_forms.bootstrap import Field
-from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout
 
-from vega_admin.utils import get_form_actions
+from vega_admin.utils import get_form_actions, get_form_helper_class
 
 try:
     # pylint: disable=import-error
@@ -68,13 +67,9 @@ class AddUserForm(UserFormMixin, forms.ModelForm):
         self.fields["username"].required = False
         self.fields["username"].help_text = _(settings.VEGA_USERNAME_HELP_TEXT)
         self.fields["email"].help_text = _(settings.VEGA_OPTIONAL_TXT)
-        self.helper = FormHelper()
-        self.helper.form_tag = True
-        self.helper.form_method = "post"
-        self.helper.render_required_fields = True
-        self.helper.form_show_labels = True
-        self.helper.html5_required = True
-        self.helper.include_media = False
+        self.helper = get_form_helper_class(
+            form_tag=True, form_method="POST", render_required_fields=True,
+            form_show_labels=True, html5_required=True, include_media=True)
         self.helper.form_id = "add-user-form"
         self.helper.layout = Layout(
             Field("first_name"),
@@ -121,13 +116,11 @@ class AddUserForm(UserFormMixin, forms.ModelForm):
         unique_username = self.cleaned_data.get("username")
         if not unique_username:
             try:
-                unique_username = get_adapter().generate_unique_username(
-                    [
-                        self.cleaned_data.get("first_name"),
-                        self.cleaned_data.get("last_name"),
-                        self.cleaned_data.get("email"),
-                    ]
-                )
+                unique_username = get_adapter().generate_unique_username([
+                    self.cleaned_data.get("first_name"),
+                    self.cleaned_data.get("last_name"),
+                    self.cleaned_data.get("email"),
+                ])
             except NameError:
                 unique_username = self.cleaned_data.get("email")
         user_data = dict(
@@ -147,13 +140,7 @@ class EditUserForm(UserFormMixin, forms.ModelForm):
 
     class Meta:
         model = User
-        fields = [
-            "first_name",
-            "last_name",
-            "username",
-            "email",
-            "is_active",
-        ]
+        fields = ["first_name", "last_name", "username", "email", "is_active"]
 
     def __init__(self, *args, **kwargs):
         """init method for edit user form"""
@@ -161,13 +148,9 @@ class EditUserForm(UserFormMixin, forms.ModelForm):
         self.vega_extra_kwargs = kwargs.pop("vega_extra_kwargs", dict())
         super().__init__(*args, **kwargs)
         self.fields["email"].help_text = _(settings.VEGA_OPTIONAL_TXT)
-        self.helper = FormHelper()
-        self.helper.form_tag = True
-        self.helper.form_method = "post"
-        self.helper.render_required_fields = True
-        self.helper.form_show_labels = True
-        self.helper.html5_required = True
-        self.helper.include_media = False
+        self.helper = get_form_helper_class(
+            form_tag=True, form_method="POST", render_required_fields=True,
+            form_show_labels=True, html5_required=True, include_media=True)
         self.helper.form_id = "edit-user-form"
         self.helper.layout = Layout(
             Field("first_name"),
