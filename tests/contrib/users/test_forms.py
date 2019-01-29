@@ -21,3 +21,9 @@ class TestForms(TestCase):
 
         """
         self.fail()
+
+    def test_password_change_form(self):
+        """
+        Test PasswordChangeForm
+        """
+        self.fail()
