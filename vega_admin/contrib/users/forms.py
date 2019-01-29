@@ -26,7 +26,7 @@ class UserFormMixin:  # pylint: disable=too-few-public-methods
 
     def clean_email(self):
         """clean email address"""
-        value = self.cleaned_data['email']
+        value = self.cleaned_data["email"]
         try:
             value = get_adapter().clean_email(value)
         except NameError:
@@ -44,59 +44,59 @@ class AddUserForm(UserFormMixin, forms.ModelForm):
     password = forms.CharField(
         label=_("Password"),
         strip=True,
-        help_text=password_validation.password_validators_help_text_html()
+        help_text=password_validation.password_validators_help_text_html(),
     )
 
     class Meta:
         model = User
         fields = [
-            'first_name',
-            'last_name',
-            'username',
-            'email',
-            'password',
-            'is_active'
+            "first_name",
+            "last_name",
+            "username",
+            "email",
+            "password",
+            "is_active",
         ]
 
     def __init__(self, *args, **kwargs):
         """init method for add user form"""
-        self.request = kwargs.pop('request', None)
+        self.request = kwargs.pop("request", None)
         self.vega_extra_kwargs = kwargs.pop("vega_extra_kwargs", dict())
         super().__init__(*args, **kwargs)
-        self.fields['first_name'].required = True
-        self.fields['last_name'].required = True
-        self.fields['username'].required = False
-        self.fields['username'].help_text = _(settings.VEGA_USERNAME_HELP_TEXT)
-        self.fields['email'].help_text = _(settings.VEGA_OPTIONAL_TXT)
+        self.fields["first_name"].required = True
+        self.fields["last_name"].required = True
+        self.fields["username"].required = False
+        self.fields["username"].help_text = _(settings.VEGA_USERNAME_HELP_TEXT)
+        self.fields["email"].help_text = _(settings.VEGA_OPTIONAL_TXT)
         self.helper = FormHelper()
         self.helper.form_tag = True
-        self.helper.form_method = 'post'
+        self.helper.form_method = "post"
         self.helper.render_required_fields = True
         self.helper.form_show_labels = True
         self.helper.html5_required = True
         self.helper.include_media = False
-        self.helper.form_id = 'add-user-form'
+        self.helper.form_id = "add-user-form"
         self.helper.layout = Layout(
-            Field('first_name'),
-            Field('last_name'),
-            Field('username'),
-            Field('email'),
-            Field('password', autocomplete="off"),
-            Field('is_active'),
+            Field("first_name"),
+            Field("last_name"),
+            Field("username"),
+            Field("email"),
+            Field("password", autocomplete="off"),
+            Field("is_active"),
             get_form_actions(
                 cancel_url=self.vega_extra_kwargs.get("cancel_url", "/")),
         )
 
     def clean_password(self):
         """clean password field"""
-        data = self.cleaned_data['password']
+        data = self.cleaned_data["password"]
         user = User()
-        if self.cleaned_data.get('first_name'):
-            user.first_name = self.cleaned_data['first_name']
-        if self.cleaned_data.get('last_name'):
-            user.last_name = self.cleaned_data['last_name']
-        if self.cleaned_data.get('email'):
-            user.email = self.cleaned_data['email']
+        if self.cleaned_data.get("first_name"):
+            user.first_name = self.cleaned_data["first_name"]
+        if self.cleaned_data.get("last_name"):
+            user.last_name = self.cleaned_data["last_name"]
+        if self.cleaned_data.get("email"):
+            user.email = self.cleaned_data["email"]
         password_validation.validate_password(password=data, user=user)
         return data
 
@@ -121,20 +121,23 @@ class AddUserForm(UserFormMixin, forms.ModelForm):
         unique_username = self.cleaned_data.get("username")
         if not unique_username:
             try:
-                unique_username = get_adapter().generate_unique_username([
-                    self.cleaned_data.get('first_name'),
-                    self.cleaned_data.get('last_name'),
-                    self.cleaned_data.get('email'),
-                ])
+                unique_username = get_adapter().generate_unique_username(
+                    [
+                        self.cleaned_data.get("first_name"),
+                        self.cleaned_data.get("last_name"),
+                        self.cleaned_data.get("email"),
+                    ]
+                )
             except NameError:
-                unique_username = self.cleaned_data.get('email')
-        user_data = dict(username=unique_username,
-                         first_name=self.cleaned_data['first_name'],
-                         last_name=self.cleaned_data['last_name'],
-                         password=self.cleaned_data['password'],
-                         )
-        if self.cleaned_data.get('email'):
-            user_data['email'] = self.cleaned_data.get('email')
+                unique_username = self.cleaned_data.get("email")
+        user_data = dict(
+            username=unique_username,
+            first_name=self.cleaned_data["first_name"],
+            last_name=self.cleaned_data["last_name"],
+            password=self.cleaned_data["password"],
+        )
+        if self.cleaned_data.get("email"):
+            user_data["email"] = self.cleaned_data.get("email")
         user = User.objects.create_user(**user_data)
         return user
 
@@ -145,33 +148,33 @@ class EditUserForm(UserFormMixin, forms.ModelForm):
     class Meta:
         model = User
         fields = [
-            'first_name',
-            'last_name',
-            'username',
-            'email',
-            'is_active'
+            "first_name",
+            "last_name",
+            "username",
+            "email",
+            "is_active",
         ]
 
     def __init__(self, *args, **kwargs):
         """init method for edit user form"""
-        self.request = kwargs.pop('request', None)
+        self.request = kwargs.pop("request", None)
         self.vega_extra_kwargs = kwargs.pop("vega_extra_kwargs", dict())
         super().__init__(*args, **kwargs)
-        self.fields['email'].help_text = _(settings.VEGA_OPTIONAL_TXT)
+        self.fields["email"].help_text = _(settings.VEGA_OPTIONAL_TXT)
         self.helper = FormHelper()
         self.helper.form_tag = True
-        self.helper.form_method = 'post'
+        self.helper.form_method = "post"
         self.helper.render_required_fields = True
         self.helper.form_show_labels = True
         self.helper.html5_required = True
         self.helper.include_media = False
-        self.helper.form_id = 'edit-user-form'
+        self.helper.form_id = "edit-user-form"
         self.helper.layout = Layout(
-            Field('first_name'),
-            Field('last_name'),
-            Field('username'),
-            Field('email'),
-            Field('is_active'),
+            Field("first_name"),
+            Field("last_name"),
+            Field("username"),
+            Field("email"),
+            Field("is_active"),
             get_form_actions(
                 cancel_url=self.vega_extra_kwargs.get("cancel_url", "/")),
         )
