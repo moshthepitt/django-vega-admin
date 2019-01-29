@@ -81,7 +81,7 @@ class AddUserForm(UserFormMixin, forms.ModelForm):
             Field('last_name'),
             Field('username'),
             Field('email'),
-            Field('password'),
+            Field('password', autocomplete="off"),
             Field('is_active'),
             get_form_actions(
                 cancel_url=self.vega_extra_kwargs.get("cancel_url", "/")),
