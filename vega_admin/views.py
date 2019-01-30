@@ -180,6 +180,11 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
             return self.permissions_actions
         return []
 
+    def get_permissions(self):
+        """Get list of permission names associated with this CRUD view"""
+        actions = self.get_actions()
+        return [self.get_permission_for_action(action) for action in actions]
+
     def get_search_fields(self):
         """Get search fields for list view"""
         return self.search_fields
