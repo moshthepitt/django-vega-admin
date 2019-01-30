@@ -1,4 +1,5 @@
 """example URL Configuration"""
-from vega_admin.contrib.users import views
+from vega_admin.contrib.users.views import UserCRUD, GroupCRUD
 
-urlpatterns = views.UserCRUD().url_patterns()  # pylint: disable=invalid-name
+# pylint: disable=invalid-name
+urlpatterns = UserCRUD().url_patterns() + GroupCRUD().url_patterns()

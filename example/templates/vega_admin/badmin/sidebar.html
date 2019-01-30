@@ -11,6 +11,11 @@
                 <li><a href="{% url 'auth.user-list' %}">{% trans "View Users" %}</a></li>
                 <li><a href="{% url 'auth.user-create' %}">{% trans "Create User" %}</a></li>
             </ul>
+            <!-- Sub menu -->
+            <ul>
+                <li><a href="{% url 'auth.group-list' %}">{% trans "View Groups" %}</a></li>
+                <li><a href="{% url 'auth.group-create' %}">{% trans "Create Group" %}</a></li>
+            </ul>
         </li>
     </ul>
 </div>

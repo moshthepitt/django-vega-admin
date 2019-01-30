@@ -1,5 +1,5 @@
 """Views module for Vega Admin users app"""
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.conf import settings
 from django.urls import reverse_lazy
 
@@ -41,3 +41,14 @@ class UserCRUD(VegaCRUDView):
         "change password",
         settings.VEGA_DELETE_ACTION,
     ]
+
+
+class GroupCRUD(VegaCRUDView):
+    """
+    CRUD view for Groups
+    """
+
+    model = Group
+    protected_actions = None
+    permissions_actions = None
+    # list_fields = ['id', 'name']
