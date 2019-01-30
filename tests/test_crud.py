@@ -360,6 +360,24 @@ class TestCRUD(TestViewsBase):
         list_res = self.client.get(list_url)
         self.assertEqual(list_res.context["object_list"].count(), 10)
 
+    def test_get_permissions(self):
+        """Test get_permissions"""
+        actions = [
+            "create",
+            "update",
+            "delete",
+            "template",
+            "view",
+            "list",
+            "artists",
+        ]
+        expected = [
+            f"artist_app.{action}_song" for action in actions
+        ]
+
+        self.assertEqual(
+            set(expected), set(CustomSongCRUD().get_permissions()))
+
     @override_settings(LOGIN_URL='/list/artists/')
     def test_login_protection(self):
         """
