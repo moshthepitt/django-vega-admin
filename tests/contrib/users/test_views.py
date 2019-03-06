@@ -43,13 +43,18 @@ class TestViews(TestCase):
                 username="TestChangePasswordView",
                 password="Extension-I-School-5"))
 
-    @override_settings(VEGA_FORCE_ORDERING=True, VEGA_ORDERING_FIELD="pk")
+    @override_settings(VEGA_FORCE_ORDERING=True)
     def test_list_view_ordering(self):
         """
         Test VEGA_FORCE_ORDERING=True
         """
+        mommy.make("auth.User", _quantity=7)
         res = self.client.get("/auth.user/list/")
         self.assertTrue(res.context["object_list"].ordered)
+        self.assertEqual("-last_login",
+                         res.context["object_list"].query.order_by[0])
+        self.assertEqual("first_name",
+                         res.context["object_list"].query.order_by[1])
 
     @override_settings(VEGA_FORCE_ORDERING=False)
     def test_list_view_ordering_off(self):
