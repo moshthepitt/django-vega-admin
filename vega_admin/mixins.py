@@ -36,6 +36,28 @@ class VegaFormMixin(VegaFormKwargsMixin):
     pass
 
 
+class VegaOrderedQuerysetMixin:
+    """
+    Optionally ensures querysets are ordered
+    """
+    order_by = None
+
+    def get_order_by(self):
+        """Get the field to use when ordering"""
+        return self.order_by or settings.VEGA_ORDERING_FIELD
+
+    def get_queryset(self):
+        """
+        Get the queryset
+        """
+        queryset = super().get_queryset()
+        if not queryset.ordered and settings.VEGA_FORCE_ORDERING:
+            order_by = self.get_order_by()
+            queryset = queryset.order_by(order_by)
+
+        return queryset
+
+
 class ListViewSearchMixin:
     """
     Adds search to listview

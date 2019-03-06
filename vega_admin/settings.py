@@ -17,6 +17,9 @@ VEGA_DEFAULT_ACTIONS = [
     VEGA_DELETE_ACTION,
 ]
 VEGA_TEMPLATE = "basic"
+# ensures that listview queries are ordered
+VEGA_FORCE_ORDERING = True
+VEGA_ORDERING_FIELD = "-pk"
 
 # crispy forms
 VEGA_CRISPY_TEMPLATE_PACK = getattr(settings, "CRISPY_TEMPLATE_PACK",

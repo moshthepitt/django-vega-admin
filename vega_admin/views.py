@@ -19,7 +19,7 @@ from vega_admin.mixins import (CRUDURLsMixin, DeleteViewMixin, DetailViewMixin,
                                ListViewSearchMixin, ObjectTitleMixin,
                                ObjectURLPatternMixin, PageTitleMixin,
                                SimpleURLPatternMixin, VegaFormMixin,
-                               VerboseNameMixin)
+                               VegaOrderedQuerysetMixin, VerboseNameMixin)
 from vega_admin.utils import (get_filterclass, get_listview_form,
                               get_modelform, get_table)
 
@@ -33,6 +33,7 @@ class VegaListView(
         ExportMixin,
         SingleTableView,
         SimpleURLPatternMixin,
+        VegaOrderedQuerysetMixin,
         ListView,):
     """
     vega-admin Generic List View
