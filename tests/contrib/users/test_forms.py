@@ -34,6 +34,32 @@ class TestForms(TestCase):
             self.client.login(
                 username="moshthepitt", password="TestAddUserForm"))
 
+        # weak password
+        bad_data = {
+            "first_name": "mosh",
+            "last_name": "pitt",
+            "username": "moshthepitt2",
+            "email": "mosh@example.com",
+            "password": "mosh@example.com",
+        }
+        form = AddUserForm(data=bad_data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(1, len(form.errors.keys()))
+        self.assertEqual('The password is too similar to the email address.',
+                         form.errors['password'][0])
+
+        # missing email and username
+        bad_data = {
+            "first_name": "mosh",
+            "last_name": "pitt",
+            "password": "TestAddUserForm",
+        }
+        form = AddUserForm(data=bad_data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(1, len(form.errors.keys()))
+        self.assertEqual('You must provide one of email or username',
+                         form.errors['__all__'][0])
+
     def test_edituserform(self):
         """
         Test EditUserForm
