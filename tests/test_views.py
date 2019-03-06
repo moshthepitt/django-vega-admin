@@ -193,6 +193,8 @@ class TestViews(TestViewsBase):
         """
         Test VegaListView
         """
+        Artist.objects.all().delete()
+
         artist = mommy.make("artist_app.Artist", name="Bob")
         mommy.make("artist_app.Artist", _quantity=7)
 
