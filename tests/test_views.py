@@ -9,7 +9,7 @@ from django.test import TestCase, override_settings
 from model_mommy import mommy
 
 from vega_admin.views import (VegaCreateView, VegaCRUDView, VegaDeleteView,
-                              VegaListView, VegaDetailView, VegaUpdateView)
+                              VegaDetailView, VegaListView, VegaUpdateView)
 
 from .artist_app.forms import ArtistForm
 from .artist_app.models import Artist, Song
@@ -101,7 +101,7 @@ class TestViewsBase(TestCase):
 
 @override_settings(
     ROOT_URLCONF="tests.artist_app.urls",
-    VEGA_TEMPLATE="basic",
+    VEGA_TEMPLATE="basic"
 )
 class TestViews(TestViewsBase):
     """
@@ -188,17 +188,20 @@ class TestViews(TestViewsBase):
                 view.get_url_name_for_action(action)
             )
 
+    @override_settings(VEGA_FORCE_ORDERING=True, VEGA_ORDERING_FIELD="pk")
     def test_vega_list_view(self):
         """
         Test VegaListView
         """
         artist = mommy.make("artist_app.Artist", name="Bob")
         mommy.make("artist_app.Artist", _quantity=7)
+
         res = self.client.get("/list/artists/")
         self.assertEqual(res.status_code, 200)
         self.assertIsInstance(res.context["view"], ArtistListView)
         self.assertIsInstance(res.context["view"], VegaListView)
         self.assertEqual(res.context["object_list"].count(), 8)
+        self.assertTrue(res.context["object_list"].ordered)
         self.assertTemplateUsed(res, "vega_admin/basic/list.html")
 
         res = self.client.get("/list/artists/?q=Bob")
@@ -210,6 +213,7 @@ class TestViews(TestViewsBase):
             set(res.context["vega_listview_search_form"].fields.keys())
         )
         self.assertEqual(res.context["object_list"].count(), 1)
+        self.assertTrue(res.context["object_list"].ordered)
         self.assertEqual(res.context["object_list"].first(), artist)
 
     def test_vega_view_view(self):
