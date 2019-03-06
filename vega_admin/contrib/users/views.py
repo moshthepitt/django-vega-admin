@@ -32,11 +32,11 @@ class UserCRUD(VegaCRUDView):
     update_form_class = EditUserForm
     protected_actions = None
     permissions_actions = None
-    view_classes = {"change password": ChangePassword}
+    view_classes = {settings.VEGA_CHANGE_PASSWORD_LABEL: ChangePassword}
     table_actions = [
         settings.VEGA_READ_ACTION,
         settings.VEGA_UPDATE_ACTION,
-        "change password",
+        settings.VEGA_CHANGE_PASSWORD_LABEL,
         settings.VEGA_DELETE_ACTION,
     ]
 
@@ -49,4 +49,4 @@ class GroupCRUD(VegaCRUDView):
     model = Group
     protected_actions = None
     permissions_actions = None
-    list_fields = ['id', 'name']
+    list_fields = ["id", "name"]
