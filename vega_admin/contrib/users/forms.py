@@ -99,7 +99,7 @@ class AddUserForm(UserFormMixin, forms.ModelForm):
     def validate_unique_email(self, value):  # pylint: disable=no-self-use
         """validate unique email while adding users"""
         try:
-            return get_adapter().validate_unique_email(value)
+            return get_adapter().validate_unique_email(email=value)
         except NameError:
             return value
 
@@ -166,8 +166,7 @@ class EditUserForm(UserFormMixin, forms.ModelForm):
     def validate_unique_email(self, value):
         """Validate unique email when editting users"""
         try:
-            return get_adapter().validate_unique_email(
-                value, user=self.instance)
+            return get_adapter().validate_unique_email(email=value)
         except NameError:
             return value
 
