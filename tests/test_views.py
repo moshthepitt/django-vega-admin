@@ -188,7 +188,7 @@ class TestViews(TestViewsBase):
                 view.get_url_name_for_action(action)
             )
 
-    @override_settings(VEGA_FORCE_ORDERING=True, VEGA_ORDERING_FIELD="pk")
+    @override_settings(VEGA_FORCE_ORDERING=True, VEGA_ORDERING_FIELD=["pk"])
     def test_vega_list_view(self):
         """
         Test VegaListView

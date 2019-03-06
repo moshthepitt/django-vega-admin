@@ -39,6 +39,7 @@ class UserCRUD(VegaCRUDView):
         settings.VEGA_CHANGE_PASSWORD_LABEL,
         settings.VEGA_DELETE_ACTION,
     ]
+    order_by = ["-last_login", "first_name"]
 
 
 class GroupCRUD(VegaCRUDView):

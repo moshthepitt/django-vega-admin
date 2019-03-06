@@ -53,7 +53,7 @@ class VegaOrderedQuerysetMixin:
         queryset = super().get_queryset()
         if not queryset.ordered and settings.VEGA_FORCE_ORDERING:
             order_by = self.get_order_by()
-            queryset = queryset.order_by(order_by)
+            queryset = queryset.order_by(*order_by)
 
         return queryset
 
