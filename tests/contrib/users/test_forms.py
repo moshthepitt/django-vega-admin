@@ -23,7 +23,7 @@ class TestForms(TestCase):
             "last_name": "pitt",
             "username": "moshthepitt",
             "email": "mosh@example.com",
-            "password": "TestAddUserForm",
+            "password": "Miserable-Water-9",
         }
 
         form = AddUserForm(data=good_data)
@@ -35,14 +35,27 @@ class TestForms(TestCase):
         self.assertEqual("mosh@example.com", user.email)
         self.assertTrue(
             self.client.login(
-                username="moshthepitt", password="TestAddUserForm"))
+                username="moshthepitt", password="Miserable-Water-9"))
+
+        # good data no username
+        good_data = {
+            "first_name": "mosh",
+            "last_name": "pitt",
+            "email": "mosh2@example.com",
+            "password": "Bean-Quarrel-0",
+        }
+
+        form = AddUserForm(data=good_data)
+        self.assertTrue(form.is_valid())
+        user = form.save()
+        self.assertEqual("mosh", user.username)  # was generated
 
         # weak password
         bad_data = {
             "first_name": "mosh",
             "last_name": "pitt",
             "username": "moshthepitt2",
-            "email": "mosh@example.com",
+            "email": "mosh3@example.com",
             "password": "mosh@example.com",
         }
         form = AddUserForm(data=bad_data)
@@ -51,6 +64,22 @@ class TestForms(TestCase):
         self.assertEqual(
             "The password is too similar to the email address.",
             form.errors["password"][0],
+        )
+
+        # email not unique
+        bad_data = {
+            "first_name": "mosh",
+            "last_name": "pitt",
+            "username": "moshthepitt3",
+            "email": "mosh@example.com",
+            "password": "Every-Actor-1",
+        }
+        form = AddUserForm(data=bad_data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(1, len(form.errors.keys()))
+        self.assertEqual(
+            "A user is already registered with this e-mail address.",
+            form.errors["email"][0],
         )
 
         # missing email and username
