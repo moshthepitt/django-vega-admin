@@ -144,6 +144,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
     table_class = None
     paginate_by = 25
     crud_path = None
+    order_by = None
 
     def __init__(self, model=None):
         """
@@ -436,6 +437,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         if settings.VEGA_LIST_ACTION in self.get_actions():
             options["list_url"] = reverse_lazy(
                 self.get_url_name_for_action(settings.VEGA_LIST_ACTION))
+            options["order_by"] = self.order_by
         if settings.VEGA_CREATE_ACTION in self.get_actions():
             options["create_url"] = reverse_lazy(
                 self.get_url_name_for_action(settings.VEGA_CREATE_ACTION))
