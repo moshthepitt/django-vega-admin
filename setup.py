@@ -13,7 +13,7 @@ setup(
     url='https://github.com/moshthepitt/django-vega-admin',
     packages=find_packages(exclude=['docs', 'tests']),
     install_requires=[
-        'Django >= 2.0',
+        'Django >=2.0.11',
         'django-crispy-forms',
         'django-braces',
         'django-filter',
