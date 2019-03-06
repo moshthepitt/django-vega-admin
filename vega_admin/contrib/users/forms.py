@@ -10,6 +10,7 @@ from crispy_forms.bootstrap import Field
 from crispy_forms.layout import Layout
 
 from vega_admin.utils import get_form_actions, get_form_helper_class
+from django.urls import reverse_lazy
 
 try:
     # pylint: disable=import-error
@@ -18,7 +19,7 @@ try:
 except ModuleNotFoundError:
     UNIQUE_EMAIL = False
 else:
-    UNIQUE_EMAIL = app_settings.UNIQUE_EMAIL
+    UNIQUE_EMAIL = app_settings.UNIQUE_EMAIL  # pylint: disable=no-member
 
 
 class UserFormMixin:  # pylint: disable=too-few-public-methods
@@ -187,6 +188,5 @@ class PasswordChangeForm(AdminPasswordChangeForm):
         self.helper.layout = Layout(
             Field("password1"),
             Field("password2"),
-            get_form_actions(
-                cancel_url=self.vega_extra_kwargs.get("cancel_url", "/")),
+            get_form_actions(cancel_url=reverse_lazy("auth.user-list")),
         )

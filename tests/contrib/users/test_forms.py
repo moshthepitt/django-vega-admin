@@ -1,6 +1,7 @@
 """Test vega_admin.contrib.users.forms module"""
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
+from unittest.mock import patch
 
 from model_mommy import mommy
 
@@ -8,6 +9,8 @@ from vega_admin.contrib.users.forms import (AddUserForm, EditUserForm,
                                             PasswordChangeForm)
 
 
+@override_settings(
+    ROOT_URLCONF="vega_admin.contrib.users.urls", VEGA_TEMPLATE="basic")
 class TestForms(TestCase):
     """
     Test class for vega_admin.contrib.users.forms
@@ -152,3 +155,18 @@ class TestForms(TestCase):
         self.assertEqual(1, len(form.errors.keys()))
         self.assertEqual("The two password fields didn't match.",
                          form.errors["password2"][0])
+
+    @patch('vega_admin.contrib.users.forms.get_form_actions')
+    def test_password_change_form_cancel_url(self, mock):
+        """Test cancel url on password change form"""
+        user = mommy.make("auth.User")
+
+        good_data = {
+            "password1": "PasswordChangeForm",
+            "password2": "PasswordChangeForm",
+        }
+        form = PasswordChangeForm(instance=user, data=good_data)
+        self.assertTrue(form.is_valid())
+        form.save()
+
+        mock.assert_called_with(cancel_url="/auth.user/list/")
