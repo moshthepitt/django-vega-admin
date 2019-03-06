@@ -1,6 +1,9 @@
 # load from setup.py
 -e .
 
+# allauth
+django-allauth
+
 # others
 pylint
 pylint-django
