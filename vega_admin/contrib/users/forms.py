@@ -22,6 +22,14 @@ else:
     UNIQUE_EMAIL = app_settings.UNIQUE_EMAIL  # pylint: disable=no-member
 
 
+def validate_unique_email(value):
+    """Validate unique email when editting users"""
+    try:
+        return get_adapter().validate_unique_email(email=value)
+    except NameError:
+        return value
+
+
 class UserFormMixin:  # pylint: disable=too-few-public-methods
     """User forms mixin"""
 
@@ -33,7 +41,7 @@ class UserFormMixin:  # pylint: disable=too-few-public-methods
         except NameError:
             pass
         if value and UNIQUE_EMAIL:
-            value = self.validate_unique_email(value)
+            value = validate_unique_email(value)
         return value
 
 
@@ -163,13 +171,6 @@ class EditUserForm(UserFormMixin, forms.ModelForm):
             get_form_actions(
                 cancel_url=self.vega_extra_kwargs.get("cancel_url", "/")),
         )
-
-    def validate_unique_email(self, value):
-        """Validate unique email when editting users"""
-        try:
-            return get_adapter().validate_unique_email(email=value)
-        except NameError:
-            return value
 
 
 class PasswordChangeForm(AdminPasswordChangeForm):
