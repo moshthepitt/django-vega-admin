@@ -1,0 +1,21 @@
+{% load i18n %}
+<div class="sidebar content-box" style="display: block;">
+    <ul class="nav">
+        <li class="submenu">
+            <a href="{% url 'auth.user-list' %}">
+                <i class="glyphicon glyphicon-list"></i> {% trans "Users" %}
+                <span class="caret pull-right"></span>
+            </a>
+            <!-- Sub menu -->
+            <ul>
+                <li><a href="{% url 'auth.user-list' %}">{% trans "View Users" %}</a></li>
+                <li><a href="{% url 'auth.user-create' %}">{% trans "Create User" %}</a></li>
+            </ul>
+            <!-- Sub menu -->
+            <ul>
+                <li><a href="{% url 'auth.group-list' %}">{% trans "View Groups" %}</a></li>
+                <li><a href="{% url 'auth.group-create' %}">{% trans "Create Group" %}</a></li>
+            </ul>
+        </li>
+    </ul>
+</div>

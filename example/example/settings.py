@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django_tables2',
     'django_filters',
     'vega_admin',
+    'vega_admin.contrib.users',
     'artists',
 ]
 
@@ -56,7 +57,7 @@ ROOT_URLCONF = 'example.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

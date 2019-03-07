@@ -19,7 +19,7 @@ from vega_admin.mixins import (CRUDURLsMixin, DeleteViewMixin, DetailViewMixin,
                                ListViewSearchMixin, ObjectTitleMixin,
                                ObjectURLPatternMixin, PageTitleMixin,
                                SimpleURLPatternMixin, VegaFormMixin,
-                               VerboseNameMixin)
+                               VegaOrderedQuerysetMixin, VerboseNameMixin)
 from vega_admin.utils import (get_filterclass, get_listview_form,
                               get_modelform, get_table)
 
@@ -33,6 +33,7 @@ class VegaListView(
         ExportMixin,
         SingleTableView,
         SimpleURLPatternMixin,
+        VegaOrderedQuerysetMixin,
         ListView,):
     """
     vega-admin Generic List View
@@ -143,6 +144,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
     table_class = None
     paginate_by = 25
     crud_path = None
+    order_by = None
 
     def __init__(self, model=None):
         """
@@ -179,6 +181,11 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         if isinstance(self.permissions_actions, list):
             return self.permissions_actions
         return []
+
+    def get_permissions(self):
+        """Get list of permission names associated with this CRUD view"""
+        actions = self.get_actions()
+        return [self.get_permission_for_action(action) for action in actions]
 
     def get_search_fields(self):
         """Get search fields for list view"""
@@ -430,6 +437,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         if settings.VEGA_LIST_ACTION in self.get_actions():
             options["list_url"] = reverse_lazy(
                 self.get_url_name_for_action(settings.VEGA_LIST_ACTION))
+            options["order_by"] = self.order_by
         if settings.VEGA_CREATE_ACTION in self.get_actions():
             options["create_url"] = reverse_lazy(
                 self.get_url_name_for_action(settings.VEGA_CREATE_ACTION))

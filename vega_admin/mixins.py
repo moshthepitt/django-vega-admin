@@ -4,6 +4,7 @@ vega-admin mixins module
 from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import FieldDoesNotExist
+from django.db import models
 from django.db.models import ProtectedError, Q
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -33,6 +34,28 @@ class VegaFormMixin(VegaFormKwargsMixin):
     """
 
     pass
+
+
+class VegaOrderedQuerysetMixin:
+    """
+    Optionally ensures querysets are ordered
+    """
+    order_by = None
+
+    def get_order_by(self):
+        """Get the field to use when ordering"""
+        return self.order_by or settings.VEGA_ORDERING_FIELD
+
+    def get_queryset(self):
+        """
+        Get the queryset
+        """
+        queryset = super().get_queryset()
+        if not queryset.ordered and settings.VEGA_FORCE_ORDERING:
+            order_by = self.get_order_by()
+            queryset = queryset.order_by(*order_by)
+
+        return queryset
 
 
 class ListViewSearchMixin:
@@ -364,3 +387,16 @@ class ObjectURLPatternMixin:
         Derive the url pattern
         """
         return f"{crud_path}/{action}/<int:pk>/"
+
+
+class TimeStampedModel:
+    """
+    Adds timestamps to a model class
+    """
+
+    created = models.DateTimeField(_("Created"), auto_now_add=True)
+    modified = models.DateTimeField(_("Modified"), auto_now=True)
+
+    class Meta:
+        """Meta class"""
+        abstract = True

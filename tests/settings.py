@@ -19,8 +19,13 @@ INSTALLED_APPS = [
     'crispy_forms',
     'django_tables2',
     'django_filters',
+    # just for testing
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
     # custom
     'vega_admin',
+    'vega_admin.contrib.users',
     # tests
     'tests.artist_app'
 ]
@@ -57,6 +62,35 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware'
 ]
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
+
+AUTHENTICATION_BACKENDS = (
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+    # `allauth` specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend'
+)
+
+# Password validation
+# https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME':
+        'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',  # noqa
+    },
+    {
+        'NAME':
+        'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME':
+        'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME':
+        'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
 
 TIME_ZONE = 'Africa/Nairobi'
 USE_I18N = True

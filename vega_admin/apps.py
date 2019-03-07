@@ -2,14 +2,16 @@
 Apps module for django-vega-admin
 """
 from django.apps import AppConfig
+from django.utils.translation import ugettext_lazy as _
 
 
 class VegaAdminConfig(AppConfig):
     """
     Apps config class
     """
-    name = 'vega_admin'
-    app_label = 'vega_admin'
+    name = "vega_admin"
+    app_label = "vega_admin"
+    verbose_name = _("Vega Admin")
 
     def ready(self):
         """
