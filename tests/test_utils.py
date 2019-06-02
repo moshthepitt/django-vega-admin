@@ -55,6 +55,16 @@ class TestUtils(TestCase):
             form().as_p()
         )
 
+    def test_get_modelform_datefield(self):
+        """Test Datefield output of get_modelform"""
+        form = get_modelform(
+            model=Song,
+            fields=["release_date"]
+        )
+        self.assertHTMLEqual(
+            """<p><label for="id_release_date">Release Date:</label> <input type="date" name="release_date" required id="id_release_date"></p>""",  # noqa
+            form().as_p())
+
     @patch('vega_admin.utils.get_modelform')
     @patch('vega_admin.utils.forms.CharField')
     def test_get_listview_form(self, charfield_mock, mock):
