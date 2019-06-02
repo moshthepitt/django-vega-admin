@@ -14,6 +14,7 @@ from tests.artist_app.models import Artist, Song
 
 from vega_admin.utils import (get_filterclass, get_listview_form,
                               get_modelform, get_table)
+from vega_admin.widgets import VegaDateWidget
 
 
 class TestUtils(TestCase):
@@ -29,62 +30,60 @@ class TestUtils(TestCase):
         self.assertEqual(Artist, form.model)
         self.assertEqual(["id", "name"], form.Meta.fields)
         # form with all options
-        form2 = get_modelform(model=Artist, fields=['name'])
+        form2 = get_modelform(model=Artist, fields=["name"])
         self.assertEqual(Artist, form2.model)
         self.assertEqual(["name"], form2.Meta.fields)
         self.assertHTMLEqual(
             """<p><label for="id_name">Name:</label> <input type="text" name="name" maxlength="100" required id="id_name"></p>""",  # noqa
-            form().as_p()
+            form().as_p(),
         )
 
     def test_get_modelform_extra_fields(self):
         """Test get_modelform with extra fields"""
-        mommy.make('artist_app.Artist', name="Kylie", id=797)
+        mommy.make("artist_app.Artist", name="Kylie", id=797)
         form = get_modelform(
             model=Song,
             fields=["artist"],
-            extra_fields=[
-                ("q", CharField(label="Search Now", required=False, ))
-            ],
+            extra_fields=[("q", CharField(label="Search Now",
+                                          required=False))],
         )
         self.assertTrue(issubclass(form, ModelForm))
         self.assertEqual(Song, form.model)
         self.assertEqual(["artist"], form.Meta.fields)
         self.assertHTMLEqual(
             """<p><label for="id_artist">Artist:</label><select name="artist" required id="id_artist"><option value="" selected>---------</option><option value="797">Kylie</option></select></p><p><label for="id_q">Search Now:</label> <input type="text" name="q" id="id_q"></p>""",  # noqa
-            form().as_p()
+            form().as_p(),
         )
 
     def test_get_modelform_datefield(self):
         """Test Datefield output of get_modelform"""
-        form = get_modelform(
-            model=Song,
-            fields=["release_date"]
-        )
+        form = get_modelform(model=Song, fields=["release_date"])
+        self.assertIsInstance(form().fields["release_date"].widget,
+                              VegaDateWidget)
         self.assertHTMLEqual(
             """<p><label for="id_release_date">Release Date:</label> <input type="date" name="release_date" required id="id_release_date"></p>""",  # noqa
-            form().as_p())
+            form().as_p(),
+        )
 
-    @patch('vega_admin.utils.get_modelform')
-    @patch('vega_admin.utils.forms.CharField')
+    @patch("vega_admin.utils.get_modelform")
+    @patch("vega_admin.utils.forms.CharField")
     def test_get_listview_form(self, charfield_mock, mock):
         """Test get_listview_form"""
         # we need to mock the return value of CharField so that we can
         # compare the test object with the object produced in get_listview_form
         charfield = CharField(
-            label=settings.VEGA_LISTVIEW_SEARCH_QUERY_TXT,
-            required=False,)
+            label=settings.VEGA_LISTVIEW_SEARCH_QUERY_TXT, required=False)
         charfield_mock.return_value = charfield
         search_field = ("q", charfield)
 
-        get_listview_form(model=Song, fields=['artist'])
+        get_listview_form(model=Song, fields=["artist"])
 
         # assert that get_modelform is called with the expected params
         mock.assert_called_once_with(
-            model=Song, fields=['artist'], extra_fields=[search_field])
+            model=Song, fields=["artist"], extra_fields=[search_field])
 
-    @patch('vega_admin.utils.get_modelform')
-    @patch('vega_admin.utils.forms.CharField')
+    @patch("vega_admin.utils.get_modelform")
+    @patch("vega_admin.utils.forms.CharField")
     def test_get_listview_form_include_search(self, charfield_mock, mock):
         """
         Test get_listview_form with include_search=True
@@ -92,28 +91,26 @@ class TestUtils(TestCase):
         # we need to mock the return value of CharField so that we can
         # compare the test object with the object produced in get_listview_form
         charfield = CharField(
-            label=settings.VEGA_LISTVIEW_SEARCH_QUERY_TXT,
-            required=False,
-        )
+            label=settings.VEGA_LISTVIEW_SEARCH_QUERY_TXT, required=False)
         charfield_mock.return_value = charfield
         search_field = ("q", charfield)
 
-        get_listview_form(model=Song, fields=['artist'], include_search=True)
+        get_listview_form(model=Song, fields=["artist"], include_search=True)
 
         # assert that get_modelform is called with the expected params
         mock.assert_called_once_with(
-            model=Song, fields=['artist'], extra_fields=[search_field])
+            model=Song, fields=["artist"], extra_fields=[search_field])
 
-    @patch('vega_admin.utils.get_modelform')
+    @patch("vega_admin.utils.get_modelform")
     def test_get_listview_form_dont_include_search(self, mock):
         """
         Test get_listview_form with include_search=False
         """
-        get_listview_form(model=Song, fields=['artist'], include_search=False)
+        get_listview_form(model=Song, fields=["artist"], include_search=False)
 
         # assert that get_modelform is called with the expected params
         mock.assert_called_once_with(
-            model=Song, fields=['artist'], extra_fields=None)
+            model=Song, fields=["artist"], extra_fields=None)
 
     @override_settings(VEGA_NOTHING_TO_SHOW="Nothing here")
     def test_get_table(self):
@@ -125,8 +122,8 @@ class TestUtils(TestCase):
         self.assertTrue(issubclass(table, Table))
         self.assertEqual(Artist, table.Meta.model)
         self.assertEqual("Nothing here", table.Meta.empty_text)
-        self.assertEqual(
-            ["id", "name"], [_[0] for _ in table.base_columns.items()])
+        self.assertEqual(["id", "name"],
+                         [_[0] for _ in table.base_columns.items()])
 
         # table with all options set
         table2 = get_table(
