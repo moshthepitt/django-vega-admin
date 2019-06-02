@@ -3,6 +3,7 @@ vega-admin forms module
 """
 from django import forms
 from django.conf import settings
+from django.db.models import DateField
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils.html import format_html
@@ -15,6 +16,7 @@ from crispy_forms.layout import HTML, Div, Layout, Submit
 from django_filters import FilterSet
 
 from vega_admin.mixins import VegaFormMixin
+from vega_admin.widgets import VegaDateWidget
 
 
 def get_form_actions(cancel_url: str):
@@ -77,6 +79,18 @@ def get_form_helper_class(  # pylint: disable=too-many-arguments
     return helper
 
 
+def get_datefields(model: object):
+    """
+    Get the datefields from a model
+
+    :param model: the model class
+    """
+    return [
+        _.name for _ in model._meta.concrete_fields
+        if isinstance(_, DateField)
+    ]
+
+
 def get_modelform(model: object,
                   fields: list = None,
                   extra_fields: list = None):
@@ -118,14 +132,22 @@ def get_modelform(model: object,
     if fields is None:
         fields = [_.name for _ in model._meta.concrete_fields]
 
+    widgets = {}
+    # set the widgets for all date input fields
+    datefields = get_datefields(model)
+    for datefield in datefields:
+        widgets[datefield] = VegaDateWidget
+
+    meta_class_options = {"model": model, "fields": fields}
+
+    if widgets:
+        meta_class_options["widgets"] = widgets
+
     # the Meta class
     meta_class = type(
-        "Meta",  # name of class
-        (),  # inherit from object
-        {
-            "model": model,
-            "fields": fields
-        },
+        "Meta",
+        (),
+        meta_class_options
     )
 
     # the attributes of our new modelform
