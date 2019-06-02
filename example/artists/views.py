@@ -26,12 +26,13 @@ class SongCRUD(VegaCRUDView):
     model = Song
     protected_actions = None
     permissions_actions = None
-    list_fields = ["name", "artist", ]
-    read_fields = ["name", "artist", ]
+    list_fields = ["name", "artist", "release_date"]
+    read_fields = [
+        "name", "artist", "release_date", "release_time", "recording_time"]
     table_attrs = {"class": "table song-table"}
-    table_actions = ["create", "artists", "update", "delete", ]
-    create_fields = ["name", "artist", ]
-    update_fields = ["name", ]
+    table_actions = ["create", "artists", "update", "delete", "view"]
+    create_fields = ["name", "artist", "release_date", "release_time"]
+    update_fields = ["name", "release_date", "release_time"]
     view_classes = {
         "artists": CustomListView,
     }
