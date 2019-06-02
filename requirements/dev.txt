@@ -21,7 +21,7 @@ django-braces==1.13.0
 django-crispy-forms==1.7.2
 django-filter==2.1.0
 django-tables2==2.0.6
-# django==2.2.1             # via django-allauth, django-filter, django-tables2, model-mommy
+django==2.2.1             # via django-allauth, django-filter, django-tables2, model-mommy
 entrypoints==0.3          # via flake8
 et-xmlfile==1.0.1         # via openpyxl
 filelock==3.0.12          # via tox
