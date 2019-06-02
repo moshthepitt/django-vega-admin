@@ -33,8 +33,6 @@ class VegaFormMixin(VegaFormKwargsMixin):
     Adds some nice stuff to formviews used in create/update/delete views
     """
 
-    pass
-
 
 class VegaOrderedQuerysetMixin:
     """
