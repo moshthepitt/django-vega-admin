@@ -61,5 +61,6 @@ class TestViews(TestCase):
         """
         Test VEGA_FORCE_ORDERING=False
         """
+        mommy.make("auth.User", _quantity=3)
         res = self.client.get("/auth.user/list/")
         self.assertFalse(res.context["object_list"].ordered)
