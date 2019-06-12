@@ -5,6 +5,7 @@
 django-allauth
 
 # others
+pre-commit
 pylint
 pylint-django
 tox
