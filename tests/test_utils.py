@@ -14,7 +14,8 @@ from tests.artist_app.models import Artist, Song
 
 from vega_admin.utils import (get_filterclass, get_listview_form,
                               get_modelform, get_table)
-from vega_admin.widgets import VegaDateWidget, VegaTimeWidget
+from vega_admin.widgets import (VegaDateTimeWidget, VegaDateWidget,
+                                VegaTimeWidget)
 
 
 class TestUtils(TestCase):
@@ -56,7 +57,7 @@ class TestUtils(TestCase):
         )
 
     def test_get_modelform_datefield(self):
-        """Test Datefield output of get_modelform"""
+        """Test DateField output of get_modelform"""
         form = get_modelform(model=Song, fields=["release_date"])
         self.assertIsInstance(form().fields["release_date"].widget,
                               VegaDateWidget)
@@ -65,8 +66,18 @@ class TestUtils(TestCase):
             form().as_p(),
         )
 
+    def test_get_modelform_datetimefield(self):
+        """Test DateTimeField output of get_modelform"""
+        form = get_modelform(model=Song, fields=["recording_time"])
+        self.assertIsInstance(form().fields['recording_time'].widget,
+                              VegaDateTimeWidget)
+        self.assertHTMLEqual(
+            """<p><label for="id_recording_time">Recording Time:</label> <input type="datetime-local" name="recording_time" required id="id_recording_time"></p>""",  # noqa
+            form().as_p(),
+        )
+
     def test_get_modelform_timefield(self):
-        """Test Timefield output of get_modelform"""
+        """Test TimeField output of get_modelform"""
         form = get_modelform(model=Song, fields=["release_time"])
         self.assertIsInstance(form().fields["release_time"].widget,
                               VegaTimeWidget)
