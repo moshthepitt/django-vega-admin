@@ -1,9 +1,11 @@
 """
 vega-admin forms module
 """
+from typing import Any, Dict, List, Optional, Tuple
+
 from django import forms
 from django.conf import settings
-from django.db.models import DateField
+from django.db.models import DateField, Model, TimeField
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils.html import format_html
@@ -16,7 +18,7 @@ from crispy_forms.layout import HTML, Div, Layout, Submit
 from django_filters import FilterSet
 
 from vega_admin.mixins import VegaFormMixin
-from vega_admin.widgets import VegaDateWidget
+from vega_admin.widgets import VegaDateWidget, VegaTimeWidget
 
 
 def get_form_actions(cancel_url: str):
@@ -27,11 +29,13 @@ def get_form_actions(cancel_url: str):
         Div(
             Div(
                 Div(
-                    HTML(f"""
+                    HTML(
+                        f"""
                         <a href="{cancel_url}"
                         class="btn btn-default btn-block vega-cancel">
                         {_(settings.VEGA_CANCEL_TEXT)}
-                        </a>"""),
+                        </a>"""
+                    ),
                     css_class="col-md-6",
                 ),
                 Div(
@@ -45,16 +49,17 @@ def get_form_actions(cancel_url: str):
                 css_class="col-md-12",
             ),
             css_class="row",
-        ))
+        )
+    )
 
 
-def get_form_helper_class(  # pylint: disable=too-many-arguments
-        form_tag: bool = True,
-        form_method: str = "POST",
-        render_required_fields: bool = True,
-        form_show_labels: bool = True,
-        html5_required: bool = True,
-        include_media: bool = True,
+def get_form_helper_class(  # pylint: disable=too-many-arguments,bad-continuation
+    form_tag: bool = True,
+    form_method: str = "POST",
+    render_required_fields: bool = True,
+    form_show_labels: bool = True,
+    html5_required: bool = True,
+    include_media: bool = True,
 ):
     """
     Returns the base form helper class
@@ -79,21 +84,25 @@ def get_form_helper_class(  # pylint: disable=too-many-arguments
     return helper
 
 
-def get_datefields(model: object):
+def get_datefields(model: Model):
     """
     Get the datefields from a model
 
     :param model: the model class
     """
-    return [
-        _.name for _ in model._meta.concrete_fields
-        if isinstance(_, DateField)
-    ]
+    return [_.name for _ in model._meta.concrete_fields if isinstance(_, DateField)]
 
 
-def get_modelform(model: object,
-                  fields: list = None,
-                  extra_fields: list = None):
+def get_timefields(model: Model):
+    """
+    Get the timefields from a model
+
+    :param model: the model class
+    """
+    return [_.name for _ in model._meta.concrete_fields if isinstance(_, TimeField)]
+
+
+def get_modelform(model: Model, fields: list = None, extra_fields: list = None):
     """
     Get the a ModelForm for the provided model
 
@@ -138,17 +147,18 @@ def get_modelform(model: object,
     for datefield in datefields:
         widgets[datefield] = VegaDateWidget
 
+    # set the widgets for all time input fields
+    timefields = get_timefields(model)
+    for timefield in timefields:
+        widgets[timefield] = VegaTimeWidget
+
     meta_class_options = {"model": model, "fields": fields}
 
     if widgets:
         meta_class_options["widgets"] = widgets
 
     # the Meta class
-    meta_class = type(
-        "Meta",
-        (),
-        meta_class_options
-    )
+    meta_class = type("Meta", (), meta_class_options)
 
     # the attributes of our new modelform
     options = {"model": model, "__init__": _constructor, "Meta": meta_class}
@@ -168,8 +178,7 @@ def get_modelform(model: object,
     return modelform_class
 
 
-def get_listview_form(model: object, fields: list,
-                      include_search: bool = True):
+def get_listview_form(model: Model, fields: List[str], include_search: bool = True):
     """
     Get a search and filter form for use in ListViews
 
@@ -179,27 +188,28 @@ def get_listview_form(model: object, fields: list,
     :param fields: list of the fields that you want included in the form
     :return: model form
     """
-    search_field = None
+    search_field: Optional[Tuple[str, Any]] = None
     if include_search:
         search_field = (
             "q",
             forms.CharField(
-                label=_(settings.VEGA_LISTVIEW_SEARCH_QUERY_TXT),
-                required=False),
+                label=_(settings.VEGA_LISTVIEW_SEARCH_QUERY_TXT), required=False
+            ),
         )
 
+    extra_fields: Optional[List[Tuple[str, Any]]] = None
     if search_field:
         extra_fields = [search_field]
-    else:
-        extra_fields = None
 
     return get_modelform(model=model, fields=fields, extra_fields=extra_fields)
 
 
-def get_table(model: object,
-              fields: list = None,
-              actions: list = None,
-              attrs: dict = None):
+def get_table(  # pylint: disable=bad-continuation
+    model: Model,
+    fields: Optional[List[str]] = None,
+    actions: Optional[List[str]] = None,
+    attrs: Optional[dict] = None,
+):
     """
     Get the Table Class for the provided model
 
@@ -210,10 +220,7 @@ def get_table(model: object,
     :return: table
     """
     # the Meta class
-    meta_options = {
-        "model": model,
-        "empty_text": _(settings.VEGA_NOTHING_TO_SHOW)
-    }
+    meta_options = {"model": model, "empty_text": _(settings.VEGA_NOTHING_TO_SHOW)}
 
     if fields:
         all_fields = [_.name for _ in model._meta.concrete_fields]
@@ -232,7 +239,7 @@ def get_table(model: object,
     meta_class = type("Meta", (), meta_options)
 
     # the attributes of our new table class
-    options = {"Meta": meta_class}
+    options: Dict[Any, Any] = {"Meta": meta_class}
 
     if isinstance(actions, list):
         # pylint: disable=unused-argument
@@ -246,10 +253,8 @@ def get_table(model: object,
                 except NoReverseMatch:
                     url = reverse(item[1], args=[record.pk])
                 name = item[0]
-                actions_links.append(
-                    f"<a href='{url}' class='vega-action'>{name}</a>")
-            actions_links_html = settings.VEGA_ACTION_LINK_SEPARATOR.join(
-                actions_links)
+                actions_links.append(f"<a href='{url}' class='vega-action'>{name}</a>")
+            actions_links_html = settings.VEGA_ACTION_LINK_SEPARATOR.join(actions_links)
             return format_html(actions_links_html)
 
         options["actions_list"] = actions
@@ -261,13 +266,14 @@ def get_table(model: object,
         options["render_action"] = render_actions_fn
 
     # create the table dynamically using type
-    table_class = type(f"{model.__name__.title()}{settings.VEGA_TABLE_LABEL}",
-                       (tables.Table, ), options)
+    table_class = type(
+        f"{model.__name__.title()}{settings.VEGA_TABLE_LABEL}", (tables.Table,), options
+    )
 
     return table_class
 
 
-def get_filterclass(model: object, fields: list = None):
+def get_filterclass(model: Model, fields: list = None):
     """
     Get the Filter Class for the provided model
 
@@ -284,7 +290,7 @@ def get_filterclass(model: object, fields: list = None):
 
     # create the filter_class dynamically using type
     filter_class = type(
-        f"{model.__name__.title()}{settings.VEGA_FILTER_LABEL}", (FilterSet, ),
-        options)
+        f"{model.__name__.title()}{settings.VEGA_FILTER_LABEL}", (FilterSet,), options
+    )
 
     return filter_class
