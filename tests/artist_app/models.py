@@ -28,16 +28,16 @@ class Song(models.Model):
     COLLABO = "2"
     SKIT = "3"
 
-    SONG_TYPES = ((SINGLE, "Single"), (COLLABO, "Collaboration"), (SKIT,
-                                                                   "Skit"))
+    SONG_TYPES = ((SINGLE, "Single"), (COLLABO, "Collaboration"), (SKIT, "Skit"))
 
     artist = models.ForeignKey(Artist, on_delete=models.PROTECT)
     name = models.CharField(max_length=100)
     song_type = models.CharField(
-        "Type", max_length=1, choices=SONG_TYPES, default=SINGLE)
+        "Type", max_length=1, choices=SONG_TYPES, default=SINGLE
+    )
     release_date = models.DateField("Release Date")
     release_time = models.TimeField("Release Time")
-    recording_time = models.DateTimeField("Recording Time", auto_now_add=True)
+    recording_time = models.DateTimeField("Recording Time", auto_now_add=False)
 
     class Meta:
         """Meta definition for Song."""
