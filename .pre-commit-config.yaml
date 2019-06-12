@@ -17,11 +17,16 @@ repos:
           - id: black
             language_version: python3.6
 
+    - repo: https://github.com/pre-commit/mirrors-yapf
+      rev: v0.27.0
+      hooks:
+          - id: yapf
+
     - repo: local
       hooks:
           - id: pylint
             name: PyLint
-            entry: python -m pylint.__main__ --load-plugins pylint_django --rcfile=.pylintrc
+            entry: python -m pylint.__main__ --rcfile=./pylintrc
             language: system
             files: \.py$
 
