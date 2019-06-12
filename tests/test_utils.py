@@ -14,7 +14,7 @@ from tests.artist_app.models import Artist, Song
 
 from vega_admin.utils import (get_filterclass, get_listview_form,
                               get_modelform, get_table)
-from vega_admin.widgets import VegaDateWidget
+from vega_admin.widgets import VegaDateWidget, VegaTimeWidget
 
 
 class TestUtils(TestCase):
@@ -62,6 +62,16 @@ class TestUtils(TestCase):
                               VegaDateWidget)
         self.assertHTMLEqual(
             """<p><label for="id_release_date">Release Date:</label> <input type="date" name="release_date" required id="id_release_date"></p>""",  # noqa
+            form().as_p(),
+        )
+
+    def test_get_modelform_timefield(self):
+        """Test Timefield output of get_modelform"""
+        form = get_modelform(model=Song, fields=["release_time"])
+        self.assertIsInstance(form().fields["release_time"].widget,
+                              VegaTimeWidget)
+        self.assertHTMLEqual(
+            """<p><label for="id_release_time">Release Time:</label> <input type="time" name="release_time" required id="id_release_time"></p>""",  # noqa
             form().as_p(),
         )
 
