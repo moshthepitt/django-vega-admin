@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from django import forms
 from django.conf import settings
-from django.db.models import DateField, Model, TimeField
+from django.db.models import DateField, DateTimeField, Model, TimeField
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils.html import format_html
@@ -86,16 +86,20 @@ def get_form_helper_class(  # pylint: disable=too-many-arguments,bad-continuatio
 
 def get_datefields(model: Model):
     """
-    Get the datefields from a model
+    Get the date fields from a model
 
     :param model: the model class
     """
-    return [_.name for _ in model._meta.concrete_fields if isinstance(_, DateField)]
+    return [
+        _.name
+        for _ in model._meta.concrete_fields
+        if isinstance(_, DateField) and not isinstance(_, DateTimeField)
+    ]
 
 
 def get_timefields(model: Model):
     """
-    Get the timefields from a model
+    Get the time fields from a model
 
     :param model: the model class
     """
