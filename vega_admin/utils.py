@@ -19,7 +19,6 @@ from crispy_forms.layout import HTML, Div, Layout, Submit
 from django_filters import FilterSet
 
 from vega_admin.mixins import VegaFormMixin
-from vega_admin.widgets import VegaDateTimeWidget, VegaTimeWidget
 
 
 def get_form_actions(cancel_url: str):
@@ -165,11 +164,11 @@ def get_modelform(model: Model, fields: list = None, extra_fields: list = None):
 
     # set the widgets for all datetime input fields
     for datetimefield in get_datetimefields(model):
-        widgets[datetimefield] = VegaDateTimeWidget
+        widgets[datetimefield] = import_string(settings.VEGA_DATETIME_WIDGET)
 
     # set the widgets for all time input fields
     for timefield in get_timefields(model):
-        widgets[timefield] = VegaTimeWidget
+        widgets[timefield] = import_string(settings.VEGA_TIME_WIDGET)
 
     meta_class_options = {"model": model, "fields": fields}
 
