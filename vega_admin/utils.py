@@ -89,6 +89,7 @@ def get_datefields(model: Model) -> List[str]:
     Get the date fields from a model
 
     :param model: the model class
+    :return: list of datefield names
     """
     return [
         _.name
@@ -102,6 +103,7 @@ def get_datetimefields(model: Model) -> List[str]:
     Get the datetime fields from a model
 
     :param model: the model class
+    :return: list of datetimefield names
     """
     return [_.name for _ in model._meta.concrete_fields if isinstance(_, DateTimeField)]
 
@@ -111,6 +113,7 @@ def get_timefields(model: Model) -> List[str]:
     Get the time fields from a model
 
     :param model: the model class
+    :return: list of timefield names
     """
     return [_.name for _ in model._meta.concrete_fields if isinstance(_, TimeField)]
 
