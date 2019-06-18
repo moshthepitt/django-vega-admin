@@ -22,8 +22,7 @@ VEGA_FORCE_ORDERING = True
 VEGA_ORDERING_FIELD = ["-pk"]
 
 # crispy forms
-VEGA_CRISPY_TEMPLATE_PACK = getattr(settings, "CRISPY_TEMPLATE_PACK",
-                                    "bootstrap3")
+VEGA_CRISPY_TEMPLATE_PACK = getattr(settings, "CRISPY_TEMPLATE_PACK", "bootstrap3")
 
 # strings
 VEGA_FORM_VALID_CREATE_TXT = "Created successfully!"
@@ -31,7 +30,8 @@ VEGA_FORM_VALID_UPDATE_TXT = "Updated successfully!"
 VEGA_FORM_VALID_DELETE_TXT = "Deleted successfully!"
 VEGA_FORM_INVALID_TXT = "Please correct the errors on the form."
 VEGA_DELETE_PROTECTED_ERROR_TXT = (
-    "You cannot delete this item, it is referenced by other items.")
+    "You cannot delete this item, it is referenced by other items."
+)
 VEGA_PERMREQUIRED_NOT_SET_TXT = "PermissionRequiredMixin not set for"
 VEGA_LISTVIEW_SEARCH_TXT = "Search"
 VEGA_LISTVIEW_SEARCH_QUERY_TXT = "Search Query"
@@ -51,10 +51,13 @@ VEGA_CHANGE_PASSWORD_LABEL = "change password"
 # exceptions
 VEGA_INVALID_ACTION = "Invalid Action"
 
+# widgets
+VEGA_DATE_WIDGET = "vega_admin.widgets.VegaDateWidget"
+
 # contrib
 # users
 VEGA_USERNAME_HELP_TEXT = (
-    "Optional. 150 characters or fewer. Letters, digits and @/./+/-/_ only.")
+    "Optional. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+)
 VEGA_OPTIONAL_TXT = "Optional."
-VEGA_EMAIL_OR_USERNAME_REQUIRED_TXT = (
-    "You must provide one of email or username")
+VEGA_EMAIL_OR_USERNAME_REQUIRED_TXT = "You must provide one of email or username"
