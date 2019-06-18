@@ -9,3 +9,8 @@ Django VegaAdmin - simple and fast automated CRUD for any Django model
 - Clone this repo
 - Run: `pip install -r requirements/dev.txt`
 - Run: `pre-commit install`
+
+## Tests
+
+- Clone this repo
+- Run: `tox`
