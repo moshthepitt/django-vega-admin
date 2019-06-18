@@ -84,7 +84,7 @@ def get_form_helper_class(  # pylint: disable=too-many-arguments,bad-continuatio
     return helper
 
 
-def get_datefields(model: Model):
+def get_datefields(model: Model) -> List[str]:
     """
     Get the date fields from a model
 
@@ -97,7 +97,7 @@ def get_datefields(model: Model):
     ]
 
 
-def get_datetimefields(model: Model):
+def get_datetimefields(model: Model) -> List[str]:
     """
     Get the datetime fields from a model
 
@@ -106,7 +106,7 @@ def get_datetimefields(model: Model):
     return [_.name for _ in model._meta.concrete_fields if isinstance(_, DateTimeField)]
 
 
-def get_timefields(model: Model):
+def get_timefields(model: Model) -> List[str]:
     """
     Get the time fields from a model
 
