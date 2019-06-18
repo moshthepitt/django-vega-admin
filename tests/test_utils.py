@@ -10,7 +10,6 @@ from django.test import TestCase, override_settings
 from django_filters import FilterSet
 from django_tables2 import Table
 from model_mommy import mommy
-from tests.artist_app.models import Artist, Song
 
 from vega_admin.utils import (
     get_filterclass,
@@ -19,6 +18,8 @@ from vega_admin.utils import (
     get_table,
 )
 from vega_admin.widgets import VegaDateTimeWidget, VegaDateWidget, VegaTimeWidget
+
+from tests.artist_app.models import Artist, Song
 
 
 class TestUtils(TestCase):
