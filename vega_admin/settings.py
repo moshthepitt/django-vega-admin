@@ -53,6 +53,8 @@ VEGA_INVALID_ACTION = "Invalid Action"
 
 # widgets
 VEGA_DATE_WIDGET = "vega_admin.widgets.VegaDateWidget"
+VEGA_DATETIME_WIDGET = "vega_admin.widgets.VegaDateTimeWidget"
+VEGA_TIME_WIDGET = "vega_admin.widgets.VegaTimeWidget"
 
 # contrib
 # users
