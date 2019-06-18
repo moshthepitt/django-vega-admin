@@ -9,6 +9,7 @@ from django.db.models import DateField, DateTimeField, Model, TimeField
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils.html import format_html
+from django.utils.module_loading import import_string
 from django.utils.translation import ugettext as _
 
 import django_tables2 as tables
@@ -18,7 +19,7 @@ from crispy_forms.layout import HTML, Div, Layout, Submit
 from django_filters import FilterSet
 
 from vega_admin.mixins import VegaFormMixin
-from vega_admin.widgets import VegaDateTimeWidget, VegaDateWidget, VegaTimeWidget
+from vega_admin.widgets import VegaDateTimeWidget, VegaTimeWidget
 
 
 def get_form_actions(cancel_url: str):
@@ -160,7 +161,7 @@ def get_modelform(model: Model, fields: list = None, extra_fields: list = None):
     widgets = {}
     # set the widgets for all date input fields
     for datefield in get_datefields(model):
-        widgets[datefield] = VegaDateWidget
+        widgets[datefield] = import_string(settings.VEGA_DATE_WIDGET)
 
     # set the widgets for all datetime input fields
     for datetimefield in get_datetimefields(model):
