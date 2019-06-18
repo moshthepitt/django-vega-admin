@@ -60,7 +60,7 @@ def get_form_helper_class(  # pylint: disable=too-many-arguments,bad-continuatio
     form_show_labels: bool = True,
     html5_required: bool = True,
     include_media: bool = True,
-):
+) -> FormHelper:
     """
     Returns the base form helper class
 
