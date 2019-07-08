@@ -1,7 +1,7 @@
 """
 Main init file for vega_admin
 """
-VERSION = (0, 0, 7)
-__version__ = '.'.join(str(v) for v in VERSION)
+VERSION = (0, 0, 9)
+__version__ = ".".join(str(v) for v in VERSION)
 # pylint: disable=invalid-name
-default_app_config = 'vega_admin.apps.VegaAdminConfig'  # noqa
+default_app_config = "vega_admin.apps.VegaAdminConfig"  # noqa
