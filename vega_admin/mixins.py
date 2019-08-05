@@ -1,6 +1,8 @@
 """
 vega-admin mixins module
 """
+from typing import List
+
 from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import FieldDoesNotExist
@@ -38,6 +40,7 @@ class VegaOrderedQuerysetMixin:
     """
     Optionally ensures querysets are ordered
     """
+
     order_by = None
 
     def get_order_by(self):
@@ -62,7 +65,7 @@ class ListViewSearchMixin:
     """
 
     form_class = ListViewSearchForm
-    search_fields = []
+    search_fields: List[str] = []
     filter_class = None
 
     def get_queryset(self):
@@ -127,8 +130,7 @@ class VerboseNameMixin:
         """
         context = super().get_context_data(**kwargs)
         context["vega_verbose_name"] = self.model._meta.verbose_name
-        context[
-            "vega_verbose_name_plural"] = self.model._meta.verbose_name_plural
+        context["vega_verbose_name_plural"] = self.model._meta.verbose_name_plural
         return context
 
 
@@ -164,11 +166,9 @@ class CRUDURLsMixin:
     update_url = "/"
     update_url_name = None
 
-    def get_crud_url(  # pylint: disable=no-self-use
-            self,
-            url: str,
-            url_name: str,
-            url_kwargs: dict = None):
+    def get_crud_url(  # pylint: disable=no-self-use,bad-continuation
+        self, url: str, url_name: str, url_kwargs: dict = None
+    ):
         """
         Helper function that returns a url
 
@@ -193,8 +193,7 @@ class CRUDURLsMixin:
 
         :return: url
         """
-        return self.get_crud_url(
-            url=self.create_url, url_name=self.create_url_name)
+        return self.get_crud_url(url=self.create_url, url_name=self.create_url_name)
 
     def get_list_url(self):
         """
@@ -202,8 +201,7 @@ class CRUDURLsMixin:
 
         :return: url
         """
-        return self.get_crud_url(
-            url=self.list_url, url_name=self.list_url_name)
+        return self.get_crud_url(url=self.list_url, url_name=self.list_url_name)
 
     def get_update_url(self):
         """
@@ -247,8 +245,7 @@ class CRUDURLsMixin:
 
         :return: url
         """
-        return self.get_crud_url(
-            url=self.cancel_url, url_name=self.cancel_url_name)
+        return self.get_crud_url(url=self.cancel_url, url_name=self.cancel_url_name)
 
     def get_context_data(self, **kwargs):
         """
@@ -304,9 +301,7 @@ class DetailViewMixin:
         """
         if self.fields and isinstance(self.fields, list):
             return self.fields
-        return [
-            _.name for _ in self.object._meta.fields
-        ]
+        return [_.name for _ in self.object._meta.fields]
 
     def get_field_value(self, field):
         """Get the value of a field"""
@@ -397,4 +392,5 @@ class TimeStampedModel:
 
     class Meta:
         """Meta class"""
+
         abstract = True
