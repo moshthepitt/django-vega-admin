@@ -5,11 +5,13 @@
 django-allauth
 
 # others
+pydocstyle
 pylint
 pylint-django
 tox
 flake8
 pep8
+autopep8
 coverage
 yapf
 isort
