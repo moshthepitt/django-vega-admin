@@ -1,10 +1,11 @@
 """
 Views module
 """
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, List, Tuple, Union
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.forms import Form, ModelForm
 from django.urls import path, reverse_lazy
 from django.utils.translation import ugettext as _
 from django.views.generic.base import View
@@ -13,7 +14,8 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
 from braces.views import FormMessagesMixin, LoginRequiredMixin, PermissionRequiredMixin
-from django_tables2 import SingleTableView
+from django_filters import FilterSet
+from django_tables2 import SingleTableView, Table
 from django_tables2.export.views import ExportMixin
 
 from vega_admin.forms import ListViewSearchForm
@@ -138,32 +140,32 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
     straight away.
     """
 
-    actions = settings.VEGA_DEFAULT_ACTIONS
-    protected_actions = actions  # actions that require login
-    permissions_actions = actions
+    actions: List[str] = settings.VEGA_DEFAULT_ACTIONS
+    protected_actions: Union[None, List[str]] = actions  # actions that require login
+    permissions_actions: Union[None, List[str]] = actions
     view_classes: Dict[str, View] = {}
-    list_fields = None
-    read_fields = None
-    search_fields = None
-    filter_fields = None
-    filter_class = None
-    search_form_class = ListViewSearchForm
-    form_fields = None
-    create_fields = None
-    update_fields = None
-    table_attrs = None
-    table_actions = [
+    list_fields: Union[None, List[str]] = None
+    read_fields: Union[None, List[str]] = None
+    search_fields: Union[None, List[str]] = None
+    filter_fields: Union[None, List[str]] = None
+    filter_class: Union[None, FilterSet] = None
+    search_form_class: Union[None, Form, ModelForm] = ListViewSearchForm
+    form_fields: Union[None, List[str]] = None
+    create_fields: Union[None, List[str]] = None
+    update_fields: Union[None, List[str]] = None
+    table_attrs: Union[None, Dict[str, str]] = None
+    table_actions: List[str] = [
         settings.VEGA_READ_ACTION,
         settings.VEGA_UPDATE_ACTION,
         settings.VEGA_DELETE_ACTION,
     ]
-    form_class = None
-    create_form_class = None
-    update_form_class = None
-    table_class = None
+    form_class: Union[None, Form, ModelForm] = None
+    create_form_class: Union[None, Form, ModelForm] = None
+    update_form_class: Union[None, Form, ModelForm] = None
+    table_class: Union[None, Table] = None
     paginate_by = 25
-    crud_path = None
-    order_by = None
+    crud_path: Union[None, str] = None
+    order_by: Union[None, str] = None
 
     def __init__(self, model=None):
         """
