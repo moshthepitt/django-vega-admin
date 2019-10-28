@@ -1,7 +1,8 @@
 """
 vega-admin forms module
 """
-from typing import Any, Dict, List, Optional, Tuple
+from inspect import isclass
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from django import forms
 from django.conf import settings
@@ -137,7 +138,7 @@ def get_modelform(model: Model, fields: list = None, extra_fields: list = None):
     # this is going to be our custom init method
     def _constructor(self, *args, **kwargs):
         self.request = kwargs.pop("request", None)
-        self.vega_extra_kwargs = kwargs.pop("vega_extra_kwargs", dict())
+        self.vega_extra_kwargs = kwargs.pop(settings.VEGA_MODELFORM_KWARG, dict())
         cancel_url = self.vega_extra_kwargs.get("cancel_url", "/")
         form_actions_class = get_form_actions(cancel_url=cancel_url)
         super(modelform_class, self).__init__(*args, **kwargs)
@@ -312,3 +313,29 @@ def get_filterclass(model: Model, fields: list = None):
     )
 
     return filter_class
+
+
+def customize_modelform(form_class: Union[forms.Form, forms.ModelForm]):
+    """Adds custom keyword arguments to a provided form class, if they are
+    missing.
+
+    Arguments:
+        form_class {Union[Form, ModelForm]} -- the form class
+
+    Returns:
+        {Union[Form, ModelForm]} -- the customized form class
+    """
+    if isclass(form_class) and settings.VEGA_MODELFORM_KWARG not in dir(form_class()):
+
+        # pylint: disable=missing-class-docstring,too-few-public-methods,inherit-non-class
+        class CustomFormClass(form_class):  # type: ignore
+            def __init__(self, *args, **kwargs):
+                self.request = kwargs.pop("request", None)
+                self.vega_extra_kwargs = kwargs.pop(
+                    settings.VEGA_MODELFORM_KWARG, dict()
+                )
+                super().__init__(*args, **kwargs)
+
+        return CustomFormClass
+
+    return form_class
