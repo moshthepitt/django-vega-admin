@@ -1,16 +1,24 @@
 """
 Module for vega-admin test views
 """
+from typing import List, Union
+
 from django.views.generic import TemplateView
 
 from braces.views import LoginRequiredMixin, PermissionRequiredMixin
-
 from django_filters import FilterSet
-from vega_admin.mixins import SimpleURLPatternMixin
-from vega_admin.views import (VegaCreateView, VegaCRUDView, VegaDeleteView,
-                              VegaListView, VegaUpdateView, VegaDetailView)
 
-from .forms import ArtistForm, CustomSearchForm, SongForm
+from vega_admin.mixins import SimpleURLPatternMixin
+from vega_admin.views import (
+    VegaCreateView,
+    VegaCRUDView,
+    VegaDeleteView,
+    VegaDetailView,
+    VegaListView,
+    VegaUpdateView,
+)
+
+from .forms import ArtistForm, CustomSearchForm, PlainArtistForm, SongForm
 from .models import Artist, Song
 from .tables import ArtistTable
 
@@ -83,14 +91,14 @@ class SongCRUD(VegaCRUDView):
     """
 
     model = Song
-    protected_actions = None
-    permissions_actions = None
-    list_fields = ["name", "artist", ]
-    read_fields = ["name", "artist", ]
+    protected_actions: Union[None, List[str]] = None
+    permissions_actions: Union[None, List[str]] = None
+    list_fields = ["name", "artist"]
+    read_fields = ["name", "artist"]
     table_attrs = {"class": "song-table"}
-    table_actions = ["create", "update", "delete", ]
-    create_fields = ["name", "artist", ]
-    update_fields = ["name", ]
+    table_actions = ["create", "update", "delete"]
+    create_fields = ["name", "artist"]
+    update_fields = ["name"]
 
 
 class CustomSongCRUD(SongCRUD):
@@ -100,19 +108,16 @@ class CustomSongCRUD(SongCRUD):
 
     class CustomListView(ArtistListView):  # pylint: disable=too-many-ancestors
         """custom list view"""
-        pass
 
     class FooView(SimpleURLPatternMixin, TemplateView):
         """random template view"""
+
         template_name = "artist_app/empty.html"
 
-    protected_actions = ["create", "update", "delete", "template", "view", ]
-    permissions_actions = None
+    protected_actions = ["create", "update", "delete", "template", "view"]
+    permissions_actions: Union[None, List[str]] = None
     crud_path = "private-songs"
-    view_classes = {
-        "artists": CustomListView,
-        "template": FooView,
-    }
+    view_classes = {"artists": CustomListView, "template": FooView}
     form_fields = ["name", "artist"]
 
 
@@ -121,9 +126,8 @@ class PermsSongCRUD(CustomSongCRUD):
     CRUD view for songs with permissions protection
     """
 
-    protected_actions = [
-        "create", "update", "delete", "artists", "list", "view", ]
-    permissions_actions = ["create", "update", "delete", "artists", "view", ]
+    protected_actions = ["create", "update", "delete", "artists", "list", "view"]
+    permissions_actions = ["create", "update", "delete", "artists", "view"]
     crud_path = "hidden-songs"
     form_class = SongForm
 
@@ -144,23 +148,18 @@ class CustomDefaultActions(ArtistCRUD):
     # pylint: disable=too-many-ancestors
     class CustomCreateView(ArtistCreate):
         """custom Create view"""
-        pass
 
     class CustomUpdateView(ArtistUpdate):
         """custom Update view"""
-        pass
 
     class CustomListView(ArtistListView):
         """custom list view"""
-        pass
 
     class CustomDeleteView(ArtistDelete):
         """custom Delete view"""
-        pass
 
     class CustomReadView(ArtistRead):
         """custom Read view"""
-        pass
 
     view_classes = {
         "list": CustomListView,
@@ -178,14 +177,13 @@ class BrokenCRUD(VegaCRUDView):
     # pylint: disable=too-many-ancestors
     class BrokenListView(LoginRequiredMixin, VegaListView):
         """View that is broken"""
+
         model = Artist
 
     model = Artist
     actions = ["break"]
     permissions_actions = actions
-    view_classes = {
-        "break": BrokenListView,
-    }
+    view_classes = {"break": BrokenListView}
     crud_path = "broken"
 
 
@@ -199,19 +197,18 @@ class Artist42CRUD(VegaCRUDView):
         """
         Custom list view that has PermissionRequiredMixin
         """
+
         model = Artist
 
     class FooView(SimpleURLPatternMixin, TemplateView):
         """random template view"""
+
         template_name = "artist_app/empty.html"
 
     model = Artist
     actions = ["list", "other"]
     permissions_actions = actions
-    view_classes = {
-        "list": CustListView,
-        "other": FooView,
-    }
+    view_classes = {"list": CustListView, "other": FooView}
     crud_path = "42"
 
 
@@ -238,8 +235,8 @@ class FilterSongCRUD(VegaCRUDView):
     """
 
     model = Song
-    actions = ["list", ]
-    filter_fields = ["name", "artist", ]
+    actions = ["list"]
+    filter_fields = ["name", "artist"]
     crud_path = "filters"
     search_form_class = None
 
@@ -254,11 +251,21 @@ class Filter2SongCRUD(VegaCRUDView):
 
         class Meta:
             model = Song
-            fields = ["artist", ]
+            fields = ["artist"]
 
     model = Song
-    actions = ["list", ]
-    search_fields = ["artist__name", ]
+    actions = ["list"]
+    search_fields = ["artist__name"]
     filter_class = SongFilter
     crud_path = "filters2"
     search_form_class = None
+
+
+class PlainFormCRUD(VegaCRUDView):
+    """Vega CRUD view created with plain form"""
+
+    model = Artist
+    permissions_actions = None
+    form_class = PlainArtistForm
+    actions = ["create", "update"]
+    crud_path = "plain-form"
