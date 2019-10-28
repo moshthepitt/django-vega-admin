@@ -9,7 +9,7 @@ from django.urls import reverse
 
 from model_mommy import mommy
 
-from .artist_app.forms import ArtistForm, CustomSearchForm
+from .artist_app.forms import ArtistForm, CustomSearchForm, PlainArtistForm
 from .artist_app.models import Artist
 from .artist_app.tables import ArtistTable
 from .artist_app.views import CustomDefaultActions, CustomSongCRUD
@@ -558,8 +558,10 @@ class TestCRUD(TestViewsBase):
 
         # create, should not result in exceptions esp. TypeError
         create_res = self.client.get(create_url)
+        self.assertIsInstance(create_res.context["form"], PlainArtistForm)
         self.assertEqual(200, create_res.status_code)
 
         # update, should not result in exceptions esp. TypeError
         update_res = self.client.get(update_url)
+        self.assertIsInstance(update_res.context["form"], PlainArtistForm)
         self.assertEqual(200, update_res.status_code)
