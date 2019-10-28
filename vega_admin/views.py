@@ -1,40 +1,55 @@
 """
 Views module
 """
+from typing import Any, Dict, Tuple
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import path, reverse_lazy
 from django.utils.translation import ugettext as _
+from django.views.generic.base import View
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
-from braces.views import (FormMessagesMixin, LoginRequiredMixin,
-                          PermissionRequiredMixin)
+from braces.views import FormMessagesMixin, LoginRequiredMixin, PermissionRequiredMixin
 from django_tables2 import SingleTableView
 from django_tables2.export.views import ExportMixin
 
 from vega_admin.forms import ListViewSearchForm
-from vega_admin.mixins import (CRUDURLsMixin, DeleteViewMixin, DetailViewMixin,
-                               ListViewSearchMixin, ObjectTitleMixin,
-                               ObjectURLPatternMixin, PageTitleMixin,
-                               SimpleURLPatternMixin, VegaFormMixin,
-                               VegaOrderedQuerysetMixin, VerboseNameMixin)
-from vega_admin.utils import (get_filterclass, get_listview_form,
-                              get_modelform, get_table)
+from vega_admin.mixins import (
+    CRUDURLsMixin,
+    DeleteViewMixin,
+    DetailViewMixin,
+    ListViewSearchMixin,
+    ObjectTitleMixin,
+    ObjectURLPatternMixin,
+    PageTitleMixin,
+    SimpleURLPatternMixin,
+    VegaFormMixin,
+    VegaOrderedQuerysetMixin,
+    VerboseNameMixin,
+)
+from vega_admin.utils import (
+    get_filterclass,
+    get_listview_form,
+    get_modelform,
+    get_table,
+)
 
 
-# pylint: disable=too-many-ancestors
+# pylint: disable=too-many-ancestors,bad-continuation
 class VegaListView(
-        VerboseNameMixin,
-        ListViewSearchMixin,
-        PageTitleMixin,
-        CRUDURLsMixin,
-        ExportMixin,
-        SingleTableView,
-        SimpleURLPatternMixin,
-        VegaOrderedQuerysetMixin,
-        ListView,):
+    VerboseNameMixin,
+    ListViewSearchMixin,
+    PageTitleMixin,
+    CRUDURLsMixin,
+    ExportMixin,
+    SingleTableView,
+    SimpleURLPatternMixin,
+    VegaOrderedQuerysetMixin,
+    ListView,
+):
     """
     vega-admin Generic List View
     """
@@ -43,13 +58,14 @@ class VegaListView(
 
 
 class VegaCreateView(
-        FormMessagesMixin,
-        PageTitleMixin,
-        VerboseNameMixin,
-        VegaFormMixin,
-        CRUDURLsMixin,
-        SimpleURLPatternMixin,
-        CreateView,):
+    FormMessagesMixin,
+    PageTitleMixin,
+    VerboseNameMixin,
+    VegaFormMixin,
+    CRUDURLsMixin,
+    SimpleURLPatternMixin,
+    CreateView,
+):
     """
     vega-admin Generic Create View
     """
@@ -60,13 +76,14 @@ class VegaCreateView(
 
 
 class VegaDetailView(
-        PageTitleMixin,
-        VerboseNameMixin,
-        CRUDURLsMixin,
-        ObjectURLPatternMixin,
-        ObjectTitleMixin,
-        DetailViewMixin,
-        DetailView,):
+    PageTitleMixin,
+    VerboseNameMixin,
+    CRUDURLsMixin,
+    ObjectURLPatternMixin,
+    ObjectTitleMixin,
+    DetailViewMixin,
+    DetailView,
+):
     """
     vega-admin Generic Detail View
     """
@@ -75,14 +92,15 @@ class VegaDetailView(
 
 
 class VegaUpdateView(
-        FormMessagesMixin,
-        PageTitleMixin,
-        VerboseNameMixin,
-        VegaFormMixin,
-        CRUDURLsMixin,
-        ObjectURLPatternMixin,
-        ObjectTitleMixin,
-        UpdateView,):
+    FormMessagesMixin,
+    PageTitleMixin,
+    VerboseNameMixin,
+    VegaFormMixin,
+    CRUDURLsMixin,
+    ObjectURLPatternMixin,
+    ObjectTitleMixin,
+    UpdateView,
+):
     """
     vega-admin Generic Update View
     """
@@ -93,14 +111,15 @@ class VegaUpdateView(
 
 
 class VegaDeleteView(
-        FormMessagesMixin,
-        PageTitleMixin,
-        VerboseNameMixin,
-        DeleteViewMixin,
-        CRUDURLsMixin,
-        ObjectURLPatternMixin,
-        ObjectTitleMixin,
-        DeleteView,):
+    FormMessagesMixin,
+    PageTitleMixin,
+    VerboseNameMixin,
+    DeleteViewMixin,
+    CRUDURLsMixin,
+    ObjectURLPatternMixin,
+    ObjectTitleMixin,
+    DeleteView,
+):
     """
     vega-admin Generic Delete View
     """
@@ -115,14 +134,14 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
     Creates generic CRUD views for a model automagically
 
     The intention is for you to give it at least a model and get back an entire
-    set of CRUD views, with everyhting you need to start doing CRUD actions
+    set of CRUD views, with everything you need to start doing CRUD actions
     straight away.
     """
 
     actions = settings.VEGA_DEFAULT_ACTIONS
     protected_actions = actions  # actions that require login
     permissions_actions = actions
-    view_classes = {}
+    view_classes: Dict[str, View] = {}
     list_fields = None
     read_fields = None
     search_fields = None
@@ -201,7 +220,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
 
     def get_search_form_class(self):
         """Get search form for list view"""
-        if self.search_form_class:
+        if self.search_form_class:  # pylint: disable=using-constant-test
             return self.search_form_class
 
         # if there are filters then we generate the form
@@ -210,7 +229,8 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
             return get_listview_form(
                 model=self.model,
                 fields=filter_class.Meta.fields,
-                include_search=self.get_search_fields() is not None)
+                include_search=self.get_search_fields() is not None,
+            )
 
         return None
 
@@ -234,8 +254,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         if self.form_class:
             return self.form_class
 
-        return get_modelform(
-            model=self.model, fields=self.get_createform_fields())
+        return get_modelform(model=self.model, fields=self.get_createform_fields())
 
     def get_updateform_fields(self):
         """
@@ -257,8 +276,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         if self.form_class:
             return self.form_class
 
-        return get_modelform(
-            model=self.model, fields=self.get_updateform_fields())
+        return get_modelform(model=self.model, fields=self.get_updateform_fields())
 
     def get_list_fields(self):
         """
@@ -290,9 +308,9 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
             tables_kwargs["fields"] = self.get_list_fields()
         if isinstance(self.get_table_actions(), list):
             table_actions = [
-                _ for _ in self.get_table_actions() if _ in self.get_actions()]
-            tables_kwargs["actions"] = self.get_action_urlnames(
-                actions=table_actions)
+                _ for _ in self.get_table_actions() if _ in self.get_actions()
+            ]
+            tables_kwargs["actions"] = self.get_action_urlnames(actions=table_actions)
         if isinstance(self.get_table_attrs(), dict):
             tables_kwargs["attrs"] = self.get_table_attrs()
 
@@ -304,10 +322,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
             return self.filter_class
 
         if self.filter_fields:
-            filter_kwargs = {
-                "model": self.model,
-                "fields": self.get_filter_fields()
-            }
+            filter_kwargs = {"model": self.model, "fields": self.get_filter_fields()}
 
             return get_filterclass(**filter_kwargs)
 
@@ -335,28 +350,25 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
 
     def get_success_url(self):  # pylint: disable=no-self-use
         """Get success_url"""
-        return reverse_lazy(
-            self.get_url_name_for_action(settings.VEGA_LIST_ACTION))
+        return reverse_lazy(self.get_url_name_for_action(settings.VEGA_LIST_ACTION))
 
     def get_cancel_url(self):  # pylint: disable=no-self-use
         """Get cancel_url"""
         return self.get_success_url()
 
     # pylint: disable=no-self-use
-    def enforce_permission_protection(self, view_class: object, action: str):
+    def enforce_permission_protection(self, view_class: View, action: str):
         """ensures view class has permission protection"""
         has_perms_mixin = issubclass(view_class, PermissionRequiredMixin)
         has_login_mixin = issubclass(view_class, LoginRequiredMixin)
 
-        options = {
-            "permission_required": self.get_permission_for_action(action)
-        }
+        options = {"permission_required": self.get_permission_for_action(action)}
 
         if not has_login_mixin and not has_perms_mixin:
             # add LoginRequiredMixin and PermissionRequiredMixin
             return type(
                 f"{view_class.__name__}{settings.VEGA_PROTECTED_LABEL}",
-                (LoginRequiredMixin, PermissionRequiredMixin, view_class,),
+                (LoginRequiredMixin, PermissionRequiredMixin, view_class),
                 options,
             )
 
@@ -364,7 +376,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
             # add LoginRequiredMixin
             return type(
                 f"{view_class.__name__}{settings.VEGA_PROTECTED_LABEL}",
-                (LoginRequiredMixin, view_class,),
+                (LoginRequiredMixin, view_class),
                 options,
             )
 
@@ -372,13 +384,15 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
             # in this case the LoginRequiredMixin was set but not
             # PermissionRequiredMixin
             raise ImproperlyConfigured(
-                _(f"{settings.VEGA_PERMREQUIRED_NOT_SET_TXT} {view_class.__name__}")  # noqa
+                _(
+                    f"{settings.VEGA_PERMREQUIRED_NOT_SET_TXT} {view_class.__name__}"
+                )  # noqa
             )
 
         return view_class
 
     # pylint: disable=no-self-use
-    def enforce_login_protection(self, view_class: object):
+    def enforce_login_protection(self, view_class: View):
         """ensures view class has login protection"""
         if issubclass(view_class, LoginRequiredMixin):
             return view_class
@@ -386,7 +400,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         # add LoginRequiredMixin
         return type(
             f"{view_class.__name__}{settings.VEGA_PROTECTED_LABEL}",
-            (LoginRequiredMixin, view_class,),
+            (LoginRequiredMixin, view_class),
             {},
         )
 
@@ -407,7 +421,8 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         raise Exception(settings.VEGA_INVALID_ACTION)
 
     def get_view_class_for_action(  # pylint: disable=too-many-branches
-            self, action: str):
+        self, action: str
+    ):
         """
         Get the view for an action
         """
@@ -436,17 +451,20 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         # add some common useful CRUD urls
         if settings.VEGA_LIST_ACTION in self.get_actions():
             options["list_url"] = reverse_lazy(
-                self.get_url_name_for_action(settings.VEGA_LIST_ACTION))
+                self.get_url_name_for_action(settings.VEGA_LIST_ACTION)
+            )
             options["order_by"] = self.order_by
         if settings.VEGA_CREATE_ACTION in self.get_actions():
             options["create_url"] = reverse_lazy(
-                self.get_url_name_for_action(settings.VEGA_CREATE_ACTION))
+                self.get_url_name_for_action(settings.VEGA_CREATE_ACTION)
+            )
         options["cancel_url"] = self.get_cancel_url()
 
         # add the success url
         if action in [
-                settings.VEGA_CREATE_ACTION, settings.VEGA_UPDATE_ACTION,
-                settings.VEGA_DELETE_ACTION
+            settings.VEGA_CREATE_ACTION,
+            settings.VEGA_UPDATE_ACTION,
+            settings.VEGA_DELETE_ACTION,
         ]:
             options["success_url"] = self.get_success_url()
 
@@ -458,18 +476,21 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         if action == settings.VEGA_UPDATE_ACTION:
             options["form_class"] = self.get_updateform_class()
             options["update_url_name"] = self.get_url_name_for_action(
-                settings.VEGA_UPDATE_ACTION)
+                settings.VEGA_UPDATE_ACTION
+            )
 
         # add the read url
         if action == settings.VEGA_READ_ACTION:
             options["read_url_name"] = self.get_url_name_for_action(
-                settings.VEGA_READ_ACTION)
+                settings.VEGA_READ_ACTION
+            )
             options["fields"] = self.get_read_fields()
 
         # add the delete url
         if action == settings.VEGA_DELETE_ACTION:
             options["delete_url_name"] = self.get_url_name_for_action(
-                settings.VEGA_DELETE_ACTION)
+                settings.VEGA_DELETE_ACTION
+            )
 
         # add the table class
         if action == settings.VEGA_LIST_ACTION:
@@ -479,7 +500,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
             options["paginate_by"] = self.paginate_by
             options["filter_class"] = self.get_filter_class()
 
-        inherited_classes = (view_class,)
+        inherited_classes: Tuple[Any, ...] = (view_class,)
 
         # permissions and login protection
         if action in self.get_permissions_actions():
@@ -488,10 +509,9 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
                 PermissionRequiredMixin,
                 view_class,
             )
-            options["permission_required"] = self.get_permission_for_action(
-                action)
+            options["permission_required"] = self.get_permission_for_action(action)
         elif action in self.get_protected_actions():
-            inherited_classes = (LoginRequiredMixin, view_class,)
+            inherited_classes = (LoginRequiredMixin, view_class)
 
         # create and return the View class
         view_label = settings.VEGA_VIEW_LABEL
