@@ -1,7 +1,7 @@
 """
 Views module
 """
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union, cast
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -33,6 +33,7 @@ from vega_admin.mixins import (
     VerboseNameMixin,
 )
 from vega_admin.utils import (
+    customize_modelform,
     get_filterclass,
     get_listview_form,
     get_modelform,
@@ -251,10 +252,14 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         """
         Get form class for create view
         """
+        chosen_form = None
         if self.create_form_class:
-            return self.create_form_class
+            chosen_form = self.create_form_class
         if self.form_class:
-            return self.form_class
+            chosen_form = self.form_class
+
+        if chosen_form is not None:
+            return customize_modelform(cast(Union[Form, ModelForm], chosen_form))
 
         return get_modelform(model=self.model, fields=self.get_createform_fields())
 
@@ -273,10 +278,14 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         """
         Get form class for create view
         """
+        chosen_form = None
         if self.update_form_class:
-            return self.update_form_class
+            chosen_form = self.update_form_class
         if self.form_class:
-            return self.form_class
+            chosen_form = self.form_class
+
+        if chosen_form is not None:
+            return customize_modelform(cast(Union[Form, ModelForm], chosen_form))
 
         return get_modelform(model=self.model, fields=self.get_updateform_fields())
 
