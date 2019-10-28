@@ -16,6 +16,7 @@ from .artist_app.views import CustomDefaultActions, CustomSongCRUD
 from .test_views import TestViewsBase
 
 
+# pylint: disable=too-many-locals,line-too-long,too-many-statements,too-many-public-methods  # noqa
 @override_settings(
     VEGA_ACTION_COLUMN_NAME="Actions",
     ROOT_URLCONF="tests.artist_app.urls",
@@ -35,8 +36,7 @@ class TestCRUD(TestViewsBase):
         self.assertEqual(
             "/artist_app.artist/create/", reverse("artist_app.artist-create")
         )
-        self.assertEqual(
-            "/artist_app.artist/list/", reverse("artist_app.artist-list"))
+        self.assertEqual("/artist_app.artist/list/", reverse("artist_app.artist-list"))
         self.assertEqual(
             f"/artist_app.artist/delete/{artist.pk}/",
             reverse("artist_app.artist-delete", kwargs={"pk": artist.pk}),
@@ -50,12 +50,8 @@ class TestCRUD(TestViewsBase):
             reverse("artist_app.artist-update", kwargs={"pk": artist.pk}),
         )
         # custom actions
-        self.assertEqual(
-            "/private-songs/artists/", reverse("private-songs-artists")
-        )
-        self.assertEqual(
-            "/private-songs/template/", reverse("private-songs-template")
-        )
+        self.assertEqual("/private-songs/artists/", reverse("private-songs-artists"))
+        self.assertEqual("/private-songs/template/", reverse("private-songs-template"))
 
     def test_create(self):
         """
@@ -70,13 +66,11 @@ class TestCRUD(TestViewsBase):
         # test what happens for a form error
         res = self.client.post(url, {})
         self.assertEqual(res.status_code, 200)
-        self.assertTrue(
-            settings.VEGA_FORM_INVALID_TXT in res.cookies["messages"].value)
+        self.assertTrue(settings.VEGA_FORM_INVALID_TXT in res.cookies["messages"].value)
 
         # test content
         res = self.client.get(url)
-        self.assertEqual(
-            "/artist_app.artist/list/", res.context_data["vega_list_url"])
+        self.assertEqual("/artist_app.artist/list/", res.context_data["vega_list_url"])
         self.assertEqual(
             "/artist_app.artist/create/", res.context_data["vega_create_url"]
         )
@@ -96,21 +90,17 @@ class TestCRUD(TestViewsBase):
 
         # test content
         res = self.client.get(url)
-        self.assertEqual(
-            "/artist_app.artist/list/", res.context_data["vega_list_url"])
+        self.assertEqual("/artist_app.artist/list/", res.context_data["vega_list_url"])
         self.assertEqual(
             "/artist_app.artist/create/", res.context_data["vega_create_url"]
         )
         self.assertEqual(artist.name, res.context_data["vega_object_title"])
-        self.assertEqual(
-            ["id", "name", ], res.context_data["vega_read_fields"])
+        self.assertEqual(["id", "name"], res.context_data["vega_read_fields"])
         self.assertDictEqual(
-            {"name": artist.name, "ID": artist.id},
-            res.context_data["vega_object_data"]
+            {"name": artist.name, "ID": artist.id}, res.context_data["vega_object_data"]
         )
         self.assertEqual(
-            f"/artist_app.artist/view/{artist.pk}/",
-            res.context_data["vega_read_url"],
+            f"/artist_app.artist/view/{artist.pk}/", res.context_data["vega_read_url"]
         )
         html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title> tt | professional artist</title></head><body><h3>tt</h3> <strong>ID</strong>: 436 <br /> <strong>name</strong>: tt <br /></body></html>"""  # noqa
         self.assertHTMLEqual(html, res.content.decode("utf-8"))
@@ -130,17 +120,17 @@ class TestCRUD(TestViewsBase):
         # test what happens for a form error
         res = self.client.post(url, {})
         self.assertEqual(res.status_code, 200)
-        self.assertTrue(
-            settings.VEGA_FORM_INVALID_TXT in res.cookies["messages"].value)
+        self.assertTrue(settings.VEGA_FORM_INVALID_TXT in res.cookies["messages"].value)
 
         # test content
         res = self.client.get(url)
-        self.assertEqual("/artist_app.artist/list/",
-                         res.context_data["vega_list_url"])
-        self.assertEqual("/artist_app.artist/create/",
-                         res.context_data["vega_create_url"])
-        self.assertEqual("/artist_app.artist/list/",
-                         res.context_data["vega_cancel_url"])
+        self.assertEqual("/artist_app.artist/list/", res.context_data["vega_list_url"])
+        self.assertEqual(
+            "/artist_app.artist/create/", res.context_data["vega_create_url"]
+        )
+        self.assertEqual(
+            "/artist_app.artist/list/", res.context_data["vega_cancel_url"]
+        )
         self.assertEqual(artist.name, res.context_data["vega_object_title"])
         self.assertEqual(
             f"/artist_app.artist/update/{artist.pk}/",
@@ -172,15 +162,13 @@ class TestCRUD(TestViewsBase):
             res, reverse("artist_app.artist-delete", kwargs={"pk": artist2.id})
         )
         self.assertTrue(
-            settings.VEGA_DELETE_PROTECTED_ERROR_TXT in
-            res.cookies["messages"].value
+            settings.VEGA_DELETE_PROTECTED_ERROR_TXT in res.cookies["messages"].value
         )
         self.assertTrue(Artist.objects.filter(id=artist2.id).exists())
 
         # test content
         res = self.client.get(url2)
-        self.assertEqual(
-            "/artist_app.artist/list/", res.context_data["vega_list_url"])
+        self.assertEqual("/artist_app.artist/list/", res.context_data["vega_list_url"])
         self.assertEqual(
             "/artist_app.artist/create/", res.context_data["vega_create_url"]
         )
@@ -208,8 +196,7 @@ class TestCRUD(TestViewsBase):
         url = reverse("artist_app.artist-list")
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(
-            "/artist_app.artist/list/", res.context_data["vega_list_url"])
+        self.assertEqual("/artist_app.artist/list/", res.context_data["vega_list_url"])
         self.assertEqual(
             "/artist_app.artist/create/", res.context_data["vega_create_url"]
         )
@@ -224,8 +211,7 @@ class TestCRUD(TestViewsBase):
         artists_view_url = reverse("private-songs-artists")
         res = self.client.get(artists_view_url)
         self.assertEqual(res.status_code, 200)
-        self.assertIsInstance(res.context["view"],
-                              CustomSongCRUD.CustomListView)
+        self.assertIsInstance(res.context["view"], CustomSongCRUD.CustomListView)
 
         template_view_url = reverse("private-songs-template")
         res = self.client.get(template_view_url)
@@ -239,35 +225,33 @@ class TestCRUD(TestViewsBase):
         url = reverse("custom-default-actions-list")
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
-        self.assertIsInstance(res.context["view"],
-                              CustomDefaultActions.CustomListView)
+        self.assertIsInstance(res.context["view"], CustomDefaultActions.CustomListView)
 
         url = reverse("custom-default-actions-create")
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
-        self.assertIsInstance(res.context["view"],
-                              CustomDefaultActions.CustomCreateView)
+        self.assertIsInstance(
+            res.context["view"], CustomDefaultActions.CustomCreateView
+        )
 
-        url = reverse(
-            "custom-default-actions-update", kwargs={"pk": artist.pk})
+        url = reverse("custom-default-actions-update", kwargs={"pk": artist.pk})
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
-        self.assertIsInstance(res.context["view"],
-                              CustomDefaultActions.CustomUpdateView)
+        self.assertIsInstance(
+            res.context["view"], CustomDefaultActions.CustomUpdateView
+        )
 
-        url = reverse(
-            "custom-default-actions-view", kwargs={"pk": artist.pk})
+        url = reverse("custom-default-actions-view", kwargs={"pk": artist.pk})
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
-        self.assertIsInstance(res.context["view"],
-                              CustomDefaultActions.CustomReadView)
+        self.assertIsInstance(res.context["view"], CustomDefaultActions.CustomReadView)
 
-        url = reverse(
-            "custom-default-actions-delete", kwargs={"pk": artist.pk})
+        url = reverse("custom-default-actions-delete", kwargs={"pk": artist.pk})
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
-        self.assertIsInstance(res.context["view"],
-                              CustomDefaultActions.CustomDeleteView)
+        self.assertIsInstance(
+            res.context["view"], CustomDefaultActions.CustomDeleteView
+        )
 
     def test_list_options(self):
         """
@@ -306,11 +290,10 @@ class TestCRUD(TestViewsBase):
         url = reverse("artist_app.song-view", kwargs={"pk": song.id})
         # test content
         res = self.client.get(url)
-        self.assertEqual(
-            ["name", "artist", ], res.context_data["vega_read_fields"])
+        self.assertEqual(["name", "artist"], res.context_data["vega_read_fields"])
         self.assertDictEqual(
             {"name": song.name, "artist": str(artist)},
-            res.context_data["vega_object_data"]
+            res.context_data["vega_object_data"],
         )
         self.assertEqual(res.status_code, 200)
         html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title> Song 1 | Song</title></head><body><h3>Song 1</h3> <strong>name</strong>: Song 1 <br /> <strong>artist</strong>: Mosh <br /></body></html>"""  # noqa
@@ -321,8 +304,7 @@ class TestCRUD(TestViewsBase):
         Test CRUD update with options
         """
         artist = mommy.make("artist_app.Artist", name="Mosh")
-        song = mommy.make(
-            "artist_app.Song", name="Song 1", artist=artist)
+        song = mommy.make("artist_app.Song", name="Song 1", artist=artist)
         url = reverse("artist_app.song-update", kwargs={"pk": song.id})
         # test content
         res = self.client.get(url)
@@ -362,23 +344,12 @@ class TestCRUD(TestViewsBase):
 
     def test_get_permissions(self):
         """Test get_permissions"""
-        actions = [
-            "create",
-            "update",
-            "delete",
-            "template",
-            "view",
-            "list",
-            "artists",
-        ]
-        expected = [
-            f"artist_app.{action}_song" for action in actions
-        ]
+        actions = ["create", "update", "delete", "template", "view", "list", "artists"]
+        expected = [f"artist_app.{action}_song" for action in actions]
 
-        self.assertEqual(
-            set(expected), set(CustomSongCRUD().get_permissions()))
+        self.assertEqual(set(expected), set(CustomSongCRUD().get_permissions()))
 
-    @override_settings(LOGIN_URL='/list/artists/')
+    @override_settings(LOGIN_URL="/list/artists/")
     def test_login_protection(self):
         """
         Test login protection
@@ -426,7 +397,7 @@ class TestCRUD(TestViewsBase):
         list_res = self.client.get(list_url)
         self.assertEqual(200, list_res.status_code)
 
-    @override_settings(LOGIN_URL='/list/artists/')
+    @override_settings(LOGIN_URL="/list/artists/")
     def test_custom_view_login_protection(self):
         """Test custom views"""
         artists_view_url = reverse("private-songs-artists")
@@ -446,7 +417,7 @@ class TestCRUD(TestViewsBase):
         res2 = self.client.get(template_view_url)
         self.assertEqual(res2.status_code, 200)
 
-    @override_settings(LOGIN_URL='/list/artists/')
+    @override_settings(LOGIN_URL="/list/artists/")
     def test_permission_protection(self):
         """
         Test permission protection
@@ -491,7 +462,7 @@ class TestCRUD(TestViewsBase):
         self.assertEqual(200, template_res.status_code)
 
         # now login to ensure that even a logged in user needs perms
-        alice_user = mommy.make('auth.User', username='alice')
+        alice_user = mommy.make("auth.User", username="alice")
         self.client.force_login(alice_user)
 
         create_res = self.client.get(create_url)
@@ -522,7 +493,7 @@ class TestCRUD(TestViewsBase):
         self.assertEqual(200, template_res.status_code)
 
         # now log in with a user who HAS the permissions
-        bob_user = mommy.make('auth.User')
+        bob_user = mommy.make("auth.User")
         permissions = self._song_permissions()
         bob_user.user_permissions.add(*permissions)
         bob_user = User.objects.get(pk=bob_user.pk)
@@ -552,7 +523,7 @@ class TestCRUD(TestViewsBase):
     @override_settings(ROOT_URLCONF="tests.artist_app.broken_urls")
     def test_broken_permission_protection(self):
         """Test custom views"""
-        bob_user = mommy.make('auth.User')
+        bob_user = mommy.make("auth.User")
         permissions = self._song_permissions()
         bob_user.user_permissions.add(*permissions)
         bob_user = User.objects.get(pk=bob_user.pk)
@@ -563,7 +534,7 @@ class TestCRUD(TestViewsBase):
 
     def test_custom_permission_protection(self):
         """Test custom views"""
-        bob_user = mommy.make('auth.User')
+        bob_user = mommy.make("auth.User")
         permissions = self._artist_permissions()
         bob_user.user_permissions.add(*permissions)
         bob_user = User.objects.get(pk=bob_user.pk)
@@ -574,3 +545,21 @@ class TestCRUD(TestViewsBase):
 
         res = self.client.get(reverse("42-other"))
         self.assertEqual(200, res.status_code)
+
+    def test_external_modelform(self):
+        """Test that CRUD views created with external model forms work"""
+        artist = mommy.make("artist_app.Artist", name="Plain Jane")
+
+        bob_user = mommy.make("auth.User")
+        self.client.force_login(bob_user)
+
+        create_url = reverse("plain-form-create")
+        update_url = reverse("plain-form-update", kwargs={"pk": artist.id})
+
+        # create
+        create_res = self.client.get(create_url)
+        self.assertEqual(200, create_res.status_code)
+
+        # update
+        update_res = self.client.get(update_url)
+        self.assertEqual(200, update_res.status_code)
