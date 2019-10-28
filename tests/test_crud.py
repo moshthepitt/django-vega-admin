@@ -556,10 +556,10 @@ class TestCRUD(TestViewsBase):
         create_url = reverse("plain-form-create")
         update_url = reverse("plain-form-update", kwargs={"pk": artist.id})
 
-        # create
+        # create, should not result in exceptions esp. TypeError
         create_res = self.client.get(create_url)
         self.assertEqual(200, create_res.status_code)
 
-        # update
+        # update, should not result in exceptions esp. TypeError
         update_res = self.client.get(update_url)
         self.assertEqual(200, update_res.status_code)
