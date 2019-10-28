@@ -267,5 +267,5 @@ class PlainFormCRUD(VegaCRUDView):
     model = Artist
     permissions_actions = None
     form_class = PlainArtistForm
-    actions = ["create", "update"]
+    actions = ["create", "update", "list"]
     crud_path = "plain-form"
