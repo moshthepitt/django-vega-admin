@@ -21,6 +21,9 @@ VEGA_TEMPLATE = "basic"
 VEGA_FORCE_ORDERING = True
 VEGA_ORDERING_FIELD = ["-pk"]
 
+# model forms
+VEGA_MODELFORM_KWARG = "vega_extra_kwargs"
+
 # crispy forms
 VEGA_CRISPY_TEMPLATE_PACK = getattr(settings, "CRISPY_TEMPLATE_PACK", "bootstrap3")
 
