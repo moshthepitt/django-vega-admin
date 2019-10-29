@@ -267,7 +267,7 @@ class CRUDURLsMixin:
         """
         kwargs = super().get_form_kwargs()
         url_kwargs = {"cancel_url": self.get_list_url()}
-        kwargs["vega_extra_kwargs"] = url_kwargs
+        kwargs[settings.VEGA_MODELFORM_KWARG] = url_kwargs
         return kwargs
 
 
