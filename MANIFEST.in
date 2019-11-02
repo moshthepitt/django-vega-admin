@@ -1,3 +1,4 @@
 include LICENSE
 include README.md
-recursive-include vega_admin *.html *.txt *.xml *.po *.mo *.js
+recursive-include vega_admin/static *
+recursive-include vega_admin/templates *
