@@ -16,7 +16,7 @@ if sys.argv[-1] == "publish":
         print("twine not installed.\nUse `pip install twine`.\nExiting.")
         sys.exit()
     os.system("python setup.py sdist bdist_wheel")
-    os.system("twine upload dist/*")
+    os.system("twine upload dist/* --skip-existing")
     print("You probably want to also tag the version now:")
     print(
         f"  git tag -a {vega_admin.__version__} -m 'version {vega_admin.__version__}'"
