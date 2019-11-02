@@ -1,12 +1,19 @@
 """
 Setup.py for django-vega-admin
 """
+import os
+
 from setuptools import find_packages, setup
+
+with open(os.path.join(os.path.dirname(__file__), "README.md")) as readme:
+    README = readme.read()
 
 setup(
     name="django-vega-admin",
     version=__import__("vega_admin").__version__,
     description="Simple and fast automated CRUD for any Django model",
+    long_description=README,
+    long_description_content_type="text/markdown",
     license="MIT",
     author="Kelvin Jayanoris",
     author_email="kelvin@jayanoris.com",
