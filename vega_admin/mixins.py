@@ -382,7 +382,7 @@ class ObjectURLPatternMixin:
         return f"{crud_path}/{action}/<int:pk>/"
 
 
-class TimeStampedModel:
+class TimeStampedModel(models.Model):
     """
     Adds timestamps to a model class
     """
