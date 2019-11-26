@@ -336,7 +336,7 @@ def customize_modelform(form_class: Union[forms.Form, forms.ModelForm]):
         pass
     except TypeError:
         # pylint: disable=missing-class-docstring,too-few-public-methods,inherit-non-class
-        class CustomFormClass(form_class):  # type: ignore
+        class VegaCustomFormClass(form_class):  # type: ignore
             def __init__(self, *args, **kwargs):
                 self.request = kwargs.pop("request", None)
                 self.vega_extra_kwargs = kwargs.pop(
@@ -344,6 +344,6 @@ def customize_modelform(form_class: Union[forms.Form, forms.ModelForm]):
                 )
                 super().__init__(*args, **kwargs)
 
-        return CustomFormClass
+        return VegaCustomFormClass
 
     return form_class
