@@ -1,11 +1,11 @@
 """
 vega-admin forms module
 """
-from inspect import isclass
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 from django import forms
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import DateField, DateTimeField, Model, TimeField
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
@@ -325,8 +325,16 @@ def customize_modelform(form_class: Union[forms.Form, forms.ModelForm]):
     Returns:
         {Union[Form, ModelForm]} -- the customized form class
     """
-    if isclass(form_class) and settings.VEGA_MODELFORM_KWARG not in dir(form_class()):
-
+    # the try here would fail with a TypeError if settings.VEGA_MODELFORM_KWARG
+    # is not a valid kwarg
+    try:
+        form_class(**{settings.VEGA_MODELFORM_KWARG: dict()})
+    except ObjectDoesNotExist:
+        # we don't care about these exceptions right now because forms that have
+        # an instance are likely to end up here as we are not supplying that
+        # instance in the try statements
+        pass
+    except TypeError:
         # pylint: disable=missing-class-docstring,too-few-public-methods,inherit-non-class
         class CustomFormClass(form_class):  # type: ignore
             def __init__(self, *args, **kwargs):
