@@ -18,7 +18,13 @@ from vega_admin.views import (
     VegaUpdateView,
 )
 
-from .forms import ArtistForm, CustomSearchForm, PlainArtistForm, SongForm
+from .forms import (
+    ArtistForm,
+    CustomSearchForm,
+    PlainArtistForm,
+    SongForm,
+    UpdateArtistForm,
+)
 from .models import Artist, Song
 from .tables import ArtistTable
 
@@ -221,8 +227,9 @@ class CustomArtistCRUD(VegaCRUDView):
     protected_actions = None
     permissions_actions = None
     crud_path = "custom-artist"
+    form_class = PlainArtistForm
     create_form_class = ArtistForm
-    update_form_class = ArtistForm
+    update_form_class = UpdateArtistForm
     table_class = ArtistTable
     search_fields = ["name"]
     search_form_class = CustomSearchForm

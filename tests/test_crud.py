@@ -9,7 +9,12 @@ from django.urls import reverse
 
 from model_mommy import mommy
 
-from .artist_app.forms import ArtistForm, CustomSearchForm, PlainArtistForm
+from .artist_app.forms import (
+    ArtistForm,
+    CustomSearchForm,
+    PlainArtistForm,
+    UpdateArtistForm,
+)
 from .artist_app.models import Artist
 from .artist_app.tables import ArtistTable
 from .artist_app.views import CustomDefaultActions, CustomSongCRUD
@@ -326,7 +331,7 @@ class TestCRUD(TestViewsBase):
         self.assertEqual(ArtistForm, create_res.context["view"].form_class)
 
         update_res = self.client.get(update_url)
-        self.assertEqual(ArtistForm, update_res.context["view"].form_class)
+        self.assertEqual(UpdateArtistForm, update_res.context["view"].form_class)
 
         list_res = self.client.get(list_url)
         self.assertEqual(ArtistTable, list_res.context["view"].table_class)

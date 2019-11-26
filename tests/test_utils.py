@@ -12,6 +12,7 @@ from django_tables2 import Table
 from model_mommy import mommy
 
 from vega_admin.utils import (
+    customize_modelform,
     get_filterclass,
     get_listview_form,
     get_modelform,
@@ -19,6 +20,7 @@ from vega_admin.utils import (
 )
 from vega_admin.widgets import VegaDateTimeWidget, VegaDateWidget, VegaTimeWidget
 
+from tests.artist_app.forms import ArtistForm, PlainArtistForm, UpdateArtistForm
 from tests.artist_app.models import Artist, Song
 
 
@@ -26,6 +28,20 @@ class TestUtils(TestCase):
     """
     class for testing vega-admin utils
     """
+
+    def test_customize_modelform(self):
+        """Test customize_modelform."""
+        self.assertEqual(ArtistForm, customize_modelform(ArtistForm))
+        self.assertEqual(UpdateArtistForm, customize_modelform(UpdateArtistForm))
+
+        custom_form_class = customize_modelform(PlainArtistForm)
+        self.assertTrue(issubclass(custom_form_class, PlainArtistForm))
+        self.assertEqual("VegaCustomFormClass", custom_form_class.__name__)
+
+        try:
+            custom_form_class(**{settings.VEGA_MODELFORM_KWARG: dict()})
+        except TypeError:
+            self.fail("Form kwargs have not been set properly")
 
     def test_get_modelform(self):
         """Test get_modelform"""
