@@ -255,7 +255,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         chosen_form = None
         if self.create_form_class:
             chosen_form = self.create_form_class
-        if self.form_class:
+        elif self.form_class:
             chosen_form = self.form_class
 
         if chosen_form is not None:
@@ -281,7 +281,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         chosen_form = None
         if self.update_form_class:
             chosen_form = self.update_form_class
-        if self.form_class:
+        elif self.form_class:
             chosen_form = self.form_class
 
         if chosen_form is not None:
