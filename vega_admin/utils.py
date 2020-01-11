@@ -13,10 +13,10 @@ from django.utils.translation import ugettext as _
 
 import django_tables2 as tables
 from crispy_forms.bootstrap import FormActions
-from crispy_forms.layout import HTML, Div, Layout, Submit
+from crispy_forms.layout import HTML, Div, Submit
 from django_filters import FilterSet
 
-from vega_admin.crispy_utils import get_form_helper_class
+from vega_admin.crispy_utils import get_form_helper_class, get_layout
 from vega_admin.mixins import VegaFormMixin
 
 
@@ -116,7 +116,7 @@ def get_modelform(model: Model, fields: list = None, extra_fields: list = None):
             include_media=True,
         )
         self.helper.form_id = f"{self.model._meta.model_name}-form"
-        self.helper.layout = Layout(*self.fields.keys())
+        self.helper.layout = get_layout(self.fields.keys())
         self.helper.layout.append(form_actions_class)
 
     if fields is None:

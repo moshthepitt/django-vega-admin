@@ -1,5 +1,8 @@
 """module for crispy form utils."""
+from typing import List
+
 from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout
 
 
 def get_form_helper_class(  # pylint: disable=too-many-arguments,bad-continuation
@@ -31,3 +34,8 @@ def get_form_helper_class(  # pylint: disable=too-many-arguments,bad-continuatio
     helper.include_media = include_media
 
     return helper
+
+
+def get_layout(formfields: List[str]):
+    """Get layout class for crispy form helper."""
+    return Layout(*formfields)
