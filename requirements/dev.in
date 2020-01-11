@@ -5,6 +5,7 @@
 django-allauth
 
 # others
+pycodestyle
 pydocstyle
 pylint
 pylint-django
