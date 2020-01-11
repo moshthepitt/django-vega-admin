@@ -1,5 +1,5 @@
 """module for crispy form utils."""
-from typing import List
+from typing import List, Optional
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
@@ -10,9 +10,10 @@ from crispy_forms.layout import HTML, Div, Layout, Submit
 
 
 def get_form_actions(  # pylint: disable=bad-continuation
-    cancel_url: str,
+    cancel_url: Optional[str] = None,
     submit_text: str = settings.VEGA_SUBMIT_TEXT,
     cancel_text: str = settings.VEGA_CANCEL_TEXT,
+    button_div_css_class: str = "col-md-6",
 ) -> FormActions:
     """
     Return the FormActions class.
@@ -24,28 +25,27 @@ def get_form_actions(  # pylint: disable=bad-continuation
     :return: form actions object
 
     """
-    return FormActions(
-        Div(
+    button_div = Div(css_class="col-md-12")
+    if cancel_url:
+        button_div.append(
             Div(
-                Div(
-                    HTML(
-                        f"""
-                        <a href="{cancel_url}"
-                        class="btn btn-default btn-block vega-cancel">
-                        {_(cancel_text)}
+                HTML(
+                    f"""<a href="{cancel_url}"
+                            class="btn btn-default btn-block vega-cancel">
+                            {_(cancel_text)}
                         </a>"""
-                    ),
-                    css_class="col-md-6",
                 ),
-                Div(
-                    Submit("submit", _(submit_text), css_class="btn-block vega-submit"),
-                    css_class="col-md-6",
-                ),
-                css_class="col-md-12",
-            ),
-            css_class="row",
+                css_class=button_div_css_class,
+            )
+        )
+    button_div.append(
+        Div(
+            Submit("submit", _(submit_text), css_class="btn-block vega-submit"),
+            css_class=button_div_css_class,
         )
     )
+
+    return FormActions(Div(button_div, css_class="row"))
 
 
 def get_form_helper_class(  # pylint: disable=too-many-arguments,bad-continuation
