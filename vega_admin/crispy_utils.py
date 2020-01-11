@@ -1,8 +1,51 @@
 """module for crispy form utils."""
 from typing import List
 
+from django.conf import settings
+from django.utils.translation import ugettext as _
+
+from crispy_forms.bootstrap import FormActions
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout
+from crispy_forms.layout import HTML, Div, Layout, Submit
+
+
+def get_form_actions(  # pylint: disable=bad-continuation
+    cancel_url: str,
+    submit_text: str = settings.VEGA_SUBMIT_TEXT,
+    cancel_text: str = settings.VEGA_CANCEL_TEXT,
+) -> FormActions:
+    """
+    Return the FormActions class.
+
+    :param cancel_url: the cancel url
+    :param submit_text: the text for the submit button
+    :param cancel_text: the text for the cancel button
+
+    :return: form actions object
+
+    """
+    return FormActions(
+        Div(
+            Div(
+                Div(
+                    HTML(
+                        f"""
+                        <a href="{cancel_url}"
+                        class="btn btn-default btn-block vega-cancel">
+                        {_(cancel_text)}
+                        </a>"""
+                    ),
+                    css_class="col-md-6",
+                ),
+                Div(
+                    Submit("submit", _(submit_text), css_class="btn-block vega-submit"),
+                    css_class="col-md-6",
+                ),
+                css_class="col-md-12",
+            ),
+            css_class="row",
+        )
+    )
 
 
 def get_form_helper_class(  # pylint: disable=too-many-arguments,bad-continuation
@@ -36,6 +79,6 @@ def get_form_helper_class(  # pylint: disable=too-many-arguments,bad-continuatio
     return helper
 
 
-def get_layout(formfields: List[str]):
+def get_layout(formfields: List[str]) -> Layout:
     """Get layout class for crispy form helper."""
     return Layout(*formfields)

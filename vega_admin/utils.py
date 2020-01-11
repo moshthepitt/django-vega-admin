@@ -12,42 +12,10 @@ from django.utils.module_loading import import_string
 from django.utils.translation import ugettext as _
 
 import django_tables2 as tables
-from crispy_forms.bootstrap import FormActions
-from crispy_forms.layout import HTML, Div, Submit
 from django_filters import FilterSet
 
-from vega_admin.crispy_utils import get_form_helper_class, get_layout
+from vega_admin.crispy_utils import get_form_actions, get_form_helper_class, get_layout
 from vega_admin.mixins import VegaFormMixin
-
-
-def get_form_actions(cancel_url: str):
-    """Return the FormActions class, for use in model forms in VegaCRUD."""
-    return FormActions(
-        Div(
-            Div(
-                Div(
-                    HTML(
-                        f"""
-                        <a href="{cancel_url}"
-                        class="btn btn-default btn-block vega-cancel">
-                        {_(settings.VEGA_CANCEL_TEXT)}
-                        </a>"""
-                    ),
-                    css_class="col-md-6",
-                ),
-                Div(
-                    Submit(
-                        "submit",
-                        _(settings.VEGA_SUBMIT_TEXT),
-                        css_class="btn-block vega-submit",
-                    ),
-                    css_class="col-md-6",
-                ),
-                css_class="col-md-12",
-            ),
-            css_class="row",
-        )
-    )
 
 
 def get_datefields(model: Model) -> List[str]:
