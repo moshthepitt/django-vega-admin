@@ -1,16 +1,16 @@
 """Forms module for users"""
 from django import forms
-from django.contrib.auth import password_validation
-from django.contrib.auth.models import User
-from django.contrib.auth.forms import AdminPasswordChangeForm
-from django.utils.translation import ugettext as _
 from django.conf import settings
+from django.contrib.auth import password_validation
+from django.contrib.auth.forms import AdminPasswordChangeForm
+from django.contrib.auth.models import User
+from django.urls import reverse_lazy
+from django.utils.translation import ugettext as _
 
 from crispy_forms.bootstrap import Field
 from crispy_forms.layout import Layout
 
-from vega_admin.utils import get_form_actions, get_form_helper_class
-from django.urls import reverse_lazy
+from vega_admin.crispy_utils import get_form_actions, get_form_helper_class
 
 try:
     # pylint: disable=import-error
@@ -78,8 +78,13 @@ class AddUserForm(UserFormMixin, forms.ModelForm):
         self.fields["username"].help_text = _(settings.VEGA_USERNAME_HELP_TEXT)
         self.fields["email"].help_text = _(settings.VEGA_OPTIONAL_TXT)
         self.helper = get_form_helper_class(
-            form_tag=True, form_method="POST", render_required_fields=True,
-            form_show_labels=True, html5_required=True, include_media=True)
+            form_tag=True,
+            form_method="POST",
+            render_required_fields=True,
+            form_show_labels=True,
+            html5_required=True,
+            include_media=True,
+        )
         self.helper.form_id = "add-user-form"
         self.helper.layout = Layout(
             Field("first_name"),
@@ -88,8 +93,7 @@ class AddUserForm(UserFormMixin, forms.ModelForm):
             Field("email"),
             Field("password", autocomplete="off"),
             Field("is_active"),
-            get_form_actions(
-                cancel_url=self.vega_extra_kwargs.get("cancel_url", "/")),
+            get_form_actions(cancel_url=self.vega_extra_kwargs.get("cancel_url", "/")),
         )
 
     def clean_password(self):
@@ -118,19 +122,20 @@ class AddUserForm(UserFormMixin, forms.ModelForm):
         username = cleaned_data.get("username")
         email = cleaned_data.get("email")
         if not email and not username:
-            raise forms.ValidationError(
-                _(settings.VEGA_EMAIL_OR_USERNAME_REQUIRED_TXT))
+            raise forms.ValidationError(_(settings.VEGA_EMAIL_OR_USERNAME_REQUIRED_TXT))
 
     def save(self, commit=True):
         """general form save method"""
         unique_username = self.cleaned_data.get("username")
         if not unique_username:
             try:
-                unique_username = get_adapter().generate_unique_username([
-                    self.cleaned_data.get("first_name"),
-                    self.cleaned_data.get("last_name"),
-                    self.cleaned_data.get("email"),
-                ])
+                unique_username = get_adapter().generate_unique_username(
+                    [
+                        self.cleaned_data.get("first_name"),
+                        self.cleaned_data.get("last_name"),
+                        self.cleaned_data.get("email"),
+                    ]
+                )
             except NameError:
                 unique_username = self.cleaned_data.get("email")
         user_data = dict(
@@ -159,8 +164,13 @@ class EditUserForm(UserFormMixin, forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["email"].help_text = _(settings.VEGA_OPTIONAL_TXT)
         self.helper = get_form_helper_class(
-            form_tag=True, form_method="POST", render_required_fields=True,
-            form_show_labels=True, html5_required=True, include_media=True)
+            form_tag=True,
+            form_method="POST",
+            render_required_fields=True,
+            form_show_labels=True,
+            html5_required=True,
+            include_media=True,
+        )
         self.helper.form_id = "edit-user-form"
         self.helper.layout = Layout(
             Field("first_name"),
@@ -168,8 +178,7 @@ class EditUserForm(UserFormMixin, forms.ModelForm):
             Field("username"),
             Field("email"),
             Field("is_active"),
-            get_form_actions(
-                cancel_url=self.vega_extra_kwargs.get("cancel_url", "/")),
+            get_form_actions(cancel_url=self.vega_extra_kwargs.get("cancel_url", "/")),
         )
 
 
@@ -183,8 +192,13 @@ class PasswordChangeForm(AdminPasswordChangeForm):
         self.vega_extra_kwargs = kwargs.pop("vega_extra_kwargs", dict())
         super().__init__(user=self.instance, *args, **kwargs)
         self.helper = get_form_helper_class(
-            form_tag=True, form_method="POST", render_required_fields=True,
-            form_show_labels=True, html5_required=True, include_media=True)
+            form_tag=True,
+            form_method="POST",
+            render_required_fields=True,
+            form_show_labels=True,
+            html5_required=True,
+            include_media=True,
+        )
         self.helper.form_id = "change-password-form"
         self.helper.layout = Layout(
             Field("password1"),
