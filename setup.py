@@ -36,7 +36,7 @@ setup(
     url="https://github.com/moshthepitt/django-vega-admin",
     packages=find_packages(exclude=["docs", "tests"]),
     install_requires=[
-        "Django >=2.1.10",
+        "Django >=2.2",
         "django-crispy-forms",
         "django-braces",
         "django-filter",
@@ -49,8 +49,8 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Framework :: Django",
-        "Framework :: Django :: 2.1",
         "Framework :: Django :: 2.2",
+        "Framework :: Django :: 3.0",
     ],
     include_package_data=True,
 )
