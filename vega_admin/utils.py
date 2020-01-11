@@ -14,7 +14,7 @@ from django.utils.translation import ugettext as _
 import django_tables2 as tables
 from django_filters import FilterSet
 
-from vega_admin.crispy_utils import get_form_actions, get_form_helper_class, get_layout
+from vega_admin.crispy_utils import get_form_helper_class, get_layout
 from vega_admin.mixins import VegaFormMixin
 
 
@@ -71,8 +71,6 @@ def get_modelform(model: Model, fields: list = None, extra_fields: list = None):
     def _constructor(self, *args, **kwargs):
         self.request = kwargs.pop("request", None)
         self.vega_extra_kwargs = kwargs.pop(settings.VEGA_MODELFORM_KWARG, dict())
-        cancel_url = self.vega_extra_kwargs.get("cancel_url", "/")
-        form_actions_class = get_form_actions(cancel_url=cancel_url)
         super(modelform_class, self).__init__(*args, **kwargs)
         # add crispy forms FormHelper
         self.helper = get_form_helper_class(
@@ -84,8 +82,11 @@ def get_modelform(model: Model, fields: list = None, extra_fields: list = None):
             include_media=True,
         )
         self.helper.form_id = f"{self.model._meta.model_name}-form"
-        self.helper.layout = get_layout(self.fields.keys())
-        self.helper.layout.append(form_actions_class)
+        self.helper.layout = get_layout(
+            self.fields.keys(),
+            with_actions=True,
+            cancel_url=self.vega_extra_kwargs.get("cancel_url", "/"),
+        )
 
     if fields is None:
         fields = [_.name for _ in model._meta.concrete_fields]

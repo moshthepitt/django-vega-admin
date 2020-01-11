@@ -79,6 +79,24 @@ def get_form_helper_class(  # pylint: disable=too-many-arguments,bad-continuatio
     return helper
 
 
-def get_layout(formfields: List[str]) -> Layout:
-    """Get layout class for crispy form helper."""
-    return Layout(*formfields)
+def get_layout(  # pylint: disable=bad-continuation
+    formfields: List[str], with_actions: bool = False, cancel_url: str = "/"
+) -> Layout:
+    """Get layout class for crispy form helper.
+
+    Arguments:
+        formfields {List[str]} -- list of form fields
+
+    Keyword Arguments:
+        with_actions {bool} -- whether to include form actions (default: {False})
+        cancel_url {str} -- the cancel url (default: {"/"})
+
+    Returns:
+        Layout -- the crispy forms Layout object
+
+    """
+    layout = Layout(*formfields)
+    if with_actions is True:
+        form_actions_class = get_form_actions(cancel_url=cancel_url)
+        layout.append(form_actions_class)
+    return layout
