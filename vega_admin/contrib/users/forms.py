@@ -30,6 +30,22 @@ def validate_unique_email(value):
         return value
 
 
+def get_formhelper():
+    """
+    Get form helper class.
+    This is simply for convenience and to avoid pylint warning about
+    duplicate code.
+    """
+    return get_form_helper_class(
+        form_method="POST",
+        form_tag=True,
+        form_show_labels=True,
+        include_media=True,
+        render_required_fields=True,
+        html5_required=True,
+    )
+
+
 class UserFormMixin:  # pylint: disable=too-few-public-methods
     """User forms mixin"""
 
@@ -77,14 +93,7 @@ class AddUserForm(UserFormMixin, forms.ModelForm):
         self.fields["username"].required = False
         self.fields["username"].help_text = _(settings.VEGA_USERNAME_HELP_TEXT)
         self.fields["email"].help_text = _(settings.VEGA_OPTIONAL_TXT)
-        self.helper = get_form_helper_class(
-            form_tag=True,
-            form_method="POST",
-            render_required_fields=True,
-            form_show_labels=True,
-            html5_required=True,
-            include_media=True,
-        )
+        self.helper = get_formhelper()
         self.helper.form_id = "add-user-form"
         self.helper.layout = Layout(
             Field("first_name"),
@@ -163,14 +172,7 @@ class EditUserForm(UserFormMixin, forms.ModelForm):
         self.vega_extra_kwargs = kwargs.pop("vega_extra_kwargs", dict())
         super().__init__(*args, **kwargs)
         self.fields["email"].help_text = _(settings.VEGA_OPTIONAL_TXT)
-        self.helper = get_form_helper_class(
-            form_tag=True,
-            form_method="POST",
-            render_required_fields=True,
-            form_show_labels=True,
-            html5_required=True,
-            include_media=True,
-        )
+        self.helper = get_formhelper()
         self.helper.form_id = "edit-user-form"
         self.helper.layout = Layout(
             Field("first_name"),
@@ -191,14 +193,7 @@ class PasswordChangeForm(AdminPasswordChangeForm):
         self.request = kwargs.pop("request", None)
         self.vega_extra_kwargs = kwargs.pop("vega_extra_kwargs", dict())
         super().__init__(user=self.instance, *args, **kwargs)
-        self.helper = get_form_helper_class(
-            form_tag=True,
-            form_method="POST",
-            render_required_fields=True,
-            form_show_labels=True,
-            html5_required=True,
-            include_media=True,
-        )
+        self.helper = get_formhelper()
         self.helper.form_id = "change-password-form"
         self.helper.layout = Layout(
             Field("password1"),
