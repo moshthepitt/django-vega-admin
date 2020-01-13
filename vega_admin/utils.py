@@ -1,6 +1,4 @@
-"""
-vega-admin forms module
-"""
+"""vega-admin forms module."""
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 from django import forms
@@ -14,80 +12,15 @@ from django.utils.module_loading import import_string
 from django.utils.translation import ugettext as _
 
 import django_tables2 as tables
-from crispy_forms.bootstrap import FormActions
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import HTML, Div, Layout, Submit
 from django_filters import FilterSet
 
+from vega_admin.crispy_utils import get_form_helper_class, get_layout
 from vega_admin.mixins import VegaFormMixin
-
-
-def get_form_actions(cancel_url: str):
-    """
-    Returns the FormActions class, for use in model forms in VegaCRUD
-    """
-    return FormActions(
-        Div(
-            Div(
-                Div(
-                    HTML(
-                        f"""
-                        <a href="{cancel_url}"
-                        class="btn btn-default btn-block vega-cancel">
-                        {_(settings.VEGA_CANCEL_TEXT)}
-                        </a>"""
-                    ),
-                    css_class="col-md-6",
-                ),
-                Div(
-                    Submit(
-                        "submit",
-                        _(settings.VEGA_SUBMIT_TEXT),
-                        css_class="btn-block vega-submit",
-                    ),
-                    css_class="col-md-6",
-                ),
-                css_class="col-md-12",
-            ),
-            css_class="row",
-        )
-    )
-
-
-def get_form_helper_class(  # pylint: disable=too-many-arguments,bad-continuation
-    form_tag: bool = True,
-    form_method: str = "POST",
-    render_required_fields: bool = True,
-    form_show_labels: bool = True,
-    html5_required: bool = True,
-    include_media: bool = True,
-) -> FormHelper:
-    """
-    Returns the base form helper class
-
-    :param form_tag: include form tag?
-    :param form_method: form method
-    :param render_required_fields: render required fields?
-    :param form_show_labels: show form labels?
-    :param html5_required: HTML5 required?
-    :param include_media: include form media?
-
-    :return: form helper class
-    """
-    helper = FormHelper()
-    helper.form_tag = form_tag
-    helper.form_method = form_method
-    helper.render_required_fields = render_required_fields
-    helper.form_show_labels = form_show_labels
-    helper.html5_required = html5_required
-    helper.include_media = include_media
-
-    return helper
 
 
 def get_datefields(model: Model) -> List[str]:
     """
-    Get the date fields from a model
+    Get the date fields from a model.
 
     :param model: the model class
     :return: list of datefield names
@@ -101,7 +34,7 @@ def get_datefields(model: Model) -> List[str]:
 
 def get_datetimefields(model: Model) -> List[str]:
     """
-    Get the datetime fields from a model
+    Get the datetime fields from a model.
 
     :param model: the model class
     :return: list of datetimefield names
@@ -111,7 +44,7 @@ def get_datetimefields(model: Model) -> List[str]:
 
 def get_timefields(model: Model) -> List[str]:
     """
-    Get the time fields from a model
+    Get the time fields from a model.
 
     :param model: the model class
     :return: list of timefield names
@@ -121,7 +54,7 @@ def get_timefields(model: Model) -> List[str]:
 
 def get_modelform(model: Model, fields: list = None, extra_fields: list = None):
     """
-    Get the a ModelForm for the provided model
+    Get the ModelForm for the provided model.
 
     :param model: the model class
     :param fields: list of the fields that you want included in the form
@@ -134,13 +67,10 @@ def get_modelform(model: Model, fields: list = None, extra_fields: list = None):
             label=_(settings.VEGA_LISTVIEW_SEARCH_QUERY_TXT),
             required=False,))]
     """
-
     # this is going to be our custom init method
     def _constructor(self, *args, **kwargs):
         self.request = kwargs.pop("request", None)
         self.vega_extra_kwargs = kwargs.pop(settings.VEGA_MODELFORM_KWARG, dict())
-        cancel_url = self.vega_extra_kwargs.get("cancel_url", "/")
-        form_actions_class = get_form_actions(cancel_url=cancel_url)
         super(modelform_class, self).__init__(*args, **kwargs)
         # add crispy forms FormHelper
         self.helper = get_form_helper_class(
@@ -152,8 +82,11 @@ def get_modelform(model: Model, fields: list = None, extra_fields: list = None):
             include_media=True,
         )
         self.helper.form_id = f"{self.model._meta.model_name}-form"
-        self.helper.layout = Layout(*self.fields.keys())
-        self.helper.layout.append(form_actions_class)
+        self.helper.layout = get_layout(
+            self.fields.keys(),
+            with_actions=True,
+            cancel_url=self.vega_extra_kwargs.get("cancel_url", "/"),
+        )
 
     if fields is None:
         fields = [_.name for _ in model._meta.concrete_fields]
@@ -199,7 +132,7 @@ def get_modelform(model: Model, fields: list = None, extra_fields: list = None):
 
 def get_listview_form(model: Model, fields: List[str], include_search: bool = True):
     """
-    Get a search and filter form for use in ListViews
+    Get a search and filter form for use in ListViews.
 
     This is essentially a model form with an additional field named `q`.
 
@@ -230,7 +163,7 @@ def get_table(  # pylint: disable=bad-continuation
     attrs: Optional[dict] = None,
 ):
     """
-    Get the Table Class for the provided model
+    Get the Table Class for the provided model.
 
     :param model: the model class
     :param fields: list of the fields that you want included in the table
@@ -263,7 +196,7 @@ def get_table(  # pylint: disable=bad-continuation
     if isinstance(actions, list):
         # pylint: disable=unused-argument
         def render_actions_fn(self, *args, **kwargs):
-            """Render the actions column"""
+            """Render the actions column."""
             record = kwargs["record"]
             actions_links = []
             for item in self.actions_list:
@@ -294,7 +227,7 @@ def get_table(  # pylint: disable=bad-continuation
 
 def get_filterclass(model: Model, fields: list = None):
     """
-    Get the Filter Class for the provided model
+    Get the Filter Class for the provided model.
 
     :param model: the model class
     :param fields: list of the fields that you want included in the table
@@ -316,14 +249,17 @@ def get_filterclass(model: Model, fields: list = None):
 
 
 def customize_modelform(form_class: Union[forms.Form, forms.ModelForm]):
-    """Adds custom keyword arguments to a provided form class, if they are
-    missing.
+    """
+    Add custom keyword arguments to a provided form class.
+
+    Adds the custom kwargs required for vega_admin, if they are missing.
 
     Arguments:
         form_class {Union[Form, ModelForm]} -- the form class
 
     Returns:
         {Union[Form, ModelForm]} -- the customized form class
+
     """
     # the try here would fail with a TypeError if settings.VEGA_MODELFORM_KWARG
     # is not a valid kwarg
