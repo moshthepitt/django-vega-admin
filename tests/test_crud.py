@@ -1,6 +1,4 @@
-"""
-vega-admin module to test views
-"""
+"""vega-admin module to test views."""
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
@@ -28,14 +26,10 @@ from .test_views import TestViewsBase
     VEGA_TEMPLATE="basic",
 )
 class TestCRUD(TestViewsBase):
-    """
-    Test class for CRUD views
-    """
+    """Test class for CRUD views."""
 
     def test_url_patterns(self):
-        """
-        Test that all url patterns work for default actions
-        """
+        """Test that all url patterns work for default actions."""
         artist = mommy.make("artist_app.Artist", name="Bob")
 
         self.assertEqual(
@@ -59,9 +53,7 @@ class TestCRUD(TestViewsBase):
         self.assertEqual("/private-songs/template/", reverse("private-songs-template"))
 
     def test_create(self):
-        """
-        Test CRUD create
-        """
+        """Test CRUD create."""
         url = reverse("artist_app.artist-create")
         res = self.client.post(url, {"name": "Mosh"})
         self.assertEqual(res.status_code, 302)
@@ -87,9 +79,7 @@ class TestCRUD(TestViewsBase):
         self.assertHTMLEqual(html, res.content.decode("utf-8"))
 
     def test_read(self):
-        """
-        Test CRUD read
-        """
+        """Test CRUD read."""
         artist = mommy.make("artist_app.Artist", name="tt", id=436)
         url = reverse("artist_app.artist-view", kwargs={"pk": artist.id})
 
@@ -111,9 +101,7 @@ class TestCRUD(TestViewsBase):
         self.assertHTMLEqual(html, res.content.decode("utf-8"))
 
     def test_update(self):
-        """
-        Test CRUD update
-        """
+        """Test CRUD update."""
         artist = mommy.make("artist_app.Artist")
         url = reverse("artist_app.artist-update", kwargs={"pk": artist.id})
         res = self.client.post(url, {"id": artist.id, "name": "Pitt"})
@@ -146,9 +134,7 @@ class TestCRUD(TestViewsBase):
         self.assertHTMLEqual(html, res.content.decode("utf-8"))
 
     def test_delete(self):
-        """
-        Test CRUD delete
-        """
+        """Test CRUD delete."""
         artist = mommy.make("artist_app.Artist")
         url = reverse("artist_app.artist-delete", kwargs={"pk": artist.id})
         res = self.client.post(url)
@@ -190,9 +176,7 @@ class TestCRUD(TestViewsBase):
         self.assertHTMLEqual(html, res.content.decode("utf-8"))
 
     def test_list(self):
-        """
-        Test CRUD list
-        """
+        """Test CRUD list."""
         # make 3 objects
         mommy.make("artist_app.Artist", name="Mosh", id="60")
         mommy.make("artist_app.Artist", name="Tranx", id="70")
@@ -210,7 +194,7 @@ class TestCRUD(TestViewsBase):
         self.assertHTMLEqual(html, res.content.decode("utf-8"))
 
     def test_custom_views(self):
-        """Test custom views"""
+        """Test custom views."""
         self.client.force_login(self.user)
 
         artists_view_url = reverse("private-songs-artists")
@@ -224,7 +208,7 @@ class TestCRUD(TestViewsBase):
         self.assertIsInstance(res.context["view"], CustomSongCRUD.FooView)
 
     def test_custom_default_views(self):
-        """Test custom default views"""
+        """Test custom default views."""
 
         artist = mommy.make("artist_app.Artist")
         url = reverse("custom-default-actions-list")
@@ -259,9 +243,7 @@ class TestCRUD(TestViewsBase):
         )
 
     def test_list_options(self):
-        """
-        Test CRUD list with configuration options
-        """
+        """Test CRUD list with configuration options."""
         # make 3 objects
         artist = mommy.make("artist_app.Artist", name="Mosh", id="60")
         mommy.make("artist_app.Song", name="Song 1", artist=artist, id="31")
@@ -275,9 +257,7 @@ class TestCRUD(TestViewsBase):
         self.assertHTMLEqual(html, res.content.decode("utf-8"))
 
     def test_create_options(self):
-        """
-        Test CRUD create with options
-        """
+        """Test CRUD create with options."""
         url = reverse("artist_app.song-create")
         # test content
         res = self.client.get(url)
@@ -287,9 +267,7 @@ class TestCRUD(TestViewsBase):
         self.assertHTMLEqual(html, res.content.decode("utf-8"))
 
     def test_read_options(self):
-        """
-        Test CRUD update with options
-        """
+        """Test CRUD update with options."""
         artist = mommy.make("artist_app.Artist", name="Mosh")
         song = mommy.make("artist_app.Song", name="Song 1", artist=artist)
         url = reverse("artist_app.song-view", kwargs={"pk": song.id})
@@ -305,9 +283,7 @@ class TestCRUD(TestViewsBase):
         self.assertHTMLEqual(html, res.content.decode("utf-8"))
 
     def test_update_options(self):
-        """
-        Test CRUD update with options
-        """
+        """Test CRUD update with options."""
         artist = mommy.make("artist_app.Artist", name="Mosh")
         song = mommy.make("artist_app.Song", name="Song 1", artist=artist)
         url = reverse("artist_app.song-update", kwargs={"pk": song.id})
@@ -319,9 +295,7 @@ class TestCRUD(TestViewsBase):
         self.assertHTMLEqual(html, res.content.decode("utf-8"))
 
     def test_custom_form_and_table_class(self):
-        """
-        Test custom form and table class
-        """
+        """Test custom form and table class."""
         artist = mommy.make("artist_app.Artist", name="Mosh")
         create_url = reverse("custom-artist-create")
         update_url = reverse("custom-artist-update", kwargs={"pk": artist.id})
@@ -339,16 +313,14 @@ class TestCRUD(TestViewsBase):
         self.assertEqual(CustomSearchForm, list_res.context["view"].form_class)
 
     def test_paginate_by(self):
-        """
-        Test paginate_by
-        """
+        """Test paginate_by."""
         mommy.make("artist_app.Artist", _quantity=20)
         list_url = reverse("custom-artist-list")
         list_res = self.client.get(list_url)
         self.assertEqual(list_res.context["object_list"].count(), 10)
 
     def test_get_permissions(self):
-        """Test get_permissions"""
+        """Test get_permissions."""
         actions = ["create", "update", "delete", "template", "view", "list", "artists"]
         expected = [f"artist_app.{action}_song" for action in actions]
 
@@ -356,9 +328,7 @@ class TestCRUD(TestViewsBase):
 
     @override_settings(LOGIN_URL="/list/artists/")
     def test_login_protection(self):
-        """
-        Test login protection
-        """
+        """Test login protection."""
         artist = mommy.make("artist_app.Artist", name="Mosh")
         song = mommy.make("artist_app.Song", name="Song 1", artist=artist)
         create_url = reverse("private-songs-create")
@@ -404,7 +374,7 @@ class TestCRUD(TestViewsBase):
 
     @override_settings(LOGIN_URL="/list/artists/")
     def test_custom_view_login_protection(self):
-        """Test custom views"""
+        """Test custom views."""
         artists_view_url = reverse("private-songs-artists")
         template_view_url = reverse("private-songs-template")
         res1 = self.client.get(artists_view_url)
@@ -424,9 +394,7 @@ class TestCRUD(TestViewsBase):
 
     @override_settings(LOGIN_URL="/list/artists/")
     def test_permission_protection(self):
-        """
-        Test permission protection
-        """
+        """Test permission protection."""
         artist = mommy.make("artist_app.Artist", name="Mosh")
         song = mommy.make("artist_app.Song", name="Song 42", artist=artist)
         create_url = reverse("hidden-songs-create")
@@ -527,7 +495,7 @@ class TestCRUD(TestViewsBase):
 
     @override_settings(ROOT_URLCONF="tests.artist_app.broken_urls")
     def test_broken_permission_protection(self):
-        """Test custom views"""
+        """Test custom views."""
         bob_user = mommy.make("auth.User")
         permissions = self._song_permissions()
         bob_user.user_permissions.add(*permissions)
@@ -538,7 +506,7 @@ class TestCRUD(TestViewsBase):
             reverse("broken-list")
 
     def test_custom_permission_protection(self):
-        """Test custom views"""
+        """Test custom views."""
         bob_user = mommy.make("auth.User")
         permissions = self._artist_permissions()
         bob_user.user_permissions.add(*permissions)
@@ -552,7 +520,7 @@ class TestCRUD(TestViewsBase):
         self.assertEqual(200, res.status_code)
 
     def test_external_modelform(self):
-        """Test that CRUD views created with external model forms work"""
+        """Test that CRUD views created with external model forms work."""
         artist = mommy.make("artist_app.Artist", name="Plain Jane")
 
         bob_user = mommy.make("auth.User")
@@ -569,4 +537,26 @@ class TestCRUD(TestViewsBase):
         # update, should not result in exceptions esp. TypeError
         update_res = self.client.get(update_url)
         self.assertIsInstance(update_res.context["form"], PlainArtistForm)
+        self.assertEqual(200, update_res.status_code)
+
+    @override_settings(
+        VEGA_ACTION_COLUMN_NAME="Actions",
+        ROOT_URLCONF="tests.artist_app.band_urls",
+        VEGA_TEMPLATE="basic",
+    )
+    def test_noneditable_fields(self):
+        """Test non-editable fields."""
+        band = mommy.make("artist_app.Band", name="mosh and friends")
+
+        bob_user = mommy.make("auth.User")
+        self.client.force_login(bob_user)
+
+        create_url = reverse("artist_app.band-create")
+        # create, should not result in exceptions
+        create_res = self.client.get(create_url)
+        self.assertEqual(200, create_res.status_code)
+
+        update_url = reverse("artist_app.band-update", kwargs={"pk": band.id})
+        # update, should not result in exceptions
+        update_res = self.client.get(update_url)
         self.assertEqual(200, update_res.status_code)
