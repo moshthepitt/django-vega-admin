@@ -1,23 +1,21 @@
-"""
-Module for vega-admin test models
-"""
+"""Module for vega-admin test models."""
 from django.db import models
 
 
 class Artist(models.Model):
-    """
-    Artist Model class
-    """
+    """Artist Model class."""
 
     name = models.CharField(max_length=100)
 
     class Meta:
+        """Meta class def."""
+
         ordering = ["name"]
         verbose_name = "professional artist"
         verbose_name_plural = "professional artists"
 
     def __str__(self):
-        """Unicode representation of Song."""
+        """Unicode representation of Artist."""
         return self.name
 
 
@@ -48,4 +46,22 @@ class Song(models.Model):
 
     def __str__(self):
         """Unicode representation of Song."""
+        return self.name
+
+
+class Band(models.Model):
+    """Band Model class."""
+
+    created = models.DateTimeField(auto_now_add=True)
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        """Meta class def."""
+
+        ordering = ["created"]
+        verbose_name = "band"
+        verbose_name_plural = "bands"
+
+    def __str__(self):
+        """Unicode representation of Band."""
         return self.name
