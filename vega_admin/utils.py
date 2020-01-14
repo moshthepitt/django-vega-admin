@@ -89,7 +89,7 @@ def get_modelform(model: Model, fields: list = None, extra_fields: list = None):
         )
 
     if fields is None:
-        fields = [_.name for _ in model._meta.concrete_fields]
+        fields = [field.name for field in model._meta.concrete_fields if field.editable]
 
     widgets = {}
     # set the widgets for all date input fields
