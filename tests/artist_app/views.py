@@ -1,6 +1,4 @@
-"""
-Module for vega-admin test views
-"""
+"""Module for vega-admin test views."""
 from typing import List, Union
 
 from django.views.generic import TemplateView
@@ -25,66 +23,50 @@ from .forms import (
     SongForm,
     UpdateArtistForm,
 )
-from .models import Artist, Song
+from .models import Artist, Band, Song
 from .tables import ArtistTable
 
 
 class ArtistCreate(VegaCreateView):  # pylint: disable=too-many-ancestors
-    """
-    Artist CreateView class
-    """
+    """Artist CreateView class."""
 
     form_class = ArtistForm
     model = Artist
 
     def get_success_url(self):
-        """
-        Method to get success url
-        """
+        """Get success URL."""
         return "/edit/artists/create/"
 
 
 class ArtistUpdate(VegaUpdateView):  # pylint: disable=too-many-ancestors
-    """
-    Artist UpdateView class
-    """
+    """Artist UpdateView class."""
 
     form_class = ArtistForm
     model = Artist
 
     def get_success_url(self):
-        """
-        Method to get success url
-        """
+        """Get success URL."""
         return f"/edit/artists/edit/{self.object.id}"
 
 
 class ArtistDelete(VegaDeleteView):  # pylint: disable=too-many-ancestors
-    """
-    Artist DeleteView class
-    """
+    """Artist DeleteView class."""
 
     model = Artist
 
     def get_success_url(self):
-        """
-        Method to get success url
-        """
+        """Get success URL."""
         return "/edit/artists/create/"
 
 
 class ArtistRead(VegaDetailView):  # pylint: disable=too-many-ancestors
-    """
-    Artist detail view
-    """
+    """Artist detail view."""
 
     model = Artist
 
 
 class ArtistListView(VegaListView):  # pylint: disable=too-many-ancestors
-    """
-    Artist list view
-    """
+    """Artist list view."""
 
     model = Artist
     table_class = ArtistTable
@@ -92,9 +74,7 @@ class ArtistListView(VegaListView):  # pylint: disable=too-many-ancestors
 
 
 class SongCRUD(VegaCRUDView):
-    """
-    CRUD view for songs
-    """
+    """CRUD view for songs."""
 
     model = Song
     protected_actions: Union[None, List[str]] = None
@@ -108,15 +88,13 @@ class SongCRUD(VegaCRUDView):
 
 
 class CustomSongCRUD(SongCRUD):
-    """
-    CRUD view for songs with login protection
-    """
+    """CRUD view for songs with login protection."""
 
     class CustomListView(ArtistListView):  # pylint: disable=too-many-ancestors
-        """custom list view"""
+        """custom list view."""
 
     class FooView(SimpleURLPatternMixin, TemplateView):
-        """random template view"""
+        """random template view."""
 
         template_name = "artist_app/empty.html"
 
@@ -128,9 +106,7 @@ class CustomSongCRUD(SongCRUD):
 
 
 class PermsSongCRUD(CustomSongCRUD):
-    """
-    CRUD view for songs with permissions protection
-    """
+    """CRUD view for songs with permissions protection."""
 
     protected_actions = ["create", "update", "delete", "artists", "list", "view"]
     permissions_actions = ["create", "update", "delete", "artists", "view"]
@@ -139,9 +115,7 @@ class PermsSongCRUD(CustomSongCRUD):
 
 
 class ArtistCRUD(VegaCRUDView):
-    """
-    CRUD view for artists
-    """
+    """CRUD view for artists."""
 
     model = Artist
     protected_actions = None
@@ -149,23 +123,23 @@ class ArtistCRUD(VegaCRUDView):
 
 
 class CustomDefaultActions(ArtistCRUD):
-    """CRUD view with custom default actions"""
+    """CRUD view with custom default actions."""
 
     # pylint: disable=too-many-ancestors
     class CustomCreateView(ArtistCreate):
-        """custom Create view"""
+        """custom Create view."""
 
     class CustomUpdateView(ArtistUpdate):
-        """custom Update view"""
+        """custom Update view."""
 
     class CustomListView(ArtistListView):
-        """custom list view"""
+        """custom list view."""
 
     class CustomDeleteView(ArtistDelete):
-        """custom Delete view"""
+        """custom Delete view."""
 
     class CustomReadView(ArtistRead):
-        """custom Read view"""
+        """custom Read view."""
 
     view_classes = {
         "list": CustomListView,
@@ -178,11 +152,11 @@ class CustomDefaultActions(ArtistCRUD):
 
 
 class BrokenCRUD(VegaCRUDView):
-    """CRUD view with broken urls"""
+    """CRUD view with broken urls."""
 
     # pylint: disable=too-many-ancestors
     class BrokenListView(LoginRequiredMixin, VegaListView):
-        """View that is broken"""
+        """View that is broken."""
 
         model = Artist
 
@@ -194,20 +168,16 @@ class BrokenCRUD(VegaCRUDView):
 
 
 class Artist42CRUD(VegaCRUDView):
-    """
-    CRUD View that sets permission required for custom view class and action
-    """
+    """CRUD View that sets permission required for custom view class and action."""
 
     # pylint: disable=too-many-ancestors
     class CustListView(PermissionRequiredMixin, VegaListView):
-        """
-        Custom list view that has PermissionRequiredMixin
-        """
+        """Custom list view that has PermissionRequiredMixin."""
 
         model = Artist
 
     class FooView(SimpleURLPatternMixin, TemplateView):
-        """random template view"""
+        """random template view."""
 
         template_name = "artist_app/empty.html"
 
@@ -219,9 +189,7 @@ class Artist42CRUD(VegaCRUDView):
 
 
 class CustomArtistCRUD(VegaCRUDView):
-    """
-    CRUD view for artists with custom forms and table
-    """
+    """CRUD view for artists with custom forms and table."""
 
     model = Artist
     protected_actions = None
@@ -237,9 +205,7 @@ class CustomArtistCRUD(VegaCRUDView):
 
 
 class FilterSongCRUD(VegaCRUDView):
-    """
-    CRUD view for songs with filtering
-    """
+    """CRUD view for songs with filtering."""
 
     model = Song
     actions = ["list"]
@@ -249,14 +215,14 @@ class FilterSongCRUD(VegaCRUDView):
 
 
 class Filter2SongCRUD(VegaCRUDView):
-    """
-    CRUD view for songs with filtering
-    """
+    """CRUD view for songs with filtering."""
 
     class SongFilter(FilterSet):
-        """Song filter class"""
+        """Song filter class."""
 
         class Meta:
+            """Meta options."""
+
             model = Song
             fields = ["artist"]
 
@@ -269,10 +235,18 @@ class Filter2SongCRUD(VegaCRUDView):
 
 
 class PlainFormCRUD(VegaCRUDView):
-    """Vega CRUD view created with plain form"""
+    """Vega CRUD view created with plain form."""
 
     model = Artist
     permissions_actions = None
     form_class = PlainArtistForm
     actions = ["create", "update", "list"]
     crud_path = "plain-form"
+
+
+class BandCRUD(VegaCRUDView):
+    """CRUD view for songs."""
+
+    model = Band
+    protected_actions: Union[None, List[str]] = None
+    permissions_actions: Union[None, List[str]] = None

@@ -1,6 +1,4 @@
-"""
-Module for vega-admin test urls
-"""
+"""Module for vega-admin test urls."""
 from django.urls import path
 
 from . import views

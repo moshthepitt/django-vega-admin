@@ -1,6 +1,4 @@
-"""
-vega-admin mixins module
-"""
+"""vega-admin mixins module."""
 from typing import List
 
 from django.conf import settings
@@ -16,14 +14,10 @@ from vega_admin.forms import ListViewSearchForm
 
 
 class VegaFormKwargsMixin:  # pylint: disable=too-few-public-methods
-    """
-    Adds form kwargs
-    """
+    """Adds form kwargs."""
 
     def get_form_kwargs(self):
-        """
-        Adds kwargs to the form
-        """
+        """Add kwargs to the form."""
         kwargs = super().get_form_kwargs()
         kwargs["request"] = self.request
         return kwargs
@@ -31,26 +25,20 @@ class VegaFormKwargsMixin:  # pylint: disable=too-few-public-methods
 
 # pylint: disable=too-few-public-methods
 class VegaFormMixin(VegaFormKwargsMixin):
-    """
-    Adds some nice stuff to formviews used in create/update/delete views
-    """
+    """Adds some nice stuff to formviews used in create/update/delete views."""
 
 
 class VegaOrderedQuerysetMixin:
-    """
-    Optionally ensures querysets are ordered
-    """
+    """Optionally ensures querysets are ordered."""
 
     order_by = None
 
     def get_order_by(self):
-        """Get the field to use when ordering"""
+        """Get the field to use when ordering."""
         return self.order_by or settings.VEGA_ORDERING_FIELD
 
     def get_queryset(self):
-        """
-        Get the queryset
-        """
+        """Get the queryset."""
         queryset = super().get_queryset()
         if not queryset.ordered and settings.VEGA_FORCE_ORDERING:
             order_by = self.get_order_by()
@@ -60,18 +48,14 @@ class VegaOrderedQuerysetMixin:
 
 
 class ListViewSearchMixin:
-    """
-    Adds search to listview
-    """
+    """Adds search to listview."""
 
     form_class = ListViewSearchForm
     search_fields: List[str] = []
     filter_class = None
 
     def get_queryset(self):
-        """
-        Get the queryset
-        """
+        """Get the queryset."""
         queryset = super().get_queryset()
 
         if self.filter_class:
@@ -91,7 +75,7 @@ class ListViewSearchMixin:
         return queryset.distinct()
 
     def get_search_form_values(self):
-        """Get search form values"""
+        """Get search form values."""
         fields = []
         if self.filter_class:
             for field in self.filter_class.Meta.fields:
@@ -106,9 +90,7 @@ class ListViewSearchMixin:
         return result
 
     def get_context_data(self, **kwargs):
-        """
-        Get context data
-        """
+        """Get context data."""
         context = super().get_context_data(**kwargs)
         if self.search_fields or self.filter_class:
             form = self.form_class(request=self.request)
@@ -120,14 +102,10 @@ class ListViewSearchMixin:
 
 
 class VerboseNameMixin:
-    """
-    Sets the Model verbose name in the context data
-    """
+    """Sets the Model verbose name in the context data."""
 
     def get_context_data(self, **kwargs):
-        """
-        Get context data
-        """
+        """Get context data."""
         context = super().get_context_data(**kwargs)
         context["vega_verbose_name"] = self.model._meta.verbose_name
         context["vega_verbose_name_plural"] = self.model._meta.verbose_name_plural
@@ -135,23 +113,17 @@ class VerboseNameMixin:
 
 
 class PageTitleMixin:
-    """
-    Sets the page title in the context data
-    """
+    """Sets the page title in the context data."""
 
     def get_context_data(self, **kwargs):
-        """
-        Get context data
-        """
+        """Get context data."""
         context = super().get_context_data(**kwargs)
         context["vega_page_title"] = getattr(self, "page_title", None)
         return context
 
 
 class CRUDURLsMixin:
-    """
-    Mixin that adds some CRUD helper urls
-    """
+    """Mixin that adds some CRUD helper urls."""
 
     cancel_url = "/"
     cancel_url_name = None
@@ -170,7 +142,7 @@ class CRUDURLsMixin:
         self, url: str, url_name: str, url_kwargs: dict = None
     ):
         """
-        Helper function that returns a url
+        Return CRUD url.
 
         Attempt to use reverse_lazy to get the url, otherwise return what we
         hope are safe defaults
@@ -189,7 +161,7 @@ class CRUDURLsMixin:
 
     def get_create_url(self):
         """
-        Get the create url for the object in question
+        Get the create url for the object in question.
 
         :return: url
         """
@@ -197,7 +169,7 @@ class CRUDURLsMixin:
 
     def get_list_url(self):
         """
-        Get the cancel url for the object in question
+        Get the cancel url for the object in question.
 
         :return: url
         """
@@ -205,7 +177,7 @@ class CRUDURLsMixin:
 
     def get_update_url(self):
         """
-        Get the update url for the object in question
+        Get the update url for the object in question.
 
         :return: url
         """
@@ -217,7 +189,7 @@ class CRUDURLsMixin:
 
     def get_read_url(self):
         """
-        Get the read url for the object in question
+        Get the read url for the object in question.
 
         :return: url
         """
@@ -229,7 +201,7 @@ class CRUDURLsMixin:
 
     def get_delete_url(self):
         """
-        Get the delete url for the object in question
+        Get the delete url for the object in question.
 
         :return: url
         """
@@ -241,16 +213,14 @@ class CRUDURLsMixin:
 
     def get_cancel_url(self):
         """
-        Get the cancel url for the object in question
+        Get the cancel url for the object in question.
 
         :return: url
         """
         return self.get_crud_url(url=self.cancel_url, url_name=self.cancel_url_name)
 
     def get_context_data(self, **kwargs):
-        """
-        Get context data
-        """
+        """Get context data."""
         context = super().get_context_data(**kwargs)
         context["vega_create_url"] = self.get_create_url()
         context["vega_list_url"] = self.get_list_url()
@@ -262,9 +232,7 @@ class CRUDURLsMixin:
         return context
 
     def get_form_kwargs(self):
-        """
-        Adds kwargs to the form
-        """
+        """Add kwargs to the form."""
         kwargs = super().get_form_kwargs()
         url_kwargs = {"cancel_url": self.get_list_url()}
         kwargs[settings.VEGA_MODELFORM_KWARG] = url_kwargs
@@ -272,30 +240,28 @@ class CRUDURLsMixin:
 
 
 class ObjectTitleMixin:
-    """Mixin for getting object title"""
+    """Mixin for getting object title."""
 
     def get_title(self):
-        """
-        By default we just return the string representation of our object
-        """
+        """By default we just return the string representation of our object."""
         return str(self.object)
 
     def get_context_data(self, **kwargs):
-        """
-        Get context data
-        """
+        """Get context data."""
         context = super().get_context_data(**kwargs)
         context["vega_object_title"] = self.get_title()
         return context
 
 
 class DetailViewMixin:
-    """Mixin for detail views"""
+    """Mixin for detail views."""
 
     fields = None
 
     def get_fields(self):
         """
+        Get fields.
+
         We first default to using our 'fields' variable if available,
         otherwise we figure it out from our object.
         """
@@ -304,7 +270,7 @@ class DetailViewMixin:
         return [_.name for _ in self.object._meta.fields]
 
     def get_field_value(self, field):
-        """Get the value of a field"""
+        """Get the value of a field."""
         if field.is_relation:
             try:
                 return str(getattr(self.object, field.name))
@@ -314,7 +280,7 @@ class DetailViewMixin:
         return self.object._get_FIELD_display(field)
 
     def get_object_data(self):
-        """Returns a dict of the data in the object"""
+        """Return a dict of the data in the object."""
         result = {}
         fields_list = self.get_fields()
         for item in fields_list:
@@ -328,9 +294,7 @@ class DetailViewMixin:
         return result
 
     def get_context_data(self, **kwargs):
-        """
-        Get context data
-        """
+        """Get context data."""
         context = super().get_context_data(**kwargs)
         context["vega_read_fields"] = self.get_fields()
         context["vega_object_data"] = self.get_object_data()
@@ -338,14 +302,10 @@ class DetailViewMixin:
 
 
 class DeleteViewMixin:
-    """
-    Mixin for delete views that adds in missing elements
-    """
+    """Mixin for delete views that adds in missing elements."""
 
     def delete(self, request, *args, **kwargs):
-        """
-        Custom delete method
-        """
+        """Delete method."""
         # Handle cases where you get ProtectedError
         try:
             return super().delete(request, *args, **kwargs)
@@ -357,40 +317,30 @@ class DeleteViewMixin:
 
 
 class SimpleURLPatternMixin:
-    """
-    very simply implements the derive_url_pattern method
-    """
+    """Very simply implements the derive_url_pattern method."""
 
     @classmethod
     def derive_url_pattern(cls, crud_path: str, action: str):
-        """
-        Derive the url pattern
-        """
+        """Derive the url pattern."""
         return f"{crud_path}/{action}/"
 
 
 class ObjectURLPatternMixin:
-    """
-    Implements the derive_url_pattern method for single object views
-    """
+    """Implements the derive_url_pattern method for single object views."""
 
     @classmethod
     def derive_url_pattern(cls, crud_path: str, action: str):
-        """
-        Derive the url pattern
-        """
+        """Derive the url pattern."""
         return f"{crud_path}/{action}/<int:pk>/"
 
 
 class TimeStampedModel(models.Model):
-    """
-    Adds timestamps to a model class
-    """
+    """Adds timestamps to a model class."""
 
     created = models.DateTimeField(_("Created"), auto_now_add=True)
     modified = models.DateTimeField(_("Modified"), auto_now=True)
 
     class Meta:
-        """Meta class"""
+        """Meta class."""
 
         abstract = True
