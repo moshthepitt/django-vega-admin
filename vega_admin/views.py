@@ -566,7 +566,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         except NameError:
             # the view does not know how to derive a url pattern
             # we are forced to try something and hope it works :(
-            return f"{self.crud_path}/{action}/"
+            return f"{view_class.get_crud_path_pattern(self.crud_path, action)}/"
 
     def url_patterns(self, actions: list = None):
         """
