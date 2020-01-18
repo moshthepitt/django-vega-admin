@@ -1,6 +1,4 @@
-"""
-Setup.py for django-vega-admin
-"""
+"""Setup.py for django-vega-admin."""
 import os
 import sys
 
@@ -48,6 +46,7 @@ setup(
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
         "Framework :: Django",
         "Framework :: Django :: 2.2",
         "Framework :: Django :: 3.0",
