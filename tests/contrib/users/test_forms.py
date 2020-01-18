@@ -1,16 +1,15 @@
 """Test vega_admin.contrib.users.forms module"""
 
-from django.test import TestCase, override_settings
 from unittest.mock import patch
+
+from django.test import TestCase, override_settings
 
 from model_mommy import mommy
 
-from vega_admin.contrib.users.forms import (AddUserForm, EditUserForm,
-                                            PasswordChangeForm)
+from vega_admin.contrib.users.forms import AddUserForm, EditUserForm, PasswordChangeForm
 
 
-@override_settings(
-    ROOT_URLCONF="vega_admin.contrib.users.urls", VEGA_TEMPLATE="basic")
+@override_settings(ROOT_URLCONF="vega_admin.contrib.users.urls", VEGA_TEMPLATE="basic")
 class TestForms(TestCase):
     """
     Test class for vega_admin.contrib.users.forms
@@ -37,8 +36,8 @@ class TestForms(TestCase):
         self.assertEqual("moshthepitt", user.username)
         self.assertEqual("mosh@example.com", user.email)
         self.assertTrue(
-            self.client.login(
-                username="moshthepitt", password="Miserable-Water-9"))
+            self.client.login(username="moshthepitt", password="Miserable-Water-9")
+        )
 
         # good data no username
         good_data = {
@@ -94,8 +93,9 @@ class TestForms(TestCase):
         form = AddUserForm(data=bad_data)
         self.assertFalse(form.is_valid())
         self.assertEqual(1, len(form.errors.keys()))
-        self.assertEqual("You must provide one of email or username",
-                         form.errors["__all__"][0])
+        self.assertEqual(
+            "You must provide one of email or username", form.errors["__all__"][0]
+        )
 
     def test_edituserform(self):
         """
@@ -132,31 +132,32 @@ class TestForms(TestCase):
         self.assertTrue(form.is_valid())
         form.save()
         self.assertTrue(
-            self.client.login(
-                username="softie", password="PasswordChangeForm"))
+            self.client.login(username="softie", password="PasswordChangeForm")
+        )
 
         # weak password
         bad_data = {"password1": "123456789", "password2": "123456789"}
         form = PasswordChangeForm(instance=user, data=bad_data)
         self.assertFalse(form.is_valid())
         self.assertEqual(1, len(form.errors.keys()))
-        self.assertEqual("This password is too common.",
-                         form.errors["password2"][0])
-        self.assertEqual("This password is entirely numeric.",
-                         form.errors["password2"][1])
+        self.assertEqual("This password is too common.", form.errors["password2"][0])
+        self.assertEqual(
+            "This password is entirely numeric.", form.errors["password2"][1]
+        )
 
         # different passwords
-        bad_data = {
-            "password1": "PasswordChangeForm",
-            "password2": "123456789"
-        }
+        bad_data = {"password1": "PasswordChangeForm", "password2": "123456789"}
         form = PasswordChangeForm(instance=user, data=bad_data)
         self.assertFalse(form.is_valid())
         self.assertEqual(1, len(form.errors.keys()))
-        self.assertEqual("The two password fields didn't match.",
-                         form.errors["password2"][0])
+        # we have to replace ’ with '
+        # django 3.0 uses ’ while django 2.2 uses '
+        self.assertEqual(
+            "The two password fields didn't match.",
+            form.errors["password2"][0].replace("’", "'"),
+        )
 
-    @patch('vega_admin.contrib.users.forms.get_form_actions')
+    @patch("vega_admin.contrib.users.forms.get_form_actions")
     def test_password_change_form_cancel_url(self, mock):
         """Test cancel url on password change form"""
         user = mommy.make("auth.User")
