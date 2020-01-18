@@ -17,10 +17,10 @@ matrix:
       env: TOXENV=py37-django30
       dist: xenial
     - python: 3.8
-      env: TOXENV=py37-django22
+      env: TOXENV=py38-django22
       dist: xenial
     - python: 3.8
-      env: TOXENV=py37-django30
+      env: TOXENV=py38-django30
       dist: xenial
 services:
   - postgresql
