@@ -8,6 +8,7 @@ from django.db import models
 from django.db.models import ProtectedError, Q
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
+from django.utils.text import slugify
 from django.utils.translation import ugettext as _
 
 from vega_admin.forms import ListViewSearchForm
@@ -316,22 +317,31 @@ class DeleteViewMixin:
             return redirect(self.get_delete_url())
 
 
-class SimpleURLPatternMixin:
-    """Very simply implements the derive_url_pattern method."""
+class CRUDPathPatterMixin:
+    """Add method to get CRUD path URL pattern"""
+
+    @classmethod
+    def get_crud_path_pattern(cls, crud_path: str, action: str):
+        """Derive the CRUD path URL pattern."""
+        return f"{crud_path}/{slugify(action, allow_unicode=True)}"
+
+
+class SimpleURLPatternMixin(CRUDPathPatterMixin):
+    """Very simple implements the derive_url_pattern method."""
 
     @classmethod
     def derive_url_pattern(cls, crud_path: str, action: str):
         """Derive the url pattern."""
-        return f"{crud_path}/{action}/"
+        return f"{cls.get_crud_path_pattern(crud_path, action)}/"
 
 
-class ObjectURLPatternMixin:
+class ObjectURLPatternMixin(CRUDPathPatterMixin):
     """Implements the derive_url_pattern method for single object views."""
 
     @classmethod
     def derive_url_pattern(cls, crud_path: str, action: str):
         """Derive the url pattern."""
-        return f"{crud_path}/{action}/<int:pk>/"
+        return f"{cls.get_crud_path_pattern(crud_path, action)}/<int:pk>/"
 
 
 class TimeStampedModel(models.Model):

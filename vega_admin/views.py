@@ -1,6 +1,4 @@
-"""
-Views module
-"""
+"""Views module."""
 from typing import Any, Dict, List, Tuple, Union, cast
 
 from django.conf import settings
@@ -53,9 +51,7 @@ class VegaListView(
     VegaOrderedQuerysetMixin,
     ListView,
 ):
-    """
-    vega-admin Generic List View
-    """
+    """vega-admin Generic List View."""
 
     template_name = f"vega_admin/{settings.VEGA_TEMPLATE}/list.html"
 
@@ -69,9 +65,7 @@ class VegaCreateView(
     SimpleURLPatternMixin,
     CreateView,
 ):
-    """
-    vega-admin Generic Create View
-    """
+    """vega-admin Generic Create View."""
 
     template_name = f"vega_admin/{settings.VEGA_TEMPLATE}/create.html"
     form_valid_message = _(settings.VEGA_FORM_VALID_CREATE_TXT)
@@ -87,9 +81,7 @@ class VegaDetailView(
     DetailViewMixin,
     DetailView,
 ):
-    """
-    vega-admin Generic Detail View
-    """
+    """vega-admin Generic Detail View."""
 
     template_name = f"vega_admin/{settings.VEGA_TEMPLATE}/read.html"
 
@@ -104,9 +96,7 @@ class VegaUpdateView(
     ObjectTitleMixin,
     UpdateView,
 ):
-    """
-    vega-admin Generic Update View
-    """
+    """vega-admin Generic Update View."""
 
     template_name = f"vega_admin/{settings.VEGA_TEMPLATE}/update.html"
     form_valid_message = _(settings.VEGA_FORM_VALID_UPDATE_TXT)
@@ -123,9 +113,7 @@ class VegaDeleteView(
     ObjectTitleMixin,
     DeleteView,
 ):
-    """
-    vega-admin Generic Delete View
-    """
+    """vega-admin Generic Delete View."""
 
     template_name = f"vega_admin/{settings.VEGA_TEMPLATE}/delete.html"
     form_valid_message = _(settings.VEGA_FORM_VALID_DELETE_TXT)
@@ -134,7 +122,7 @@ class VegaDeleteView(
 
 class VegaCRUDView:  # pylint: disable=too-many-public-methods
     """
-    Creates generic CRUD views for a model automagically
+    Creates generic CRUD views for a model automagically.
 
     The intention is for you to give it at least a model and get back an entire
     set of CRUD views, with everything you need to start doing CRUD actions
@@ -166,12 +154,10 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
     table_class: Union[None, Table] = None
     paginate_by = 25
     crud_path: Union[None, str] = None
-    order_by: Union[None, str] = None
+    order_by: Union[None, List[str], str] = None
 
     def __init__(self, model=None):
-        """
-        Initialize!
-        """
+        """Initialize!."""
         if model is not None:
             self.model = model
         self.model_name = self.model._meta.model_name
@@ -181,48 +167,46 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
             self.crud_path = self.model._meta.label_lower
 
     def get_actions(self):
-        """Get actions"""
+        """Get actions."""
         custom_actions = self.get_view_classes().keys()
         custom_actions = [_ for _ in custom_actions if _ not in self.actions]
         return self.actions + custom_actions
 
     def get_view_classes(self):  # pylint: disable=no-self-use
-        """
-        Returns the available views
-        """
+        """Return the available views."""
         return self.view_classes
 
     def get_protected_actions(self):
-        """Get list of actions that have login protection"""
+        """Get list of actions that have login protection."""
         if isinstance(self.protected_actions, list):
             return self.protected_actions
         return []
 
     def get_permissions_actions(self):
-        """Get list of actions that have permissions protection"""
+        """Get list of actions that have permissions protection."""
         if isinstance(self.permissions_actions, list):
             return self.permissions_actions
         return []
 
     def get_permissions(self):
-        """Get list of permission names associated with this CRUD view"""
+        """Get list of permission names associated with this CRUD view."""
         actions = self.get_actions()
         return [self.get_permission_for_action(action) for action in actions]
 
     def get_search_fields(self):
-        """Get search fields for list view"""
+        """Get search fields for list view."""
         return self.search_fields
 
     def get_read_fields(self):
-        """Get read fields for read view"""
+        """Get read fields for read view."""
         return self.read_fields
 
     def get_filter_fields(self):
-        """Get filter fields for list view"""
+        """Get filter fields for list view."""
         return self.filter_fields
 
     def get_search_form_class(self):
-        """Get search form for list view"""
+        """Get search form for list view."""
         if self.search_form_class:  # pylint: disable=using-constant-test
             return self.search_form_class
 
@@ -238,9 +222,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         return None
 
     def get_createform_fields(self):
-        """
-        Get fields for create form
-        """
+        """Get fields for create form."""
         if self.create_fields:
             return self.create_fields
         if self.form_fields:
@@ -249,9 +231,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         return None
 
     def get_createform_class(self):
-        """
-        Get form class for create view
-        """
+        """Get form class for create view."""
         chosen_form = None
         if self.create_form_class:
             chosen_form = self.create_form_class
@@ -264,9 +244,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         return get_modelform(model=self.model, fields=self.get_createform_fields())
 
     def get_updateform_fields(self):
-        """
-        Get fields for update form
-        """
+        """Get fields for update form."""
         if self.update_fields:
             return self.update_fields
         if self.form_fields:
@@ -275,9 +253,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         return None
 
     def get_updateform_class(self):
-        """
-        Get form class for create view
-        """
+        """Get form class for create view."""
         chosen_form = None
         if self.update_form_class:
             chosen_form = self.update_form_class
@@ -290,27 +266,19 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         return get_modelform(model=self.model, fields=self.get_updateform_fields())
 
     def get_list_fields(self):
-        """
-        Get the list_fields
-        """
+        """Get the list_fields."""
         return self.list_fields
 
     def get_table_actions(self):
-        """
-        Get the table actions
-        """
+        """Get the table actions."""
         return self.table_actions
 
     def get_table_attrs(self):
-        """
-        Get the table_attrs
-        """
+        """Get the table_attrs."""
         return self.table_attrs
 
     def get_table_class(self):
-        """
-        Get the table class
-        """
+        """Get the table class."""
         if self.table_class:
             return self.table_class
 
@@ -328,7 +296,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         return get_table(**tables_kwargs)
 
     def get_filter_class(self):
-        """Get the filter class"""
+        """Get the filter class."""
         if self.filter_class:
             return self.filter_class
 
@@ -340,36 +308,36 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         return None
 
     def get_create_view_class(self):  # pylint: disable=no-self-use
-        """Get view class for create action"""
+        """Get view class for create action."""
         return VegaCreateView
 
     def get_update_view_class(self):  # pylint: disable=no-self-use
-        """Get view class for update action"""
+        """Get view class for update action."""
         return VegaUpdateView
 
     def get_read_view_class(self):  # pylint: disable=no-self-use
-        """Get view class for read action"""
+        """Get view class for read action."""
         return VegaDetailView
 
     def get_list_view_class(self):  # pylint: disable=no-self-use
-        """Get view class for list action"""
+        """Get view class for list action."""
         return VegaListView
 
     def get_delete_view_class(self):  # pylint: disable=no-self-use
-        """Get view class for delete action"""
+        """Get view class for delete action."""
         return VegaDeleteView
 
     def get_success_url(self):  # pylint: disable=no-self-use
-        """Get success_url"""
+        """Get success_url."""
         return reverse_lazy(self.get_url_name_for_action(settings.VEGA_LIST_ACTION))
 
     def get_cancel_url(self):  # pylint: disable=no-self-use
-        """Get cancel_url"""
+        """Get cancel_url."""
         return self.get_success_url()
 
     # pylint: disable=no-self-use
     def enforce_permission_protection(self, view_class: View, action: str):
-        """ensures view class has permission protection"""
+        """Ensure view class has permission protection."""
         has_perms_mixin = issubclass(view_class, PermissionRequiredMixin)
         has_login_mixin = issubclass(view_class, LoginRequiredMixin)
 
@@ -404,7 +372,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
 
     # pylint: disable=no-self-use
     def enforce_login_protection(self, view_class: View):
-        """ensures view class has login protection"""
+        """Ensure view class has login protection."""
         if issubclass(view_class, LoginRequiredMixin):
             return view_class
 
@@ -416,7 +384,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
         )
 
     def get_default_action_view_classes(self, action: str):
-        """Get view class for default actions"""
+        """Get view class for default actions."""
         if action == settings.VEGA_LIST_ACTION:
             return self.get_list_view_class()
         if action == settings.VEGA_CREATE_ACTION:
@@ -434,9 +402,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
     def get_view_class_for_action(  # pylint: disable=too-many-branches
         self, action: str
     ):
-        """
-        Get the view for an action
-        """
+        """Get the view for an action."""
         view_classes = self.get_view_classes()
         try:
             # return the view class if found
@@ -534,44 +500,34 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
 
     # pylint: disable=no-self-use
     def get_url_name_for_action(self, action: str):
-        """
-        Returns the url name for the action
-        """
+        """Return the url name for the action."""
         return f"{self.crud_path}-{action}"
 
     def get_permission_for_action(self, action: str):
-        """Get permission for action"""
+        """Get permission for action."""
         return f"{self.app_label}.{action}_{self.model_name}"
 
     def get_action_urlname(self, action: str):
-        """
-        Get tuple of action and url name
-        """
+        """Get tuple of action and url name."""
         return (action, self.get_url_name_for_action(action))
 
     def get_action_urlnames(self, actions: list = None):
-        """
-        Get list of tuples of (action, url_name)
-        """
+        """Get list of tuples of (action, url_name)."""
         if actions is None:
             actions = self.get_actions()
         return [self.get_action_urlname(_) for _ in actions]
 
     def get_url_pattern_for_action(self, view_class, action: str):
-        """
-        Returns the url pattern for the provided action
-        """
+        """Return the url pattern for the provided action."""
         try:
             return view_class.derive_url_pattern(self.crud_path, action)
         except NameError:
             # the view does not know how to derive a url pattern
             # we are forced to try something and hope it works :(
-            return f"{self.crud_path}/{action}/"
+            return f"{view_class.get_crud_path_pattern(self.crud_path, action)}/"
 
     def url_patterns(self, actions: list = None):
-        """
-        Returns the URL patters for the selected actions in this CRUD view
-        """
+        """Return the URL patters for the selected actions in this CRUD view."""
         if actions is None:
             actions = self.get_actions()
         urls = []
