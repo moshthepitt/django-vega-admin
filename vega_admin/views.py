@@ -166,7 +166,7 @@ class VegaCRUDView:  # pylint: disable=too-many-public-methods
     table_class: Union[None, Table] = None
     paginate_by = 25
     crud_path: Union[None, str] = None
-    order_by: Union[None, str] = None
+    order_by: Union[None, List[str], str] = None
 
     def __init__(self, model=None):
         """
