@@ -17,7 +17,7 @@ if sys.argv[-1] == "publish":
     os.system("twine upload dist/* --skip-existing")
     print("You probably want to also tag the version now:")
     print(
-        f"  git tag -a {vega_admin.__version__} -m 'version {vega_admin.__version__}'"
+        f"  git tag -a v{vega_admin.__version__} -m 'version {vega_admin.__version__}'"
     )
     print("  git push --tags")
     sys.exit()
