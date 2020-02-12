@@ -14,7 +14,7 @@ from django.utils.translation import ugettext as _
 import django_tables2 as tables
 from django_filters import FilterSet
 
-from vega_admin.crispy_utils import get_form_helper_class, get_layout
+from vega_admin.crispy_utils import get_default_formhelper, get_layout
 from vega_admin.mixins import VegaFormMixin
 
 
@@ -73,14 +73,7 @@ def get_modelform(model: Model, fields: list = None, extra_fields: list = None):
         self.vega_extra_kwargs = kwargs.pop(settings.VEGA_MODELFORM_KWARG, dict())
         super(modelform_class, self).__init__(*args, **kwargs)
         # add crispy forms FormHelper
-        self.helper = get_form_helper_class(
-            form_tag=True,
-            form_method="POST",
-            render_required_fields=True,
-            form_show_labels=True,
-            html5_required=True,
-            include_media=True,
-        )
+        self.helper = get_default_formhelper()
         self.helper.form_id = f"{self.model._meta.model_name}-form"
         self.helper.layout = get_layout(
             self.fields.keys(),
@@ -252,7 +245,8 @@ def customize_modelform(form_class: Union[forms.Form, forms.ModelForm]):
     """
     Add custom keyword arguments to a provided form class.
 
-    Adds the custom kwargs required for vega_admin, if they are missing.
+    - Adds the custom kwargs required for vega_admin, if they are missing.
+    - Adds a crispy form helper if missing
 
     Arguments:
         form_class {Union[Form, ModelForm]} -- the form class
@@ -279,6 +273,14 @@ def customize_modelform(form_class: Union[forms.Form, forms.ModelForm]):
                     settings.VEGA_MODELFORM_KWARG, dict()
                 )
                 super().__init__(*args, **kwargs)
+                if not hasattr(self, "helper"):
+                    self.helper = get_default_formhelper()
+                    self.helper.form_id = f"{self.Meta.model._meta.model_name}-form"
+                    self.helper.layout = get_layout(
+                        self.fields.keys(),
+                        with_actions=True,
+                        cancel_url=self.vega_extra_kwargs.get("cancel_url", "/"),
+                    )
 
         return VegaCustomFormClass
 
