@@ -38,8 +38,11 @@ class TestUtils(TestCase):
         self.assertTrue(issubclass(custom_form_class, PlainArtistForm))
         self.assertEqual("VegaCustomFormClass", custom_form_class.__name__)
 
+        # test that form kwargs have been set
         try:
-            custom_form_class(**{settings.VEGA_MODELFORM_KWARG: dict()})
+            custom_form_class(
+                **{"request": None, settings.VEGA_MODELFORM_KWARG: dict()}
+            )
         except TypeError:
             self.fail("Form kwargs have not been set properly")
 
