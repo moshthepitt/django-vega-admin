@@ -209,7 +209,6 @@ class TestCRUD(TestViewsBase):
 
     def test_custom_default_views(self):
         """Test custom default views."""
-
         artist = mommy.make("artist_app.Artist")
         url = reverse("custom-default-actions-list")
         res = self.client.get(url)
