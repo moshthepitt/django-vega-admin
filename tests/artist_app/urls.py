@@ -12,6 +12,7 @@ perms_crud_song_patterns = views.PermsSongCRUD().url_patterns()
 custom_default_patterns = views.CustomDefaultActions().url_patterns()
 patterns_42 = views.Artist42CRUD().url_patterns()
 plainform_patterns = views.PlainFormCRUD().url_patterns()
+create_artist_only_patterns = views.CreateOnlyCRUD().url_patterns()
 
 
 urlpatterns = (
@@ -30,4 +31,5 @@ urlpatterns = (
     + perms_crud_song_patterns
     + patterns_42
     + plainform_patterns
+    + create_artist_only_patterns
 )

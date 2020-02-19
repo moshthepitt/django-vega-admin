@@ -250,3 +250,13 @@ class BandCRUD(VegaCRUDView):
     model = Band
     protected_actions: Union[None, List[str]] = None
     permissions_actions: Union[None, List[str]] = None
+
+
+class CreateOnlyCRUD(VegaCRUDView):
+    """Vega CRUD view created with plain form."""
+
+    model = Artist
+    protected_actions: Union[None, List[str]] = None
+    permissions_actions: Union[None, List[str]] = None
+    actions = ["create"]
+    crud_path = "create-artist-only"
