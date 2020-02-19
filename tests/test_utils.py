@@ -7,6 +7,7 @@ from django.conf import settings
 from django.forms import CharField, ModelForm
 from django.test import TestCase, override_settings
 
+from crispy_forms.bootstrap import FormActions
 from django_filters import FilterSet
 from django_tables2 import Table
 from model_mommy import mommy
@@ -38,10 +39,24 @@ class TestUtils(TestCase):
         self.assertTrue(issubclass(custom_form_class, PlainArtistForm))
         self.assertEqual("VegaCustomFormClass", custom_form_class.__name__)
 
+        # test that form kwargs have been set
         try:
-            custom_form_class(**{settings.VEGA_MODELFORM_KWARG: dict()})
+            form = custom_form_class(
+                **{"request": None, settings.VEGA_MODELFORM_KWARG: dict()}
+            )
         except TypeError:
             self.fail("Form kwargs have not been set properly")
+        else:
+            self.assertTrue(hasattr(form, "helper"))
+            self.assertEqual(form.helper.form_method, "post")
+            self.assertEqual(form.helper.form_tag, True)
+            self.assertEqual(form.helper.form_show_labels, True)
+            self.assertEqual(form.helper.include_media, True)
+            self.assertEqual(form.helper.render_required_fields, True)
+            self.assertEqual(form.helper.html5_required, True)
+            self.assertEqual(form.helper.form_id, "artist-form")
+            self.assertEqual(form.helper.layout.fields[0], "name")
+            self.assertTrue(isinstance(form.helper.layout.fields[1], FormActions))
 
     def test_get_modelform(self):
         """Test get_modelform"""

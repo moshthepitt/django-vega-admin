@@ -79,6 +79,23 @@ def get_form_helper_class(  # pylint: disable=too-many-arguments,bad-continuatio
     return helper
 
 
+def get_default_formhelper():
+    """
+    Get form helper class with reasonable defaults.
+
+    This is simply for convenience because it represents a very commonly used
+    form helper class.
+    """
+    return get_form_helper_class(
+        form_method="POST",
+        form_tag=True,
+        form_show_labels=True,
+        include_media=True,
+        render_required_fields=True,
+        html5_required=True,
+    )
+
+
 def get_layout(  # pylint: disable=bad-continuation
     formfields: List[str], with_actions: bool = False, cancel_url: str = "/"
 ) -> Layout:
