@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-{% load staticfiles i18n %}
+{% load static i18n %}
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock %}</title>
     {% block meta_keywords %}<meta name="keywords" content="{% block meta_keywords_content %}{% endblock %}" />{% endblock %}
-    {% block meta_description %}<meta name="description" content="{% block meta_description_content %}{% endblock %}" />{% endblock %}    
+    {% block meta_description %}<meta name="description" content="{% block meta_description_content %}{% endblock %}" />{% endblock %}
     {% block other_meta %}{% endblock %}
 
     {% block css %}
-    <link rel="stylesheet" type="text/css" href="{% static 'badmin/bootstrap/css/bootstrap.min.css' %}" />    
-    <link rel="stylesheet" type="text/css" href="{% static 'badmin/css/styles.css' %}" />  
+    <link rel="stylesheet" type="text/css" href="{% static 'badmin/bootstrap/css/bootstrap.min.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'badmin/css/styles.css' %}" />
     {% block extracss %}{% endblock %}
-    {% endblock %}    
+    {% endblock %}
 
     {% block extrahead %}{% endblock %}
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -52,9 +52,9 @@
                   {{ message }}
                 </div>
                 {% endfor %}
-            {% endif %}  
+            {% endif %}
             </div>
-          </div>      
+          </div>
           {% endblock %}
           {% block page_content %}
           <div class="row page-content">
@@ -71,16 +71,16 @@
       </div>
     </div>
     <footer>
-         <div class="container">         
+         <div class="container">
             <div class="copy text-center">
                &copy; Vega Admin {% trans "2018" %} - {% now "Y" %}
-            </div>            
+            </div>
          </div>
     </footer>
     {% block js %}
     <script src="{% static 'badmin/js/jquery-2.2.4.min.js' %}"></script>
     <script src="{% static 'badmin/bootstrap/js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'badmin/js/custom.js' %}"></script>  
+    <script src="{% static 'badmin/js/custom.js' %}"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="{% static 'badmin/js/ie10-viewport-bug-workaround.js' %}"></script>
     {% block extrajs %}{% endblock %}
