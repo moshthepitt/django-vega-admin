@@ -13,6 +13,7 @@ if sys.argv[-1] == "publish":
     if os.system("pip freeze | grep twine"):
         print("twine not installed.\nUse `pip install twine`.\nExiting.")
         sys.exit()
+    os.system("rm -rf build/ *.egg-info/")
     os.system("python setup.py sdist bdist_wheel")
     os.system("twine upload dist/* --skip-existing")
     print("You probably want to also tag the version now:")
@@ -32,7 +33,7 @@ setup(
     author="Kelvin Jayanoris",
     author_email="kelvin@jayanoris.com",
     url="https://github.com/moshthepitt/django-vega-admin",
-    packages=find_packages(exclude=["docs", "tests"]),
+    packages=find_packages(exclude=["docs", "*.egg-info", "build", "tests.*", "tests"]),
     install_requires=[
         "Django >=2.2",
         "django-crispy-forms",
